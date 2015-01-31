@@ -86,7 +86,6 @@ void ExtensionSidebarEventRouter::OnStateChanged(
     if (!arguments->Get(0, &first_value))
       return true;
     if (first_value->GetType() == base::Value::TYPE_NULL)
-
       return true;
   }
   return false;
