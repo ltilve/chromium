@@ -1,14 +1,22 @@
+<<<<<<< HEAD
 // Copyright 2012 The Chromium Authors. All rights reserved.
+=======
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 #include "chrome/browser/ui/views/frame/browser_view_layout.h"
 
+<<<<<<< HEAD
 #include "base/observer_list.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_finder.h"
 #include "chrome/browser/ui/browser_window.h"
+=======
+#include "chrome/browser/sidebar/sidebar_manager.h"
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 #include "chrome/browser/ui/find_bar/find_bar.h"
 #include "chrome/browser/ui/find_bar/find_bar_controller.h"
 #include "chrome/browser/ui/search/search_model.h"
@@ -478,6 +486,7 @@ void BrowserViewLayout::LayoutContentsContainerView(int top, int bottom) {
   contents_container_->SetBoundsRect(contents_container_bounds);
 }
 
+<<<<<<< HEAD
 void BrowserViewLayout::UpdateTopContainerBounds() {
   // Set the bounds of the top container view such that it is tall enough to
   // fully show all of its children. In particular, the bottom of the bookmark
@@ -509,6 +518,84 @@ void BrowserViewLayout::UpdateTopContainerBounds() {
       immersive_mode_controller_->GetTopContainerVerticalOffset(
           top_container_bounds.size()));
   top_container_->SetBoundsRect(top_container_bounds);
+=======
+void BrowserViewLayout::LayoutTabContents(int top, int bottom) {
+  // The ultimate idea is to calcualte bounds and reserved areas for all
+  // contents views first and then resize them all, so every view
+  // (and its contents) is resized and laid out only once.
+
+  // The views hierarcy (see browser_view.h for more details):
+  // 1) Sidebar is not allowed:
+  //     contents_split_ -> [contents_container_ | devtools]
+  // 2) Sidebar is allowed:
+  //     contents_split_ ->
+  //         [sidebar_split -> [contents_container_ | sidebar]] | devtools
+
+  gfx::Rect sidebar_split_bounds;
+  gfx::Rect contents_bounds;
+  gfx::Rect sidebar_bounds;
+  gfx::Rect devtools_bounds;
+
+  gfx::Rect contents_split_bounds(vertical_layout_rect_.x(), top,
+                                  vertical_layout_rect_.width(),
+                                  std::max(0, bottom - top));
+  contents_split_->CalculateChildrenBounds(
+      contents_split_bounds, &sidebar_split_bounds, &devtools_bounds);
+  gfx::Point contents_split_offset(
+      contents_split_bounds.x() - contents_split_->bounds().x(),
+      contents_split_bounds.y() - contents_split_->bounds().y());
+  gfx::Point sidebar_split_offset(contents_split_offset);
+  sidebar_split_offset.Offset(sidebar_split_bounds.x(),
+                              sidebar_split_bounds.y());
+
+  views::SingleSplitView* sidebar_split = browser_view_->sidebar_split_;
+  if (sidebar_split) {
+    DCHECK(sidebar_split == contents_split_->child_at(0));
+    sidebar_split->CalculateChildrenBounds(
+        sidebar_split_bounds, &contents_bounds, &sidebar_bounds);
+  } else {
+    contents_bounds = sidebar_split_bounds;
+  }
+
+  // Layout resize corner, sidebar mini tabs and calculate reserved contents
+  // rects here as all contents view bounds are already determined, but not yet
+  // set at this point, so contents will be laid out once at most.
+  // TODO(alekseys): layout sidebar minitabs and adjust reserved rect
+  // accordingly.
+  gfx::Rect browser_reserved_rect;
+  if (!browser_view_->frame_->IsMaximized() &&
+      !browser_view_->frame_->IsFullscreen()) {
+    gfx::Size resize_corner_size = browser_view_->GetResizeCornerSize();
+    if (!resize_corner_size.IsEmpty()) {
+      gfx::Rect bounds = browser_view_->GetContentsBounds();
+      gfx::Point resize_corner_origin(
+          bounds.right() - resize_corner_size.width(),
+          bounds.bottom() - resize_corner_size.height());
+      browser_reserved_rect =
+          gfx::Rect(resize_corner_origin, resize_corner_size);
+    }
+  }
+
+  UpdateReservedContentsRect(browser_reserved_rect,
+                             browser_view_->contents_container_,
+                             contents_bounds,
+                             sidebar_split_offset);
+  if (sidebar_split) {
+    UpdateReservedContentsRect(browser_reserved_rect,
+                               browser_view_->sidebar_container_,
+                               sidebar_bounds,
+                               sidebar_split_offset);
+  }
+  UpdateReservedContentsRect(browser_reserved_rect,
+                             browser_view_->devtools_container_,
+                             devtools_bounds,
+                             contents_split_offset);
+
+  // Now it's safe to actually resize all contents views in the hierarchy.
+  contents_split_->SetBoundsRect(contents_split_bounds);
+  if (sidebar_split)
+    sidebar_split->SetBoundsRect(sidebar_split_bounds);
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 }
 
 int BrowserViewLayout::GetContentsOffsetForBookmarkBar() {
@@ -520,9 +607,25 @@ int BrowserViewLayout::GetContentsOffsetForBookmarkBar() {
     return 0;
   }
 
+<<<<<<< HEAD
   // Offset for the detached bookmark bar.
   return bookmark_bar_->height() -
       bookmark_bar_->GetFullyDetachedToolbarOverlap();
+=======
+  if (contents_split_->child_at(1) && contents_split_->child_at(1)->visible())
+    return 0;
+
+  if (SidebarManager::IsSidebarAllowed()) {
+    views::View* sidebar_split = contents_split_->child_at(0);
+    if (sidebar_split->child_count() >= 2 &&
+        sidebar_split->child_at(1)->visible())
+      return 0;
+  }
+
+  // Adjust for separator.
+  return active_bookmark_bar_->height() -
+      views::NonClientFrameView::kClientEdgeThickness;
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 }
 
 int BrowserViewLayout::LayoutDownloadShelf(int bottom) {

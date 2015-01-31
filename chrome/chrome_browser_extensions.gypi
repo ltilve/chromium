@@ -82,6 +82,8 @@
       'browser/apps/shortcut_manager_factory.h',
       'browser/copresence/chrome_whispernet_client.cc',
       'browser/copresence/chrome_whispernet_client.h',
+      'browser/extensions/extension_sidebar_api.cc',
+      'browser/extensions/extension_sidebar_api.h',
       'browser/extensions/active_install_data.cc',
       'browser/extensions/active_install_data.h',
       'browser/extensions/active_script_controller.cc',

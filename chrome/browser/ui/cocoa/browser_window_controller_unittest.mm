@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -69,6 +69,10 @@ using ::testing::Return;
 
 - (NSView*)findBarView {
   return [findBarCocoaController_ view];
+}
+
+- (NSView*)sidebarView {
+  return [sidebarController_ view];
 }
 
 - (BOOL)bookmarkBarVisible {
@@ -720,6 +724,21 @@ TEST_F(BrowserWindowControllerTest, TestSigninMenuItemNoErrors) {
   EXPECT_TRUE([[syncMenuItem title] isEqualTo:alreadySignedIn]);
   EXPECT_FALSE([syncMenuItem isHidden]);
 }
+
+// Tests that the sidebar view and devtools view are both non-opaque.
+TEST_F(BrowserWindowControllerTest, TestSplitViewsAreNotOpaque) {
+  // Add a subview to the sidebar view to mimic what happens when a tab is added
+  // to the window.  NSSplitView only marks itself as non-opaque when one of its
+  // subviews is non-opaque, so the test will not pass without this subview.
+  base::scoped_nsobject<NSView> view(
+      [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 10, 10)]);
+  [[controller_ sidebarView] addSubview:view];
+
+  EXPECT_FALSE([[controller_ tabContentArea] isOpaque]);
+  EXPECT_FALSE([[[controller_ devToolsController] view] isOpaque]);
+  EXPECT_FALSE([[controller_ sidebarView] isOpaque]);
+}
+
 
 TEST_F(BrowserWindowControllerTest, TestSigninMenuItemAuthError) {
   base::scoped_nsobject<NSMenuItem> syncMenuItem(

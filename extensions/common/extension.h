@@ -23,6 +23,7 @@
 #include "extensions/common/extension_resource.h"
 #include "extensions/common/install_warning.h"
 #include "extensions/common/manifest.h"
+#include "extensions/common/extension_sidebar_defaults.h"
 #include "extensions/common/url_pattern_set.h"
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/gfx/geometry/size.h"
@@ -210,6 +211,7 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
 
   // The mimetype used for extensions.
   static const char kMimeType[];
+  static const int kSidebarIconMaxSize;
 
   // See Type definition in Manifest.
   Manifest::Type GetType() const;
@@ -360,6 +362,9 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
 
   void AddWebExtentPattern(const URLPattern& pattern);
   const URLPatternSet& web_extent() const { return extent_; }
+  ExtensionSidebarDefaults* sidebar_defaults() const {
+    return sidebar_defaults_.get();
+  }
 
  private:
   friend class base::RefCountedThreadSafe<Extension>;
@@ -402,7 +407,9 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
   bool LoadDescription(base::string16* error);
   bool LoadManifestVersion(base::string16* error);
   bool LoadShortName(base::string16* error);
-
+  bool LoadSidebarFeatures(base::string16* error);
+  ExtensionSidebarDefaults* LoadExtensionSidebarDefaults(
+    const base::DictionaryValue* extension_sidebar, base::string16* error);
   bool CheckMinimumChromeVersion(base::string16* error) const;
 
   // The extension's human-readable name. Name is used for display purpose. It
@@ -473,7 +480,8 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
 
   // Set to true at the end of InitValue when initialization is finished.
   bool finished_parsing_manifest_;
-
+  // The extension's sidebar, if any.
+  scoped_ptr<ExtensionSidebarDefaults> sidebar_defaults_;
   // Ensures that any call to GetManifestData() prior to finishing
   // initialization happens from the same thread (this can happen when certain
   // parts of the initialization process need information from previous parts).
