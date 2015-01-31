@@ -9,7 +9,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/values.h"
-//#include "chrome/browser/extensions/extension_event_router.h"
+#include "extensions/browser/event_router.h"
 #include "chrome/browser/extensions/chrome_extension_function.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
@@ -29,13 +29,13 @@ using content::WebContents;
 
 namespace {
 // Errors.
-/*const char kNoSidebarError[] =
+const char kNoSidebarError[] =
     "This extension has no sidebar specified.";
 const char kNoTabError[] = "No tab with id: *.";
 const char kNoCurrentWindowError[] = "No current browser window was found";
 const char kNoDefaultTabError[] = "No default tab was found";
-const char kInvalidExpandContextError[] =
-    "Sidebar can be expanded only in response to an explicit user gesture";
+//const char kInvalidExpandContextError[] =
+//    "Sidebar can be expanded only in response to an explicit user gesture";
 // Keys.
 const char kBadgeTextKey[] = "text";
 const char kImageDataKey[] = "imageData";
@@ -51,14 +51,14 @@ namespace extension_sidebar_constants {
 // Sidebar states.
 const char kActiveState[] = "active";
 const char kHiddenState[] = "hidden";
-const char kShownState[] = "shown";*/
+const char kShownState[] = "shown";
 }  // namespace extension_sidebar_constants
 
 // static
 void ExtensionSidebarEventRouter::OnStateChanged(
     Profile* profile, content::WebContents* tab, const std::string& content_id,
     const std::string& state) {
-  /*int tab_id = extensions::ExtensionTabUtil::GetTabId(tab);
+  int tab_id = extensions::ExtensionTabUtil::GetTabId(tab);
   base::DictionaryValue* details = new base::DictionaryValue;
   details->SetInteger(kTabIdKey, tab_id);
   details->SetString(kStateKey, state);
@@ -67,38 +67,43 @@ void ExtensionSidebarEventRouter::OnStateChanged(
   args.Set(0, details);
   std::string json_args;
   base::JSONWriter::Write(&args, &json_args);
-  */
-  //TODO(me):GetExtensionEventRouter?
-  //profile->GetExtensionEventRouter()->DispatchEventToExtension(
-  //    extension_sidebar_utils::GetExtensionIdByContentId(content_id),
-  //    kOnStateChanged, json_args, profile, GURL());
+  
+  scoped_ptr<base::ListValue> event_args(new base::ListValue());
+  event_args->Append(new base::StringValue(json_args));
+
+  extensions::EventRouter* router = extensions::EventRouter::Get(profile);
+  scoped_ptr<extensions::Event> event(new extensions::Event(
+      kOnStateChanged, event_args.Pass()));
+  event->restrict_to_browser_context = profile;
+
+  router->DispatchEventToExtension(
+      extension_sidebar_utils::GetExtensionIdByContentId(content_id),
+      event.Pass());
 }
 
 
 // List is considered empty if it is actually empty or contains just one value,
 // either 'null' or 'undefined'.
-/*static bool IsArgumentListEmpty(const base::ListValue* arguments) {
+static bool IsArgumentListEmpty(const base::ListValue* arguments) {
   if (arguments->empty())
     return true;
   if (arguments->GetSize() == 1) {
-    TODO(me):
-    base::Value* first_value = 0;
+    const base::Value* first_value = 0;
     if (!arguments->Get(0, &first_value))
       return true;
     if (first_value->GetType() == base::Value::TYPE_NULL)
       return true;
   }
   return false;
-}*/
+}
 
 
 bool SidebarFunction::RunSync() {
-  // TODO(me):sidebar_defaults?
-  //if (!GetExtension()->sidebar_defaults()) {
-  //  error_ = kNoSidebarError;
-  //  return false;
-  //}
-/*
+  if (!extension()->sidebar_defaults()) {
+    error_ = kNoSidebarError;
+    return false;
+  }
+
   if (!args_.get())
     return false;
 
@@ -111,11 +116,11 @@ bool SidebarFunction::RunSync() {
   }
 
   int tab_id;
-//  content::WebContents* tab_contents = NULL;
+  content::WebContents* web_contents = NULL;
   if (details->HasKey(kTabIdKey)) {
     EXTENSION_FUNCTION_VALIDATE(details->GetInteger(kTabIdKey, &tab_id));
     if (!extensions::ExtensionTabUtil::GetTabById(tab_id, GetProfile(), include_incognito(),
-                                      NULL, NULL, &tab_contents, NULL)) {
+                                      NULL, NULL, &web_contents, NULL)) {
       error_ = extensions::ErrorUtils::FormatErrorMessage(
           kNoTabError, base::IntToString(tab_id));
       return false;
@@ -126,46 +131,39 @@ bool SidebarFunction::RunSync() {
       error_ = kNoCurrentWindowError;
       return false;
     }
-    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &tab_contents, &tab_id)) {
+    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &web_contents, &tab_id)) {
       error_ = kNoDefaultTabError;
       return false;
     }
   }
-  if (!tab_contents)
+  if (!web_contents)
     return false;
 
-  std::string content_id(GetExtension()->id());
-  return RunImpl(static_cast<content::WebContents*>(tab_contents->web_contents()),
+  std::string content_id(extension()->id());
+  return RunImpl(static_cast<content::WebContents*>(web_contents),
                  content_id, *details);
-                 */
 return true;
 }
 
 
-bool CollapseSidebarFunction::RunImpl(TabContents* tab,
+bool CollapseSidebarFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
-  //SidebarManager::GetInstance()->CollapseSidebar(tab, content_id);
+  SidebarManager::GetInstance()->CollapseSidebar(tab, content_id);
   return true;
 }
 
-bool ExpandSidebarFunction::RunImpl(TabContents* tab,
+bool ExpandSidebarFunction::RunImpl(content::WebContents* tab,
                                     const std::string& content_id,
                                     const base::DictionaryValue& details) {
-  // TODO(alekseys): enable this check back when WebKit's user gesture flag
-  // reporting for extension calls is fixed.
-  // if (!user_gesture()) {
-  //  error_ = kInvalidExpandContextError;
-  //  return false;
-  // }
-//  SidebarManager::GetInstance()->ExpandSidebar(tab, content_id);
+  SidebarManager::GetInstance()->ExpandSidebar(tab, content_id);
   return true;
 }
 
-bool GetStateSidebarFunction::RunImpl(TabContents* tab,
+bool GetStateSidebarFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
- /* SidebarManager* manager = SidebarManager::GetInstance();
+  SidebarManager* manager = SidebarManager::GetInstance();
 
   const char* result = extension_sidebar_constants::kHiddenState;
   if (manager->GetSidebarTabContents(tab, content_id)) {
@@ -188,7 +186,7 @@ bool GetStateSidebarFunction::RunImpl(TabContents* tab,
         content::WebContents* contents = NULL;
         int default_tab_id = -1;
         if (browser &&
-            ExtensionTabUtil::GetDefaultTab(browser, &contents,
+            extensions::ExtensionTabUtil::GetDefaultTab(browser, &contents,
                                             &default_tab_id)) {
           is_active = default_tab_id == tab_id;
         }
@@ -199,68 +197,68 @@ bool GetStateSidebarFunction::RunImpl(TabContents* tab,
                          extension_sidebar_constants::kShownState;
   }
 
-  //result_.reset(Value::CreateStringValue(result));*/
+  SetResult(new base::StringValue(result));
   return true;
 }
 
-bool HideSidebarFunction::RunImpl(TabContents* tab,
+bool HideSidebarFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,
                                   const base::DictionaryValue& details) {
-  //SidebarManager::GetInstance()->HideSidebar(tab, content_id);
+  SidebarManager::GetInstance()->HideSidebar(tab, content_id);
   return true;
 }
 
-bool NavigateSidebarFunction::RunImpl(TabContents* tab,
+bool NavigateSidebarFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
-/*  std::string path_string;
+ std::string path_string;
   EXTENSION_FUNCTION_VALIDATE(details.GetString(kPathKey, &path_string));
 
   GURL url = extension_sidebar_utils::ResolveRelativePath(
-      path_string, GetExtension(), &error_);
+      path_string, extension(), &error_);
   if (!url.is_valid())
     return false;
 
-  SidebarManager::GetInstance()->NavigateSidebar(tab, content_id, url);*/
+  SidebarManager::GetInstance()->NavigateSidebar(tab, content_id, url);
   return true;
 }
 
-bool SetBadgeTextSidebarFunction::RunImpl(TabContents* tab,
+bool SetBadgeTextSidebarFunction::RunImpl(content::WebContents* tab,
                                           const std::string& content_id,
                                           const base::DictionaryValue& details) {
-  /*string16 badge_text;
+  base::string16 badge_text;
   EXTENSION_FUNCTION_VALIDATE(details.GetString(kBadgeTextKey, &badge_text));
   SidebarManager::GetInstance()->SetSidebarBadgeText(
-      tab, content_id, badge_text);*/
+      tab, content_id, badge_text);
   return true;
 }
 
-bool SetIconSidebarFunction::RunImpl(TabContents* tab,
+bool SetIconSidebarFunction::RunImpl(content::WebContents* tab,
                                      const std::string& content_id,
                                      const base::DictionaryValue& details) {
-  /*base::BinaryValue* binary;
+  const base::BinaryValue* binary = 0;
   EXTENSION_FUNCTION_VALIDATE(details.GetBinary(kImageDataKey, &binary));
   IPC::Message bitmap_pickle(binary->GetBuffer(), binary->GetSize());
-  void* iter = NULL;
+  PickleIterator iter(bitmap_pickle);
   scoped_ptr<SkBitmap> bitmap(new SkBitmap);
   EXTENSION_FUNCTION_VALIDATE(
       IPC::ReadParam(&bitmap_pickle, &iter, bitmap.get()));
-  SidebarManager::GetInstance()->SetSidebarIcon(tab, content_id, *bitmap);*/
+  SidebarManager::GetInstance()->SetSidebarIcon(tab, content_id, *bitmap);
   return true;
 }
 
-bool SetTitleSidebarFunction::RunImpl(TabContents* tab,
+bool SetTitleSidebarFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
-  /*string16 title;
+  base::string16 title;
   EXTENSION_FUNCTION_VALIDATE(details.GetString(kTitleKey, &title));
-  SidebarManager::GetInstance()->SetSidebarTitle(tab, content_id, title);*/
+  SidebarManager::GetInstance()->SetSidebarTitle(tab, content_id, title);
   return true;
 }
 
-bool ShowSidebarFunction::RunImpl(TabContents* tab,
+bool ShowSidebarFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,
                                   const base::DictionaryValue& details) {
-  //SidebarManager::GetInstance()->ShowSidebar(tab, content_id);
+  SidebarManager::GetInstance()->ShowSidebar(tab, content_id);
   return true;
 }

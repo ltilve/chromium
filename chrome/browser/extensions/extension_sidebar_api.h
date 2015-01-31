@@ -6,10 +6,9 @@
 #define CHROME_BROWSER_EXTENSIONS_EXTENSION_SIDEBAR_API_H_
 
 #include <string>
-#include "extensions/browser/extension_function.h"
+#include "chrome/browser/extensions/chrome_extension_function.h"
 
 class Profile;
-class TabContents;
 
 namespace base {
 class DictionaryValue;
@@ -38,21 +37,21 @@ class ExtensionSidebarEventRouter {
 };
 
 // Base class for sidebar function APIs.
-class SidebarFunction : public SyncExtensionFunction {
+class SidebarFunction : public ChromeSyncExtensionFunction {
  public:
   bool RunSync() override;
  protected:
   ~SidebarFunction() override {};
 
  private:
-  virtual bool RunImpl(TabContents* tab,
+  virtual bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) = 0;
 };
 
 class CollapseSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
  protected:
@@ -63,7 +62,7 @@ class CollapseSidebarFunction : public SidebarFunction {
 
 class ExpandSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
  protected:
@@ -74,7 +73,7 @@ class ExpandSidebarFunction : public SidebarFunction {
 
 class GetStateSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -85,7 +84,7 @@ protected:
 
 class HideSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -96,7 +95,7 @@ protected:
 
 class NavigateSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -107,7 +106,7 @@ protected:
 
 class SetBadgeTextSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -118,7 +117,7 @@ protected:
 
 class SetIconSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -129,7 +128,7 @@ protected:
 
 class SetTitleSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
@@ -140,7 +139,7 @@ protected:
 
 class ShowSidebarFunction : public SidebarFunction {
  private:
-  bool RunImpl(TabContents* tab,
+  bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
