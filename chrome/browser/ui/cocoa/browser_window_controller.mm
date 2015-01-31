@@ -60,6 +60,7 @@
 #import "chrome/browser/ui/cocoa/profiles/avatar_base_controller.h"
 #import "chrome/browser/ui/cocoa/profiles/avatar_button_controller.h"
 #import "chrome/browser/ui/cocoa/profiles/avatar_icon_controller.h"
+#import "chrome/browser/ui/cocoa/sidebar_controller.h"
 #import "chrome/browser/ui/cocoa/status_bubble_mac.h"
 #import "chrome/browser/ui/cocoa/tab_contents/overlayable_contents_controller.h"
 #import "chrome/browser/ui/cocoa/tab_contents/sad_tab_controller.h"
@@ -326,13 +327,21 @@ using content::WebContents;
     [[devToolsController_ view] setFrame:[[self tabContentArea] bounds]];
     [[self tabContentArea] addSubview:[devToolsController_ view]];
 
+
+    // Create a sub-controller for the docked sidebar and add its view to the
+    // hierarchy.  This must happen before the previewable contents controller
+    // is instantiated.
+    //TODO(me):here self should be another
+    sidebarController_.reset([[SidebarController alloc] init]);
+    [[sidebarController_ view] setFrame:[[devToolsController_ view] bounds]];
+    [[devToolsController_ view] addSubview:[sidebarController_ view]];
     // Create the overlayable contents controller.  This provides the switch
     // view that TabStripController needs.
     overlayableContentsController_.reset(
         [[OverlayableContentsController alloc] initWithBrowser:browser]);
     [[overlayableContentsController_ view]
-        setFrame:[[devToolsController_ view] bounds]];
-    [[devToolsController_ view]
+        setFrame:[[sidebarController_ view] bounds]];
+    [[sidebarController_ view]
         addSubview:[overlayableContentsController_ view]];
 
     // Create a controller for the tab strip, giving it the model object for
@@ -449,6 +458,7 @@ using content::WebContents;
 
     // We are done initializing now.
     initializing_ = NO;
+
   }
   return self;
 }
@@ -568,6 +578,11 @@ using content::WebContents;
                                             withProfile:browser_->profile()];
   if (layout_changed && [findBarCocoaController_ isFindBarVisible])
     [self layoutSubviews];
+}
+
+- (void)updateSidebarForContents:(content::WebContents*)contents {
+  [sidebarController_ updateSidebarForTabContents:contents];
+  [sidebarController_ ensureContentsVisible];
 }
 
 // Called when the user wants to close a window or from the shutdown process.
@@ -1653,6 +1668,9 @@ using content::WebContents;
   windowShim_->UpdateTitleBar();
 
   // Update the bookmark bar.
+
+  [sidebarController_ updateSidebarForTabContents:
+      static_cast<content::WebContents*>(contents)];
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?
   windowShim_->BookmarkBarStateChanged(
@@ -1667,6 +1685,9 @@ using content::WebContents;
   // crbug.com/340720
   PermissionBubbleManager::FromWebContents(contents)->SetView(
       permissionBubbleCocoa_.get());
+
+  // Update devTools and sidebar contents after size for all views is set.
+  [sidebarController_ ensureContentsVisible];
 
   // Must do this after bookmark and infobar updates to avoid
   // unnecesary resize in contents.

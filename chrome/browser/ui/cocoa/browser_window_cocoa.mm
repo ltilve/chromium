@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -13,7 +13,7 @@
 #include "base/strings/string_util.h"
 #include "base/strings/sys_string_conversions.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/chrome_notification_types.h"
+#include "chrome/common/chrome_notification_types.h"
 #include "chrome/browser/download/download_shelf.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/fullscreen.h"
@@ -21,6 +21,10 @@
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
+#include "chrome/browser/ui/app_list/app_list_util.h"
+#include "chrome/browser/ui/app_list/app_list_service.h"
+#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands_mac.h"
@@ -130,6 +134,10 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
     controller_(controller),
     initial_show_state_(ui::SHOW_STATE_DEFAULT),
     attention_request_id_(0) {
+
+  registrar_.Add(
+      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
+      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 
   gfx::Rect bounds;
   chrome::GetSavedWindowBoundsAndShowState(browser_,
@@ -312,6 +320,8 @@ void BrowserWindowCocoa::BookmarkBarStateChanged(
 void BrowserWindowCocoa::UpdateDevTools() {
   [controller_ updateDevToolsForContents:
       browser_->tab_strip_model()->GetActiveWebContents()];
+  UpdateSidebarForContents(
+          browser_->tab_strip_model()->GetActiveWebContents());
 }
 
 void BrowserWindowCocoa::UpdateLoadingAnimations(bool should_animate) {
@@ -785,6 +795,20 @@ void BrowserWindowCocoa::ModelChanged(const SearchModel::State& old_state,
                                       const SearchModel::State& new_state) {
 }
 
+void BrowserWindowCocoa::Observe(int type,
+                                 const content::NotificationSource& source,
+                                 const content::NotificationDetails& details) {
+  switch (type) {
+    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
+      UpdateSidebarForContents(
+          content::Details<SidebarContainer>(details)->tab_contents());
+      break;
+    default:
+      NOTREACHED();  // we don't ask for anything else!
+      break;
+  }
+}
+
 void BrowserWindowCocoa::DestroyBrowser() {
   [controller_ destroyBrowser];
 
@@ -806,6 +830,12 @@ void BrowserWindowCocoa::ShowAvatarBubbleFromAvatarButton(
   [controller showAvatarBubbleAnchoredAt:anchor
                                 withMode:mode
                          withServiceType:manage_accounts_params.service_type];
+}
+
+void BrowserWindowCocoa::UpdateSidebarForContents(content::WebContents* tab_contents) {
+  if (tab_contents == browser_->tab_strip_model()->GetActiveWebContents()) {
+    [controller_ updateSidebarForContents:tab_contents];
+  }
 }
 
 int

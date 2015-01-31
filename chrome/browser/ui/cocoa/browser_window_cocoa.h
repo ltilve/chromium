@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -34,6 +34,7 @@ class Extension;
 class BrowserWindowCocoa :
     public BrowserWindow,
     public extensions::ExtensionKeybindingRegistry::Delegate,
+    public content::NotificationObserver,
     public SearchModelObserver {
  public:
   BrowserWindowCocoa(Browser* browser,
@@ -157,6 +158,10 @@ class BrowserWindowCocoa :
   int GetRenderViewHeightInsetWithDetachedBookmarkBar() override;
   void ExecuteExtensionCommand(const extensions::Extension* extension,
                                const extensions::Command& command) override;
+  // content::NotificationObserver overrides:
+  void Observe(int type,
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
 
   // Overridden from ExtensionKeybindingRegistry::Delegate:
   extensions::ActiveTabPermissionGranter* GetActiveTabPermissionGranter()
@@ -177,7 +182,8 @@ class BrowserWindowCocoa :
 
  private:
   NSWindow* window() const;  // Accessor for the (current) |NSWindow|.
-
+  void UpdateSidebarForContents(content::WebContents* tab_contents);
+  content::NotificationRegistrar registrar_;
   Browser* browser_;  // weak, owned by controller
   BrowserWindowController* controller_;  // weak, owns us
   base::scoped_nsobject<NSString> pending_window_title_;

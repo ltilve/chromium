@@ -32,6 +32,7 @@
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/permissions/permissions_info.h"
+#include "extensions/common/extension_sidebar_utils.h"
 #include "extensions/common/switches.h"
 #include "extensions/common/url_pattern.h"
 #include "net/base/filename_util.h"
@@ -538,7 +539,8 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
 
   if (!LoadSharedFeatures(error))
     return false;
-
+  if (!LoadSidebarFeatures(error))
+    return false;
   permissions_parser_->Finalize(this);
   permissions_parser_.reset();
 
@@ -685,12 +687,79 @@ bool Extension::LoadExtent(const char* key,
   return true;
 }
 
+ExtensionSidebarDefaults* Extension::LoadExtensionSidebarDefaults(
+    const base::DictionaryValue* extension_sidebar, base::string16* error) {
+  scoped_ptr<ExtensionSidebarDefaults> result(new ExtensionSidebarDefaults());
+
+  std::string default_icon;
+  // Read sidebar's |default_icon| (optional).
+  if (extension_sidebar->HasKey(keys::kSidebarDefaultIcon)) {
+    if (!extension_sidebar->GetString(keys::kSidebarDefaultIcon,
+                                      &default_icon) ||
+        default_icon.empty()) {
+      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultIconPath);
+      return NULL;
+    }
+    result->set_default_icon_path(default_icon);
+  }
+
+  // Read sidebar's |default_title| (optional).
+  base::string16 default_title;
+  if (extension_sidebar->HasKey(keys::kSidebarDefaultTitle)) {
+    if (!extension_sidebar->GetString(keys::kSidebarDefaultTitle,
+                                      &default_title)) {
+      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultTitle);
+      return NULL;
+    }
+  }
+  result->set_default_title(default_title);
+
+  // Read sidebar's |default_page| (optional).
+  // TODO(rdevlin.cronin): Continue removing std::string errors and replace
+  //  with string16
+  std::string default_page;
+  std::string utf8_error;
+  if (extension_sidebar->HasKey(keys::kSidebarDefaultPage)) {
+    if (!extension_sidebar->GetString(keys::kSidebarDefaultPage,
+                                      &default_page) ||
+        default_page.empty()) {
+      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultPage);
+      return NULL;
+    }
+    GURL url = extension_sidebar_utils::ResolveRelativePath(
+        default_page, this, &utf8_error);
+    *error = base::UTF8ToUTF16(utf8_error);
+    if (!url.is_valid())
+      return NULL;
+    result->set_default_page(url);
+  }
+
+  return result.release();
+}
 bool Extension::LoadSharedFeatures(base::string16* error) {
   if (!LoadDescription(error) ||
       !ManifestHandler::ParseExtension(this, error) ||
       !LoadShortName(error))
     return false;
 
+  return true;
+}
+bool Extension::LoadSidebarFeatures(base::string16* error) {
+   // Initialize sidebar action (optional).
+  if (manifest_->HasKey(keys::kSidebar)) {
+    const base::DictionaryValue* sidebar_value = NULL;
+    if (!manifest_->GetDictionary(keys::kSidebar, &sidebar_value)) {
+      *error = base::ASCIIToUTF16(errors::kInvalidSidebar);
+      return false;
+    }
+/*    if (!api_permissions.count(ExtensionAPIPermission::kExperimental)) {
+      *error = ASCIIToUTF16(errors::kSidebarExperimental);
+      return false;
+    }*/
+    sidebar_defaults_.reset(LoadExtensionSidebarDefaults(sidebar_value, error));
+    if (!sidebar_defaults_.get())
+      return false;  // Failed to parse sidebar definition.
+  }
   return true;
 }
 

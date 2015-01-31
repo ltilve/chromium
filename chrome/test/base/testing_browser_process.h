@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -76,6 +76,7 @@ class TestingBrowserProcess : public BrowserProcess {
   BackgroundModeManager* background_mode_manager() override;
   void set_background_mode_manager_for_test(
       scoped_ptr<BackgroundModeManager> manager) override;
+  SidebarManager* sidebar_manager() override;
   StatusTray* status_tray() override;
   SafeBrowsingService* safe_browsing_service() override;
   safe_browsing::ClientSideDetectionService* safe_browsing_detection_service()

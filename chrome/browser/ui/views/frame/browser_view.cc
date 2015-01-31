@@ -33,6 +33,7 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
+<<<<<<< HEAD
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/themes/theme_service_factory.h"
@@ -40,6 +41,13 @@
 #include "chrome/browser/ui/bookmarks/bookmark_bar_constants.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bubble_delegate.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bubble_sign_in_delegate.h"
+=======
+#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
+#include "chrome/browser/tabs/tab_strip_model.h"
+#include "chrome/browser/themes/theme_service.h"
+#include "chrome/browser/ui/app_modal_dialogs/app_modal_dialog_queue.h"
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -446,6 +454,7 @@ BrowserView::BrowserView()
     : views::ClientView(nullptr, nullptr),
       last_focused_view_storage_id_(
           views::ViewStorage::GetInstance()->CreateStorageID()),
+<<<<<<< HEAD
       frame_(nullptr),
       top_container_(nullptr),
       tabstrip_(nullptr),
@@ -454,6 +463,22 @@ BrowserView::BrowserView()
       infobar_container_(nullptr),
       contents_web_view_(nullptr),
       contents_container_(nullptr),
+=======
+      frame_(NULL),
+      browser_(browser),
+      active_bookmark_bar_(NULL),
+      tabstrip_(NULL),
+      toolbar_(NULL),
+      infobar_container_(NULL),
+      sidebar_container_(NULL),
+      sidebar_split_(NULL),
+      contents_container_(NULL),
+      devtools_container_(NULL),
+      preview_container_(NULL),
+      contents_(NULL),
+      contents_split_(NULL),
+      devtools_dock_side_(DEVTOOLS_DOCK_SIDE_BOTTOM),
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
       initialized_(false),
       in_process_fullscreen_(false),
 #if defined(OS_WIN)
@@ -462,6 +487,11 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
+
+  registrar_.Add(
+      this,
+      chrome::NOTIFICATION_SIDEBAR_CHANGED,
+      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -575,6 +605,12 @@ gfx::Point BrowserView::OffsetPointForToolbarBackgroundImage(
   window_point.Offset(frame_->GetThemeBackgroundXInset(),
                       -frame_->GetTopInset());
   return window_point;
+}
+
+int BrowserView::GetSidebarWidth() const {
+  if (!sidebar_container_ || !sidebar_container_->visible())
+    return 0;
+  return sidebar_split_->divider_offset();
 }
 
 bool BrowserView::IsTabStripVisible() const {
@@ -1151,10 +1187,71 @@ void BrowserView::FocusAppMenu() {
 }
 
 void BrowserView::RotatePaneFocus(bool forwards) {
+<<<<<<< HEAD
   GetWidget()->GetFocusManager()->RotatePaneFocus(
       forwards ?
           views::FocusManager::kForward : views::FocusManager::kBackward,
       views::FocusManager::kWrap);
+=======
+  // This gets called when the user presses F6 (forwards) or Shift+F6
+  // (backwards) to rotate to the next pane. Here, our "panes" are the
+  // tab contents and each of our accessible toolbars, infobars, downloads
+  // shelf, etc.  When a pane has focus, all of its controls are accessible
+  // in the tab traversal, and the tab traversal is "trapped" within that pane.
+  //
+  // Get a vector of all panes in the order we want them to be focused,
+  // with NULL to represent the tab contents getting focus. If one of these
+  // is currently invisible or has no focusable children it will be
+  // automatically skipped.
+  std::vector<views::AccessiblePaneView*> accessible_panes;
+  GetAccessiblePanes(&accessible_panes);
+  int pane_count = static_cast<int>(accessible_panes.size());
+
+  std::vector<views::View*> accessible_views(
+      accessible_panes.begin(), accessible_panes.end());
+  accessible_views.push_back(GetTabContentsContainerView());
+  if (sidebar_container_ && sidebar_container_->visible())
+    accessible_views.push_back(GetSidebarContainerView());
+  if (devtools_container_->visible())
+    accessible_views.push_back(devtools_container_->GetFocusView());
+  int count = static_cast<int>(accessible_views.size());
+
+  // Figure out which view (if any) currently has the focus.
+  const views::View* focused_view = GetFocusManager()->GetFocusedView();
+  int index = -1;
+  if (focused_view) {
+    for (int i = 0; i < count; ++i) {
+      if (accessible_views[i] == focused_view ||
+          accessible_views[i]->Contains(focused_view)) {
+        index = i;
+        break;
+      }
+    }
+  }
+
+  // If the focus isn't currently in a pane, save the focus so we
+  // can restore it if the user presses Escape.
+  if (focused_view && index >= pane_count)
+    GetFocusManager()->StoreFocusedView();
+
+  // Try to focus the next pane; if SetPaneFocusAndFocusDefault returns
+  // false it means the pane didn't have any focusable controls, so skip
+  // it and try the next one.
+  for (;;) {
+    if (forwards)
+      index = (index + 1) % count;
+    else
+      index = ((index - 1) + count) % count;
+
+    if (index < pane_count) {
+      if (accessible_panes[index]->SetPaneFocusAndFocusDefault())
+        break;
+    } else {
+      accessible_views[index]->RequestFocus();
+      break;
+    }
+  }
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 }
 
 void BrowserView::DestroyBrowser() {
@@ -1495,13 +1592,40 @@ views::View* BrowserView::GetTabContentsContainerView() const {
   return contents_web_view_;
 }
 
+views::View* BrowserView::GetSidebarContainerView() const {
+  if (!sidebar_container_)
+    return NULL;
+  return sidebar_container_->GetFocusView();
+}
+
 ToolbarView* BrowserView::GetToolbarView() const {
   return toolbar_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// BrowserView, content::NotificationObserver implementation:
+
+void BrowserView::Observe(int type,
+                          const content::NotificationSource& source,
+                          const content::NotificationDetails& details) {
+  switch (type) {
+    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
+      if (content::Details<SidebarContainer>(details)->tab_contents() ==
+          browser_->GetSelectedWebContents()) {
+        UpdateSidebar();
+      }
+      break;
+
+    default:
+      NOTREACHED() << "Got a notification we didn't register for!";
+      break;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // BrowserView, TabStripModelObserver implementation:
 
+<<<<<<< HEAD
 void BrowserView::TabInsertedAt(WebContents* contents,
                                 int index,
                                 bool foreground) {
@@ -1516,6 +1640,20 @@ void BrowserView::TabInsertedAt(WebContents* contents,
     aura::client::ParentWindowWithContext(
         window, root_window, root_window->GetBoundsInScreen());
     DCHECK(contents->GetNativeView()->GetRootWindow());
+=======
+void BrowserView::TabDetachedAt(TabContentsWrapper* contents, int index) {
+  // We use index here rather than comparing |contents| because by this time
+  // the model has already removed |contents| from its list, so
+  // browser_->GetSelectedWebContents() will return NULL or something else.
+  if (index == browser_->tabstrip_model()->active_index()) {
+    // We need to reset the current tab contents to NULL before it gets
+    // freed. This is because the focus manager performs some operations
+    // on the selected TabContents when it is removed.
+    contents_container_->ChangeWebContents(NULL);
+    infobar_container_->ChangeTabContents(NULL);
+    UpdateSidebarForContents(NULL);
+    UpdateDevToolsForContents(NULL);
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
   }
 #endif
   web_contents_close_handler_->TabInserted();
@@ -2000,6 +2138,7 @@ void BrowserView::InitViews() {
   infobar_container_ = new InfoBarContainerView(this);
   AddChildView(infobar_container_);
 
+<<<<<<< HEAD
   contents_web_view_ = new ContentsWebView(browser_->profile());
   contents_web_view_->set_id(VIEW_ID_TAB_CONTAINER);
   contents_web_view_->SetEmbedFullscreenWidgetMode(true);
@@ -2061,6 +2200,61 @@ void BrowserView::InitViews() {
                             GetContentsLayoutManager(),
                             immersive_mode_controller_.get());
   SetLayoutManager(browser_view_layout);
+=======
+  contents_container_ = new TabContentsContainer;
+  contents_ = new ContentsContainer(contents_container_);
+
+  SkColor bg_color = GetWidget()->GetThemeProvider()->
+      GetColor(ThemeService::COLOR_TOOLBAR);
+
+  bool sidebar_allowed = SidebarManager::IsSidebarAllowed();
+  if (sidebar_allowed) {
+    sidebar_container_ = new TabContentsContainer;
+    sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
+    sidebar_container_->SetVisible(false);
+
+    sidebar_split_ = new views::SingleSplitView(
+        contents_,
+        sidebar_container_,
+        views::SingleSplitView::HORIZONTAL_SPLIT,
+        this);
+    sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
+    sidebar_split_->SetAccessibleName(
+        l10n_util::GetStringUTF16(IDS_ACCNAME_SIDE_BAR));
+    sidebar_split_->set_background(
+        views::Background::CreateSolidBackground(bg_color));
+  }
+
+  devtools_container_ = new TabContentsContainer;
+  devtools_container_->set_id(VIEW_ID_DEV_TOOLS_DOCKED);
+  devtools_container_->SetVisible(false);
+
+  views::View* contents_view = contents_;
+  if (sidebar_allowed)
+    contents_view = sidebar_split_;
+
+  contents_split_ = new views::SingleSplitView(
+      contents_view,
+      devtools_container_,
+      views::SingleSplitView::VERTICAL_SPLIT,
+      this);
+  contents_split_->set_id(VIEW_ID_CONTENTS_SPLIT);
+  contents_split_->SetAccessibleName(
+      l10n_util::GetStringUTF16(IDS_ACCNAME_WEB_CONTENTS));
+  contents_split_->set_background(
+      views::Background::CreateSolidBackground(bg_color));
+  AddChildView(contents_split_);
+  set_contents_view(contents_split_);
+
+#if defined(USE_VIRTUAL_KEYBOARD)
+  status_bubble_.reset(new StatusBubbleTouch(contents_));
+#else
+  status_bubble_.reset(new StatusBubbleViews(contents_));
+#endif
+
+#if defined(OS_WIN) && !defined(USE_AURA)
+  InitSystemMenu();
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
 #if defined(OS_WIN)
   // Create a custom JumpList and add it to an observer of TabRestoreService
@@ -2181,11 +2375,90 @@ bool BrowserView::MaybeShowInfoBar(WebContents* contents) {
   return true;
 }
 
+<<<<<<< HEAD
 void BrowserView::UpdateDevToolsForContents(
     WebContents* web_contents, bool update_devtools_web_contents) {
   DevToolsContentsResizingStrategy strategy;
   WebContents* devtools = DevToolsWindow::GetInTabWebContents(
       web_contents, &strategy);
+=======
+void BrowserView::UpdateSidebar() {
+  UpdateSidebarForContents(GetSelectedTabContentsWrapper());
+  Layout();
+}
+
+void BrowserView::UpdateSidebarForContents(TabContentsWrapper* tab_contents) {
+  if (!sidebar_container_)
+    return;  // Happens when sidebar is not allowed.
+  if (!SidebarManager::GetInstance())
+    return;  // Happens only in tests.
+
+  TabContents* sidebar_contents = NULL;
+  if (tab_contents) {
+    SidebarContainer* client_host = SidebarManager::GetInstance()->
+        GetActiveSidebarContainerFor(
+            static_cast<TabContents*>(tab_contents->web_contents()));
+    if (client_host)
+      sidebar_contents = client_host->sidebar_contents();
+  }
+
+  bool visible = NULL != sidebar_contents &&
+                 browser_->SupportsWindowFeature(Browser::FEATURE_SIDEBAR);
+
+  bool should_show = visible && !sidebar_container_->visible();
+  bool should_hide = !visible && sidebar_container_->visible();
+
+  // Update sidebar content.
+  TabContents* old_contents =
+      static_cast<TabContents*>(sidebar_container_->web_contents());
+  sidebar_container_->ChangeWebContents(sidebar_contents);
+  SidebarManager::GetInstance()->
+      NotifyStateChanges(old_contents, sidebar_contents);
+
+  // Update sidebar UI width.
+  if (should_show) {
+    // Restore split offset.
+    int sidebar_width = g_browser_process->local_state()->GetInteger(
+        prefs::kExtensionSidebarWidth);
+    if (sidebar_width < 0) {
+      // Initial load, set to default value.
+      sidebar_width = sidebar_split_->width() / 7;
+    }
+    // Make sure user can see both panes.
+    int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
+    sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
+                             std::max(min_sidebar_width, sidebar_width));
+
+    sidebar_split_->set_divider_offset(
+        sidebar_split_->width() - sidebar_width);
+
+    sidebar_container_->SetVisible(true);
+    sidebar_split_->InvalidateLayout();
+    Layout();
+  } else if (should_hide) {
+    // Store split offset when hiding sidebar only.
+    g_browser_process->local_state()->SetInteger(
+        prefs::kExtensionSidebarWidth,
+        sidebar_split_->width() - sidebar_split_->divider_offset());
+
+    sidebar_container_->SetVisible(false);
+    sidebar_split_->InvalidateLayout();
+    Layout();
+  }
+}
+
+void BrowserView::UpdateDevToolsForContents(TabContentsWrapper* wrapper) {
+  WebContents* devtools_contents = NULL;
+  if (wrapper) {
+    TabContentsWrapper* devtools_contents_wrapper =
+        DevToolsWindow::GetDevToolsContents(wrapper->web_contents());
+    if (devtools_contents_wrapper)
+      devtools_contents = devtools_contents_wrapper->web_contents();
+  }
+
+  bool should_show = devtools_contents && !devtools_container_->visible();
+  bool should_hide = !devtools_contents && devtools_container_->visible();
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
   if (!devtools_web_view_->web_contents() && devtools &&
       !devtools_focus_tracker_.get()) {
@@ -2465,6 +2738,7 @@ void BrowserView::ShowAvatarBubbleFromAvatarButton(
       alignment = views::BubbleBorder::ALIGN_EDGE_TO_ANCHOR_EDGE;
     }
 
+<<<<<<< HEAD
     profiles::BubbleViewMode bubble_view_mode;
     profiles::TutorialMode tutorial_mode;
     profiles::BubbleViewModeFromAvatarBubbleMode(
@@ -2481,6 +2755,35 @@ void BrowserView::ShowAvatarBubbleFromAvatarButton(
                                       views::BubbleBorder::PAINT_NORMAL;
     AvatarMenuBubbleView::ShowBubble(anchor_view, arrow, arrow_paint_type,
                                      alignment, bounds, browser());
+=======
+  // When we toggle the NTP floating bookmarks bar and/or the info bar,
+  // we don't want any TabContents to be attached, so that we
+  // avoid an unnecessary resize and re-layout of a TabContents.
+  if (change_tab_contents)
+    contents_container_->ChangeWebContents(NULL);
+  infobar_container_->ChangeTabContents(new_contents->infobar_tab_helper());
+  if (bookmark_bar_view_.get()) {
+    bookmark_bar_view_->SetBookmarkBarState(
+        browser_->bookmark_bar_state(),
+        BookmarkBar::DONT_ANIMATE_STATE_CHANGE);
+  }
+  UpdateUIForContents(new_contents);
+  if (change_tab_contents)
+    contents_container_->ChangeWebContents(new_contents->web_contents());
+  UpdateSidebarForContents(new_contents);
+
+  UpdateDevToolsForContents(new_contents);
+  // TODO(beng): This should be called automatically by ChangeWebContents, but I
+  //             am striving for parity now rather than cleanliness. This is
+  //             required to make features like Duplicate Tab, Undo Close Tab,
+  //             etc not result in sad tab.
+  new_contents->web_contents()->DidBecomeSelected();
+  if (BrowserList::GetLastActive() == browser_ &&
+      !browser_->tabstrip_model()->closing_all() && GetWidget()->IsVisible()) {
+    // We only restore focus if our window is visible, to avoid invoking blur
+    // handlers when we are eventually shown.
+    new_contents->web_contents()->GetView()->RestoreFocus();
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
   }
   ProfileMetrics::LogProfileOpenMethod(ProfileMetrics::ICON_AVATAR_BUBBLE);
 }

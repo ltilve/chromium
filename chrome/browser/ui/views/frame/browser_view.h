@@ -21,11 +21,18 @@
 #include "chrome/browser/ui/omnibox/omnibox_popup_model_observer.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/views/frame/browser_frame.h"
+<<<<<<< HEAD
 #include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/frame/immersive_mode_controller.h"
 #include "chrome/browser/ui/views/frame/web_contents_close_handler.h"
 #include "chrome/browser/ui/views/load_complete_listener.h"
 #include "ui/base/accelerators/accelerator.h"
+=======
+#include "chrome/browser/ui/views/tab_contents/tab_contents_container.h"
+#include "chrome/browser/ui/views/tabs/abstract_tab_strip_view.h"
+#include "chrome/browser/ui/views/unhandled_keyboard_event_handler.h"
+#include "content/public/browser/notification_registrar.h"
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 #include "ui/base/models/simple_menu_model.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/views/controls/button/button.h"
@@ -78,6 +85,11 @@ class WebView;
 //  including the TabStrip, toolbars, download shelves, the content area etc.
 //
 class BrowserView : public BrowserWindow,
+<<<<<<< HEAD
+=======
+                    public BrowserWindowTesting,
+                    public content::NotificationObserver,
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
                     public TabStripModelObserver,
                     public ui::AcceleratorProvider,
                     public views::WidgetDelegate,
@@ -148,8 +160,13 @@ class BrowserView : public BrowserWindow,
   gfx::Point OffsetPointForToolbarBackgroundImage(
       const gfx::Point& point) const;
 
+<<<<<<< HEAD
   // Container for the tabstrip, toolbar, etc.
   TopContainerView* top_container() { return top_container_; }
+=======
+  // Returns the width of the currently displayed sidebar or 0.
+  int GetSidebarWidth() const;
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
   // Accessor for the TabStrip.
   TabStrip* tabstrip() { return tabstrip_; }
@@ -328,6 +345,7 @@ class BrowserView : public BrowserWindow,
 #endif
   // TODO(beng): Not an override, move somewhere else.
   void SetDownloadShelfVisible(bool visible);
+<<<<<<< HEAD
   bool IsDownloadShelfVisible() const override;
   DownloadShelf* GetDownloadShelf() override;
   void ConfirmBrowserCloseWithPendingDownloads(
@@ -366,6 +384,56 @@ class BrowserView : public BrowserWindow,
   LocationBarView* GetLocationBarView() const;
   views::View* GetTabContentsContainerView() const;
   ToolbarView* GetToolbarView() const;
+=======
+  virtual bool IsDownloadShelfVisible() const OVERRIDE;
+  virtual DownloadShelf* GetDownloadShelf() OVERRIDE;
+  virtual void ShowCollectedCookiesDialog(TabContentsWrapper* wrapper) OVERRIDE;
+  virtual void ConfirmBrowserCloseWithPendingDownloads() OVERRIDE;
+  virtual void UserChangedTheme() OVERRIDE;
+  virtual int GetExtraRenderViewHeight() const OVERRIDE;
+  virtual void WebContentsFocused(content::WebContents* contents) OVERRIDE;
+  virtual void ShowPageInfo(Profile* profile,
+                            const GURL& url,
+                            const content::SSLStatus& ssl,
+                            bool show_history) OVERRIDE;
+  virtual void ShowAppMenu() OVERRIDE;
+  virtual bool PreHandleKeyboardEvent(const NativeWebKeyboardEvent& event,
+                                      bool* is_keyboard_shortcut) OVERRIDE;
+  virtual void HandleKeyboardEvent(const NativeWebKeyboardEvent& event)
+      OVERRIDE;
+  virtual void ShowCreateWebAppShortcutsDialog(TabContentsWrapper* tab_contents)
+      OVERRIDE;
+  virtual void ShowCreateChromeAppShortcutsDialog(
+      Profile*, const Extension* app) OVERRIDE;
+  virtual void Cut() OVERRIDE;
+  virtual void Copy() OVERRIDE;
+  virtual void Paste() OVERRIDE;
+  virtual void ShowInstant(TabContentsWrapper* preview) OVERRIDE;
+  virtual void HideInstant() OVERRIDE;
+  virtual gfx::Rect GetInstantBounds() OVERRIDE;
+  virtual WindowOpenDisposition GetDispositionForPopupBounds(
+      const gfx::Rect& bounds) OVERRIDE;
+  virtual FindBar* CreateFindBar() OVERRIDE;
+#if defined(OS_CHROMEOS)
+  virtual void ShowMobileSetup() OVERRIDE;
+  virtual void ShowKeyboardOverlay(gfx::NativeWindow owning_window) OVERRIDE;
+#endif
+  virtual void ShowAvatarBubble(content::WebContents* web_contents,
+                                const gfx::Rect& rect) OVERRIDE;
+  virtual void ShowAvatarBubbleFromAvatarButton() OVERRIDE;
+
+  // Overridden from BrowserWindowTesting:
+  virtual BookmarkBarView* GetBookmarkBarView() const OVERRIDE;
+  virtual LocationBarView* GetLocationBarView() const OVERRIDE;
+  virtual views::View* GetTabContentsContainerView() const OVERRIDE;
+  virtual views::View* GetSidebarContainerView() const OVERRIDE;
+  virtual ToolbarView* GetToolbarView() const OVERRIDE;
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
+
+  // Overridden from content::NotificationObserver:
+  virtual void Observe(int type,
+                       const content::NotificationSource& source,
+                       const content::NotificationDetails& details) OVERRIDE;
 
   // Overridden from TabStripModelObserver:
   void TabInsertedAt(content::WebContents* contents,
@@ -479,8 +547,28 @@ class BrowserView : public BrowserWindow,
   // Prepare to show the Bookmark Bar for the specified WebContents.
   // Returns true if the Bookmark Bar can be shown (i.e. it's supported for this
   // Browser type) and there should be a subsequent re-layout to show it.
+<<<<<<< HEAD
   // |contents| can be null.
   bool MaybeShowBookmarkBar(content::WebContents* contents);
+=======
+  // |contents| can be NULL.
+  bool MaybeShowBookmarkBar(TabContentsWrapper* contents);
+
+  // Prepare to show an Info Bar for the specified TabContents. Returns true
+  // if there is an Info Bar to show and one is supported for this Browser
+  // type, and there should be a subsequent re-layout to show it.
+  // |contents| can be NULL.
+  bool MaybeShowInfoBar(TabContentsWrapper* contents);
+
+  // Updates sidebar UI according to the current tab and sidebar state.
+  void UpdateSidebar();
+  // Displays active sidebar linked to the |tab_contents| or hides sidebar UI,
+  // if there's no such sidebar.
+  void UpdateSidebarForContents(TabContentsWrapper* tab_contents);
+
+  // Shows docked devtools.
+  void ShowDevToolsContainer();
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
   // Moves the bookmark bar view to the specified parent, which may be null,
   // |this|, or |top_container_|. Ensures that |top_container_| stays in front
@@ -573,6 +661,7 @@ class BrowserView : public BrowserWindow,
 
   // BrowserView layout (LTR one is pictured here).
   //
+<<<<<<< HEAD
   // --------------------------------------------------------------------
   // | TopContainerView (top_container_)                                |
   // |  --------------------------------------------------------------  |
@@ -600,6 +689,45 @@ class BrowserView : public BrowserWindow,
   //     positioned on top of the bar while the tab's contents are placed below
   //     the bar.  This allows the find bar to always align with the top of
   //     contents_container_ regardless if there's bookmark or info bars.
+=======
+  // ----------------------------------------------------------------
+  // | Tabs (1)                                                     |
+  // |--------------------------------------------------------------|
+  // | Navigation buttons, menus and the address bar (toolbar_)     |
+  // |--------------------------------------------------------------|
+  // | All infobars (infobar_container_) *                          |
+  // |--------------------------------------------------------------|
+  // | Bookmarks (bookmark_bar_view_) *                             |
+  // |--------------------------------------------------------------|
+  // |Page content (contents_)              ||                      |
+  // |--------------------------------------|| Sidebar content      |
+  // || contents_container_ and/or         ||| (sidebar_container_) |
+  // || preview_container_                 |||                      |
+  // ||                                    |(2)                     |
+  // ||                                    |||                      |
+  // ||                                    |||                      |
+  // ||                                    |||                      |
+  // ||                                    |||                      |
+  // |--------------------------------------||                      |
+  // |==(3)=========================================================|
+  // |                                                              |
+  // |                                                              |
+  // | Debugger (devtools_container_)                               |
+  // |                                                              |
+  // |                                                              |
+  // |--------------------------------------------------------------|
+  // | Active downloads (download_shelf_)                           |
+  // ----------------------------------------------------------------
+  //
+  // (1) - tabstrip_, default position
+  // (2) - sidebar_split_
+  // (3) - contents_split_
+  //
+  // * - The bookmark bar and info bar are swapped when on the new tab page.
+  //     Additionally contents_ is positioned on top of the bookmark bar when
+  //     the bookmark bar is detached. This is done to allow the
+  //     preview_container_ to appear over the bookmark bar.
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
   // The view that manages the tab strip, toolbar, and sometimes the bookmark
   // bar. Stacked top in the view hiearachy so it can be used to slide out
@@ -627,8 +755,25 @@ class BrowserView : public BrowserWindow,
   // The InfoBarContainerView that contains InfoBars for the current tab.
   InfoBarContainerView* infobar_container_;
 
+<<<<<<< HEAD
   // The view that contains the selected WebContents.
   ContentsWebView* contents_web_view_;
+=======
+  // The view that contains sidebar for the current tab.
+  TabContentsContainer* sidebar_container_;
+
+  // Split view containing the contents container and sidebar container.
+  views::SingleSplitView* sidebar_split_;
+
+  // The view that contains the selected TabContents.
+  TabContentsContainer* contents_container_;
+
+  // The view that contains devtools window for the selected TabContents.
+  TabContentsContainer* devtools_container_;
+
+  // The view that contains instant's TabContents.
+  TabContentsContainer* preview_container_;
+>>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
   // The view that contains devtools window for the selected WebContents.
   views::WebView* devtools_web_view_;
@@ -687,6 +832,8 @@ class BrowserView : public BrowserWindow,
   base::RepeatingTimer<BrowserView> loading_animation_timer_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
+
+  content::NotificationRegistrar registrar_;
 
   // Used to measure the loading spinner animation rate.
   base::TimeTicks last_animation_time_;

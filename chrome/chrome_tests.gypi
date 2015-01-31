@@ -251,6 +251,7 @@
       'browser/extensions/extension_messages_apitest.cc',
       'browser/extensions/extension_override_apitest.cc',
       'browser/extensions/extension_resource_request_policy_apitest.cc',
+      'browser/extensions/extension_sidebar_apitest.cc',
       'browser/extensions/extension_startup_browsertest.cc',
       'browser/extensions/extension_storage_apitest.cc',
       'browser/extensions/extension_storage_monitor_browsertest.cc',

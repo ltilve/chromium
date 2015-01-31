@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -72,6 +72,7 @@ class BrowserProcessImpl : public BrowserProcess,
   // framework, rather than in the destructor, so that we can
   // interleave cleanup with threads being stopped.
   void StartTearDown();
+
   void PostDestroyThreads();
 
   // BrowserProcess implementation.
@@ -89,6 +90,7 @@ class BrowserProcessImpl : public BrowserProcess,
   BrowserProcessPlatformPart* platform_part() override;
   extensions::EventRouterForwarder* extension_event_router_forwarder() override;
   NotificationUIManager* notification_ui_manager() override;
+  SidebarManager* sidebar_manager() override;
   message_center::MessageCenter* message_center() override;
   policy::BrowserPolicyConnector* browser_policy_connector() override;
   policy::PolicyService* policy_service() override;
@@ -147,6 +149,7 @@ class BrowserProcessImpl : public BrowserProcess,
   void CreateLocalState();
   void CreateViewedPageTracker();
   void CreateIconManager();
+  void CreateSidebarManager();
   void CreateIntranetRedirectDetector();
   void CreateNotificationUIManager();
   void CreateStatusTrayManager();
@@ -205,6 +208,8 @@ class BrowserProcessImpl : public BrowserProcess,
 #if !defined(OS_ANDROID)
   scoped_ptr<RemoteDebuggingServer> remote_debugging_server_;
 #endif
+  bool created_sidebar_manager_;
+  scoped_refptr<SidebarManager> sidebar_manager_;
 
 #if defined(ENABLE_PRINT_PREVIEW)
   scoped_refptr<printing::PrintPreviewDialogController>

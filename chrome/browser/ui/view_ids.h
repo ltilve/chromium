@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -89,6 +89,12 @@ enum ViewID {
 
   // The omnibox icon to do voice-based search.
   VIEW_ID_MIC_SEARCH_BUTTON,
+
+  // The Sidebar container.
+  VIEW_ID_SIDE_BAR_CONTAINER,
+
+  // The sidebar split.
+  VIEW_ID_SIDE_BAR_SPLIT,
 
   // Used in chrome/browser/ui/cocoa/view_id_util_browsertest.mm.
   // If you add new ids, make sure the above test passes.
