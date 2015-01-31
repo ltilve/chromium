@@ -151,6 +151,7 @@ ChromeExtensionsClient::CreateFeatureProviderSource(
   if (name == "api") {
     source->LoadJSON(IDR_EXTENSION_API_FEATURES);
     source->LoadJSON(IDR_CHROME_EXTENSION_API_FEATURES);
+    source->LoadJSON(IDR_EXTENSION_API_JSON_EXPERIMENTAL_SIDEBAR);
   } else if (name == "manifest") {
     source->LoadJSON(IDR_EXTENSION_MANIFEST_FEATURES);
     source->LoadJSON(IDR_CHROME_EXTENSION_MANIFEST_FEATURES);
