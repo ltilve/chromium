@@ -49,103 +49,103 @@ class SidebarFunction : public ChromeSyncExtensionFunction {
                        const base::DictionaryValue& details) = 0;
 };
 
-class CollapseSidebarFunction : public SidebarFunction {
+class SidebarCollapseFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
  protected:
-  ~CollapseSidebarFunction() override {} ;
+  ~SidebarCollapseFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.collapse", SIDEBAR_COLLAPSE);
+  DECLARE_EXTENSION_FUNCTION("sidebar.collapse", SIDEBAR_COLLAPSE);
 };
 
-class ExpandSidebarFunction : public SidebarFunction {
+class SidebarExpandFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
  protected:
-  ~ExpandSidebarFunction() override {} ;
+  ~SidebarExpandFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.expand", SIDEBAR_EXPAND);
+  DECLARE_EXTENSION_FUNCTION("sidebar.expand", SIDEBAR_EXPAND);
 };
 
-class GetStateSidebarFunction : public SidebarFunction {
+class SidebarGetStateFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~GetStateSidebarFunction() override {} ;
+  ~SidebarGetStateFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.getState", SIDEBAR_GETSTATE);
+  DECLARE_EXTENSION_FUNCTION("sidebar.getState", SIDEBAR_GETSTATE);
 };
 
-class HideSidebarFunction : public SidebarFunction {
+class SidebarHideFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~HideSidebarFunction() override {} ;
+  ~SidebarHideFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.hide", SIDEBAR_HIDE);
+  DECLARE_EXTENSION_FUNCTION("sidebar.hide", SIDEBAR_HIDE);
 };
 
-class NavigateSidebarFunction : public SidebarFunction {
+class SidebarNavigateFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~NavigateSidebarFunction() override {} ;
+  ~SidebarNavigateFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.navigate", SIDEBAR_NAVIGATE);
+  DECLARE_EXTENSION_FUNCTION("sidebar.navigate", SIDEBAR_NAVIGATE);
 };
 
-class SetBadgeTextSidebarFunction : public SidebarFunction {
+class SidebarSetBadgeTextFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~SetBadgeTextSidebarFunction() override {} ;
+  ~SidebarSetBadgeTextFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.setBadgeText", SIDEBAR_BADGETEXT);
+  DECLARE_EXTENSION_FUNCTION("sidebar.setBadgeText", SIDEBAR_BADGETEXT);
 };
 
-class SetIconSidebarFunction : public SidebarFunction {
+class SidebarSetIconFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~SetIconSidebarFunction() override {} ;
+  ~SidebarSetIconFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.setIcon", SIDEBAR_SETICON);
+  DECLARE_EXTENSION_FUNCTION("sidebar.setIcon", SIDEBAR_SETICON);
 };
 
-class SetTitleSidebarFunction : public SidebarFunction {
+class SidebarSetTitleFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~SetTitleSidebarFunction() override {} ;
+  ~SidebarSetTitleFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.setTitle", SIDEBAR_SETTITLE);
+  DECLARE_EXTENSION_FUNCTION("sidebar.setTitle", SIDEBAR_SETTITLE);
 };
 
-class ShowSidebarFunction : public SidebarFunction {
+class SidebarShowFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
                        const std::string& content_id,
                        const base::DictionaryValue& details) override;
 protected:
-  ~ShowSidebarFunction() override {} ;
+  ~SidebarShowFunction() override {} ;
 
-  DECLARE_EXTENSION_FUNCTION("experimental.sidebar.show", SIDEBAR_SHOW);
+  DECLARE_EXTENSION_FUNCTION("sidebar.show", SIDEBAR_SHOW);
 };
 
 #endif  // CHROME_BROWSER_EXTENSIONS_EXTENSION_SIDEBAR_API_H_

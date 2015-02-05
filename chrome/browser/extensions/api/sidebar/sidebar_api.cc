@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/extensions/extension_sidebar_api.h"
+#include "chrome/browser/extensions/api/sidebar/sidebar_api.h"
 
 #include "base/json/json_writer.h"
 #include "base/strings/string16.h"
@@ -146,21 +146,21 @@ return true;
 }
 
 
-bool CollapseSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarCollapseFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
   SidebarManager::GetInstance()->CollapseSidebar(tab, content_id);
   return true;
 }
 
-bool ExpandSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarExpandFunction::RunImpl(content::WebContents* tab,
                                     const std::string& content_id,
                                     const base::DictionaryValue& details) {
   SidebarManager::GetInstance()->ExpandSidebar(tab, content_id);
   return true;
 }
 
-bool GetStateSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarGetStateFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
   SidebarManager* manager = SidebarManager::GetInstance();
@@ -201,14 +201,14 @@ bool GetStateSidebarFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool HideSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarHideFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,
                                   const base::DictionaryValue& details) {
   SidebarManager::GetInstance()->HideSidebar(tab, content_id);
   return true;
 }
 
-bool NavigateSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarNavigateFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
  std::string path_string;
@@ -223,7 +223,7 @@ bool NavigateSidebarFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool SetBadgeTextSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarSetBadgeTextFunction::RunImpl(content::WebContents* tab,
                                           const std::string& content_id,
                                           const base::DictionaryValue& details) {
   base::string16 badge_text;
@@ -233,7 +233,7 @@ bool SetBadgeTextSidebarFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool SetIconSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarSetIconFunction::RunImpl(content::WebContents* tab,
                                      const std::string& content_id,
                                      const base::DictionaryValue& details) {
   const base::BinaryValue* binary = 0;
@@ -247,7 +247,7 @@ bool SetIconSidebarFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool SetTitleSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarSetTitleFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
   base::string16 title;
@@ -256,7 +256,7 @@ bool SetTitleSidebarFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool ShowSidebarFunction::RunImpl(content::WebContents* tab,
+bool SidebarShowFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,
                                   const base::DictionaryValue& details) {
   SidebarManager::GetInstance()->ShowSidebar(tab, content_id);

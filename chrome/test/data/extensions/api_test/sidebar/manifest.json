@@ -7,5 +7,5 @@
     "page": "test.html"
   },
   "sidebar": {},
-  "permissions": ["tabs", "experimental"]
+  "permissions": ["tabs", "sidebar"]
 }

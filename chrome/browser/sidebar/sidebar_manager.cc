@@ -8,7 +8,7 @@
 
 #include "base/command_line.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/extensions/extension_sidebar_api.h"
+#include "chrome/browser/extensions/api/sidebar/sidebar_api.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/chrome_notification_types.h"

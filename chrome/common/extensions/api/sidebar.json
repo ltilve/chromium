@@ -1,6 +1,6 @@
 [
   {
-    "namespace": "experimental.sidebar",
+    "namespace": "sidebar",
     "nodoc": true,
     "types": [],
     "functions": [

@@ -614,6 +614,11 @@
     "dependencies": ["permission:sessions"],
     "contexts": ["blessed_extension"]
   },
+  "sidebar.show": {
+    "channel": "dev",
+    "dependencies": ["manifest:sidebar"],
+    "contexts": ["blessed_extension"]
+  },
   "signedInDevices": {
     "dependencies": ["permission:signedInDevices"],
     "contexts": ["blessed_extension"]
