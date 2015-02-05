@@ -5,12 +5,12 @@
 // API test for chrome.experimental.sidebar.
 // browser_tests.exe --gtest_filter=SidebarApiTest.Sidebar
 
-const assertEq = chrome.test.assertEq;
-const assertTrue = chrome.test.assertTrue;
-const pass = chrome.test.callbackPass;
+const assertEq = function() {};//chrome.test.assertEq;
+const assertTrue = function() {};//chrome.test.assertTrue;
+const pass = function() {};//chrome.test.callbackPass;
 
 if (!chrome.sidebar) {
-  chrome.sidebar = chrome.experimental.sidebar;
+//  chrome.sidebar = chrome.experimental.sidebar;
 }
 
 /**
@@ -135,7 +135,18 @@ function collapseSidebarForCurrentTab(callback) {
 function hideSidebarForCurrentTab(callback) {
   hideSidebar(undefined, callback);
 }
-
+showSidebarForCurrentTab(function() {
+  expandSidebarForCurrentTab(function() {
+    collapseSidebarForCurrentTab(function() {
+      hideSidebarForCurrentTab(function() {
+        showSidebarForCurrentTab(function() {
+          hideSidebarForCurrentTab(pass());
+        });
+      });
+    });
+  });
+});
+/*
 var tests = [
   function showHideSidebar() {
     showSidebarForCurrentTab(function() {
@@ -244,3 +255,4 @@ var tests = [
 ];
 
 chrome.test.runTests(tests);
+*/
