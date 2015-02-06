@@ -614,8 +614,7 @@
     "dependencies": ["permission:sessions"],
     "contexts": ["blessed_extension"]
   },
-  "sidebar.show": {
-    "channel": "dev",
+  "sidebar": {
     "dependencies": ["manifest:sidebar"],
     "contexts": ["blessed_extension"]
   },

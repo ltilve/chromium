@@ -97,7 +97,6 @@ bool ParseHelper(Extension* extension,
   // NOTE: We need to get the APIPermission before we check if features
   // associated with them are available because the feature system does not
   // know about aliases.
-
   std::vector<std::string> host_data;
   if (!APIPermissionSet::ParseFromJSON(
           permissions,
@@ -117,6 +116,7 @@ bool ParseHelper(Extension* extension,
        ++iter) {
     Feature* feature = permission_features->GetFeature(iter->name());
 
+    
     // The feature should exist since we just got an APIPermission for it. The
     // two systems should be updated together whenever a permission is added.
     DCHECK(feature) << "Could not find feature for " << iter->name();
@@ -168,7 +168,7 @@ bool ParseHelper(Extension* extension,
        iter != host_data.end();
        ++iter) {
     const std::string& permission_str = *iter;
-
+    
     // Check if it's a host pattern permission.
     URLPattern pattern = URLPattern(kAllowedSchemes);
     URLPattern::ParseResult parse_result = pattern.Parse(permission_str);

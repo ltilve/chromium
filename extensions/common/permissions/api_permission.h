@@ -167,6 +167,7 @@ class APIPermission {
     kSearchProvider,
     kSerial,
     kSessions,
+    kSidebar,
     kSignedInDevices,
     kSocket,
     kStartupPages,
