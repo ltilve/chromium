@@ -59,7 +59,7 @@ class SidebarContainer : public content::WebContentsDelegate {
   const std::string& content_id() const { return content_id_; }
 
   // Returns TabContents sidebar is linked to.
-  content::WebContents* tab_contents() const { return tab_; }
+  content::WebContents* web_contents() const { return tab_; }
 
   // Returns sidebar's TabContents.
   content::WebContents* sidebar_contents() const { return sidebar_contents_.get(); }

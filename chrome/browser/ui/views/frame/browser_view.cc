@@ -37,6 +37,7 @@
 #include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/themes/theme_properties.h"
+#include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bar_constants.h"
@@ -132,6 +133,8 @@
 #include "ui/gfx/screen.h"
 #include "ui/strings/grit/ui_strings.h"
 #include "ui/views/controls/button/menu_button.h"
+#include "ui/views/controls/single_split_view.h"
+#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/textfield/textfield.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/focus/external_focus_tracker.h"
@@ -753,6 +756,10 @@ bool BrowserView::IsAlwaysOnTop() const {
 void BrowserView::SetAlwaysOnTop(bool always_on_top) {
   // Not implemented for browser windows.
   NOTIMPLEMENTED();
+}
+
+bool BrowserView::SplitHandleMoved(views::SingleSplitView* sender) {
+  return true;
 }
 
 gfx::NativeWindow BrowserView::GetNativeWindow() const {
@@ -1516,7 +1523,7 @@ views::View* BrowserView::GetTabContentsContainerView() const {
 views::View* BrowserView::GetSidebarContainerView() const {
   if (!sidebar_container_)
     return NULL;
-  return sidebar_container_->GetFocusView();
+  return NULL;//sidebar_container_->GetFocusView();TODO(me)
 }
 
 ToolbarView* BrowserView::GetToolbarView() const {
@@ -1531,8 +1538,8 @@ void BrowserView::Observe(int type,
                           const content::NotificationDetails& details) {
   switch (type) {
     case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      if (content::Details<SidebarContainer>(details)->tab_contents() ==
-          browser_->GetSelectedWebContents()) {
+      if (content::Details<SidebarContainer>(details)->web_contents() ==
+          browser_->tab_strip_model()->GetActiveWebContents()) {
         UpdateSidebar();
       }
       break;
@@ -2051,17 +2058,15 @@ void BrowserView::InitViews() {
 
   web_contents_close_handler_.reset(
       new WebContentsCloseHandler(contents_web_view_));
-  SkColor bg_color = GetWidget()->GetThemeProvider()->
-      GetColor(ThemeService::COLOR_TOOLBAR);
 
   bool sidebar_allowed = SidebarManager::IsSidebarAllowed();
   if (sidebar_allowed) {
-    sidebar_container_ = new TabContentsContainer;
+    sidebar_container_ = new views::WebView(browser_->profile());
     sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
     sidebar_container_->SetVisible(false);
 
     sidebar_split_ = new views::SingleSplitView(
-        contents_,
+        contents_web_view_,
         sidebar_container_,
         views::SingleSplitView::HORIZONTAL_SPLIT,
         this);
@@ -2069,7 +2074,8 @@ void BrowserView::InitViews() {
     sidebar_split_->SetAccessibleName(
         l10n_util::GetStringUTF16(IDS_ACCNAME_SIDE_BAR));
     sidebar_split_->set_background(
-        views::Background::CreateSolidBackground(bg_color));
+        views::Background::CreateSolidBackground(ThemeProperties::GetDefaultColor(
+          ThemeProperties::COLOR_CONTROL_BACKGROUND)));
   }
 
   devtools_web_view_ = new views::WebView(browser_->profile());
@@ -2128,32 +2134,21 @@ void BrowserView::InitViews() {
                             immersive_mode_controller_.get());
   SetLayoutManager(browser_view_layout);
 
-  views::View* contents_view = contents_;
+  views::View* contents_view = top_container_;
   if (sidebar_allowed)
     contents_view = sidebar_split_;
 
   contents_split_ = new views::SingleSplitView(
       contents_view,
-      devtools_container_,
+      devtools_web_view_,
       views::SingleSplitView::VERTICAL_SPLIT,
       this);
   contents_split_->set_id(VIEW_ID_CONTENTS_SPLIT);
-  contents_split_->SetAccessibleName(
-      l10n_util::GetStringUTF16(IDS_ACCNAME_WEB_CONTENTS));
   contents_split_->set_background(
-      views::Background::CreateSolidBackground(bg_color));
+      views::Background::CreateSolidBackground(ThemeProperties::GetDefaultColor(
+          ThemeProperties::COLOR_CONTROL_BACKGROUND)));
   AddChildView(contents_split_);
   set_contents_view(contents_split_);
-
-#if defined(USE_VIRTUAL_KEYBOARD)
-  status_bubble_.reset(new StatusBubbleTouch(contents_));
-#else
-  status_bubble_.reset(new StatusBubbleViews(contents_));
-#endif
-
-#if defined(OS_WIN) && !defined(USE_AURA)
-  InitSystemMenu();
->>>>>>> parent of 3a80ea3... Rip Out the Sidebar API
 
 #if defined(OS_WIN)
   // Create a custom JumpList and add it to an observer of TabRestoreService
@@ -2275,21 +2270,21 @@ bool BrowserView::MaybeShowInfoBar(WebContents* contents) {
 }
 
 void BrowserView::UpdateSidebar() {
-  UpdateSidebarForContents(GetSelectedTabContentsWrapper());
+  UpdateSidebarForContents(GetActiveWebContents());
   Layout();
 }
 
-void BrowserView::UpdateSidebarForContents(TabContentsWrapper* tab_contents) {
+void BrowserView::UpdateSidebarForContents(WebContents* web_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
   if (!SidebarManager::GetInstance())
     return;  // Happens only in tests.
 
   WebContents* sidebar_contents = NULL;
-  if (tab_contents) {
+  if (web_contents) {
     SidebarContainer* client_host = SidebarManager::GetInstance()->
         GetActiveSidebarContainerFor(
-            static_cast<TabContents*>(tab_contents->web_contents()));
+            static_cast<WebContents*>(web_contents));
     if (client_host)
       sidebar_contents = client_host->sidebar_contents();
   }
@@ -2301,9 +2296,9 @@ void BrowserView::UpdateSidebarForContents(TabContentsWrapper* tab_contents) {
   bool should_hide = !visible && sidebar_container_->visible();
 
   // Update sidebar content.
-  TabContents* old_contents =
-      static_cast<TabContents*>(sidebar_container_->web_contents());
-  sidebar_container_->ChangeWebContents(sidebar_contents);
+  WebContents* old_contents =
+      static_cast<WebContents*>(sidebar_container_->web_contents());
+  sidebar_container_->SetWebContents(sidebar_contents);
   SidebarManager::GetInstance()->
       NotifyStateChanges(old_contents, sidebar_contents);
 
@@ -2614,7 +2609,7 @@ void BrowserView::ShowAvatarBubbleFromAvatarButton(
     anchor_view = toolbar_->app_menu();
   else if (!frame_->GetAvatarMenuButton()->button_on_right())
     arrow = views::BubbleBorder::TOP_LEFT;
-UpdateSidebarForContents(new_contents);
+  
   if (switches::IsNewAvatarMenu()) {
     NewAvatarButton* button = frame_->GetNewAvatarMenuButton();
     if (button) {

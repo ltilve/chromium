@@ -510,7 +510,7 @@ void BrowserViewLayout::UpdateTopContainerBounds() {
       immersive_mode_controller_->GetTopContainerVerticalOffset(
           top_container_bounds.size()));
   top_container_->SetBoundsRect(top_container_bounds);
-/*
+/*TODO(me)
 void BrowserViewLayout::LayoutTabContents(int top, int bottom) {
   // The ultimate idea is to calcualte bounds and reserved areas for all
   // contents views first and then resize them all, so every view
@@ -600,7 +600,7 @@ int BrowserViewLayout::GetContentsOffsetForBookmarkBar() {
   }
 
   if (SidebarManager::IsSidebarAllowed()) {
-    views::View* sidebar_split = contents_split_->child_at(0);
+    views::View* sidebar_split = top_container_->child_at(0);
     if (sidebar_split->child_count() >= 2 &&
         sidebar_split->child_at(1)->visible())
       return 0;
