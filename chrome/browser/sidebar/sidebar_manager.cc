@@ -89,24 +89,23 @@ void SidebarManager::NotifyStateChanges(
           FindSidebarContainerFor(active_sidebar_contents);
 
   if (was_active_host != NULL) {
-    /*Profile* profile = Profile::FromBrowserContext(
+    Profile* profile = Profile::FromBrowserContext(
         was_active_sidebar_contents->GetBrowserContext());
     ExtensionSidebarEventRouter::OnStateChanged(
         profile,
-        was_active_host->tab_contents(),
+        was_active_host->web_contents(),
         was_active_host->content_id(),
         extension_sidebar_constants::kShownState);
-        */
   }
 
   if (active_host != NULL) {
-    /*Profile* profile = Profile::FromBrowserContext(
+    Profile* profile = Profile::FromBrowserContext(
         active_sidebar_contents->GetBrowserContext());
     ExtensionSidebarEventRouter::OnStateChanged(
         profile,
-        active_host->tab_contents(),
+        active_host->web_contents(),
         active_host->content_id(),
-        extension_sidebar_constants::kActiveState);*/
+        extension_sidebar_constants::kActiveState);
   }
 }
 
@@ -124,10 +123,10 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
 
   host->Show();
 
-  /*Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
+  Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
   ExtensionSidebarEventRouter::OnStateChanged(
       profile, tab, content_id,
-      extension_sidebar_constants::kShownState);*/
+      extension_sidebar_constants::kShownState);
 }
 
 void SidebarManager::ExpandSidebar(content::WebContents* tab,
@@ -182,10 +181,10 @@ void SidebarManager::HideSidebar(WebContents* tab,
 
   UnregisterSidebarContainerFor(tab, content_id);
 
-  /*Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
+  Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
   ExtensionSidebarEventRouter::OnStateChanged(
       profile, tab, content_id,
-      extension_sidebar_constants::kHiddenState);*/
+      extension_sidebar_constants::kHiddenState);
 }
 
 void SidebarManager::NavigateSidebar(content::WebContents* tab,

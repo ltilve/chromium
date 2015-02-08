@@ -611,7 +611,8 @@
     "contexts": ["blessed_extension"]
   },
   "sidebar": {
-    "dependencies": ["manifest:sidebar"],
+    "channel": "stable",
+    "extension_types": ["extension", "legacy_packaged_app"],
     "contexts": ["blessed_extension"]
   },
   "signedInDevices": {

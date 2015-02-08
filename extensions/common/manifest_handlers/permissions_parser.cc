@@ -116,7 +116,6 @@ bool ParseHelper(Extension* extension,
        ++iter) {
     Feature* feature = permission_features->GetFeature(iter->name());
 
-    
     // The feature should exist since we just got an APIPermission for it. The
     // two systems should be updated together whenever a permission is added.
     DCHECK(feature) << "Could not find feature for " << iter->name();

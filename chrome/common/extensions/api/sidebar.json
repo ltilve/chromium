@@ -1,7 +1,7 @@
 [
   {
     "namespace": "sidebar",
-    "nodoc": true,
+    "description": "Use the <code>chrome.sidebar</code> API to interact with the browser's sidebar system. You can use this API to create, modify, and rearrange sidebars in the browser.",
     "types": [],
     "functions": [
       {
