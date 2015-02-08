@@ -10,6 +10,7 @@ const assertTrue = function() {};//chrome.test.assertTrue;
 const pass = function() {};//chrome.test.callbackPass;
 
 if (!chrome.sidebar) {
+  alert("nothing");
 //  chrome.sidebar = chrome.experimental.sidebar;
 }
 
@@ -109,7 +110,9 @@ function hideSidebar(id, callback) {
 * @param {function} callback Closure.
 */
 function showSidebarForCurrentTab(callback) {
-  showSidebar(undefined, callback);
+   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    showSidebar(tabs[0].id, callback);
+  })
 }
 
 /**
@@ -135,15 +138,17 @@ function collapseSidebarForCurrentTab(callback) {
 function hideSidebarForCurrentTab(callback) {
   hideSidebar(undefined, callback);
 }
+
 showSidebarForCurrentTab(function() {
   expandSidebarForCurrentTab(function() {
+    /*
     collapseSidebarForCurrentTab(function() {
       hideSidebarForCurrentTab(function() {
         showSidebarForCurrentTab(function() {
           hideSidebarForCurrentTab(pass());
         });
       });
-    });
+    });*/
   });
 });
 /*

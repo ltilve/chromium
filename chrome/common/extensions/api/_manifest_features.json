@@ -50,6 +50,10 @@
     "channel": "stable",
     "extension_types": ["extension"]
   },
+  "sidebar": {
+    "channel": "stable",
+    "extension_types": ["extension"]
+  },
   "chrome_settings_overrides": {
     "channel": "stable",
     "extension_types": ["extension"],

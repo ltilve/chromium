@@ -516,7 +516,7 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
 
   if (!LoadRequiredFeatures(error))
     return false;
-
+    
   // We don't need to validate because InitExtensionID already did that.
   manifest_->GetString(keys::kPublicKey, &public_key_);
 
@@ -536,10 +536,10 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
     manifest_->GetBoolean(keys::kConvertedFromUserScript,
                           &converted_from_user_script_);
   }
+  if (!LoadSidebarFeatures(error))
+    return false;
 
   if (!LoadSharedFeatures(error))
-    return false;
-  if (!LoadSidebarFeatures(error))
     return false;
   permissions_parser_->Finalize(this);
   permissions_parser_.reset();

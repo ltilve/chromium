@@ -801,7 +801,7 @@ void BrowserWindowCocoa::Observe(int type,
   switch (type) {
     case chrome::NOTIFICATION_SIDEBAR_CHANGED:
       UpdateSidebarForContents(
-          content::Details<SidebarContainer>(details)->tab_contents());
+          content::Details<SidebarContainer>(details)->web_contents());
       break;
     default:
       NOTREACHED();  // we don't ask for anything else!

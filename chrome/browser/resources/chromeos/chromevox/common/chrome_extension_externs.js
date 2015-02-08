@@ -305,6 +305,8 @@ chrome.runtime.MessageSenderEvent.prototype.hasListener = function(callback) {};
 chrome.runtime.MessageSenderEvent.prototype.hasListeners = function() {};
 
 
+chrome.sidebar = {};
+chrome.sidebar.getState = function(windowId, options, callback) {};
 /**
  * @const
  */
