@@ -466,9 +466,9 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-	registrar_.Add(
-		this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-		content::Source<SidebarManager>(SidebarManager::GetInstance()));
+  registrar_.Add(
+    this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
+    content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -547,11 +547,11 @@ void BrowserView::InitStatusBubble() {
 }
 
 bool BrowserView::SplitHandleMoved(views::SingleSplitView* sender) {
-	for (int i = 0; i < sender->child_count(); ++i)
-		sender->child_at(i)->InvalidateLayout();
-	SchedulePaint();
-	Layout();
-	return false;
+  for (int i = 0; i < sender->child_count(); ++i)
+    sender->child_at(i)->InvalidateLayout();
+  SchedulePaint();
+  Layout();
+  return false;
 }
 
 void BrowserView::InitPermissionBubbleView() {
@@ -2058,9 +2058,9 @@ void BrowserView::InitViews() {
 
   sidebar_split_ = new views::SingleSplitView(
     contents_container_,
-	  sidebar_container_,
-	  views::SingleSplitView::HORIZONTAL_SPLIT,
-      this);
+    sidebar_container_,
+    views::SingleSplitView::HORIZONTAL_SPLIT,
+    this);
   sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
   sidebar_split_->set_background(
       views::Background::CreateSolidBackground(
@@ -2131,7 +2131,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host = SidebarManager::GetInstance()->
-		GetActiveSidebarContainerFor(new_contents);
+        GetActiveSidebarContainerFor(new_contents);
     if (client_host)
       sidebar_contents = client_host->sidebar_contents();
   }
@@ -2142,7 +2142,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   bool should_hide = !visible && sidebar_container_->visible();
   // Update sidebar content.
   WebContents* old_contents =
-	  static_cast<WebContents*>(sidebar_web_view_->web_contents());
+      static_cast<WebContents*>(sidebar_web_view_->web_contents());
   sidebar_web_view_->SetWebContents(sidebar_contents);
   SidebarManager::GetInstance()->
       NotifyStateChanges(old_contents, sidebar_contents);
@@ -2150,7 +2150,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
-	int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
+    int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
         //prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
       // Initial load, set to default value.verti
@@ -2161,7 +2161,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
     sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
 
-	sidebar_split_->set_divider_offset(
+    sidebar_split_->set_divider_offset(
         sidebar_split_->width() - sidebar_width);
 
     sidebar_container_->SetVisible(true);
