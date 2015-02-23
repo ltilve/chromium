@@ -29,7 +29,6 @@
 #include "ui/base/models/simple_menu_model.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/views/controls/button/button.h"
-#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/webview/unhandled_keyboard_event_handler.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/widget_observer.h"
@@ -70,7 +69,6 @@ namespace views {
 class AccessiblePaneView;
 class ExternalFocusTracker;
 class WebView;
-class SingleSplitView;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,13 +78,11 @@ class SingleSplitView;
 //  including the TabStrip, toolbars, download shelves, the content area etc.
 //
 class BrowserView : public BrowserWindow,
-                    public content::NotificationObserver,
                     public TabStripModelObserver,
                     public ui::AcceleratorProvider,
                     public views::WidgetDelegate,
                     public views::WidgetObserver,
                     public views::ClientView,
-                    public views::SingleSplitViewListener,
                     public InfoBarContainerDelegate,
                     public LoadCompleteListener::Delegate,
                     public OmniboxPopupModelObserver {
@@ -154,8 +150,6 @@ class BrowserView : public BrowserWindow,
 
   // Container for the tabstrip, toolbar, etc.
   TopContainerView* top_container() { return top_container_; }
-  // Returns the width of the currently displayed sidebar or 0.
-  int GetSidebarWidth() const;
 
   // Accessor for the TabStrip.
   TabStrip* tabstrip() { return tabstrip_; }
@@ -216,7 +210,6 @@ class BrowserView : public BrowserWindow,
   // move it to a WindowDelegate subclass.
   content::WebContents* GetActiveWebContents() const;
 
-  bool SplitHandleMoved(views::SingleSplitView* sender) override;
   // Retrieves the icon to use in the frame to indicate an OTR window.
   gfx::ImageSkia GetOTRAvatarIcon() const;
 
@@ -372,16 +365,7 @@ class BrowserView : public BrowserWindow,
   BookmarkBarView* GetBookmarkBarView() const;
   LocationBarView* GetLocationBarView() const;
   views::View* GetTabContentsContainerView() const;
-  views::View* GetSidebarContainerView() const;
   ToolbarView* GetToolbarView() const;
-
-
-  // Overridden from content::NotificationObserver:
-  void Observe(int type,
-                       const content::NotificationSource& source,
-                       const content::NotificationDetails& details) override;
-  
-  void UpdateSidebarForContents(content::WebContents* web_contents);
 
   // Overridden from TabStripModelObserver:
   void TabInsertedAt(content::WebContents* contents,
@@ -497,9 +481,6 @@ class BrowserView : public BrowserWindow,
   // Browser type) and there should be a subsequent re-layout to show it.
   // |contents| can be null.
   bool MaybeShowBookmarkBar(content::WebContents* contents);
-
-  // Updates sidebar UI according to the current tab and sidebar state.
-  void UpdateSidebar();
 
   // Moves the bookmark bar view to the specified parent, which may be null,
   // |this|, or |top_container_|. Ensures that |top_container_| stays in front
@@ -620,7 +601,6 @@ class BrowserView : public BrowserWindow,
   //     the bar.  This allows the find bar to always align with the top of
   //     contents_container_ regardless if there's bookmark or info bars.
 
-
   // The view that manages the tab strip, toolbar, and sometimes the bookmark
   // bar. Stacked top in the view hiearachy so it can be used to slide out
   // the top views in immersive fullscreen.
@@ -649,12 +629,6 @@ class BrowserView : public BrowserWindow,
 
   // The view that contains the selected WebContents.
   ContentsWebView* contents_web_view_;
-  // The view that contains sidebar for the current tab.
-  views::WebView* sidebar_container_;
-
-  // Split view containing the contents container and sidebar container.
-  views::SingleSplitView* sidebar_split_;
-  views::SingleSplitView* contents_split_;;
 
   // The view that contains devtools window for the selected WebContents.
   views::WebView* devtools_web_view_;
@@ -713,8 +687,6 @@ class BrowserView : public BrowserWindow,
   base::RepeatingTimer<BrowserView> loading_animation_timer_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
-
-  content::NotificationRegistrar registrar_;
 
   // Used to measure the loading spinner animation rate.
   base::TimeTicks last_animation_time_;

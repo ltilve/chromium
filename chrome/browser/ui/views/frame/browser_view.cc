@@ -33,11 +33,8 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/themes/theme_properties.h"
-#include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bar_constants.h"
@@ -133,8 +130,6 @@
 #include "ui/gfx/screen.h"
 #include "ui/strings/grit/ui_strings.h"
 #include "ui/views/controls/button/menu_button.h"
-#include "ui/views/controls/single_split_view.h"
-#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/textfield/textfield.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/focus/external_focus_tracker.h"
@@ -459,8 +454,6 @@ BrowserView::BrowserView()
       infobar_container_(nullptr),
       contents_web_view_(nullptr),
       contents_container_(nullptr),
-      sidebar_container_(NULL),
-      sidebar_split_(NULL),
       initialized_(false),
       in_process_fullscreen_(false),
 #if defined(OS_WIN)
@@ -469,11 +462,6 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-
-  registrar_.Add(
-      this,
-      chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -587,12 +575,6 @@ gfx::Point BrowserView::OffsetPointForToolbarBackgroundImage(
   window_point.Offset(frame_->GetThemeBackgroundXInset(),
                       -frame_->GetTopInset());
   return window_point;
-}
-
-int BrowserView::GetSidebarWidth() const {
-  if (!sidebar_container_ || !sidebar_container_->visible())
-    return 0;
-  return sidebar_split_->divider_offset();
 }
 
 bool BrowserView::IsTabStripVisible() const {
@@ -756,10 +738,6 @@ bool BrowserView::IsAlwaysOnTop() const {
 void BrowserView::SetAlwaysOnTop(bool always_on_top) {
   // Not implemented for browser windows.
   NOTIMPLEMENTED();
-}
-
-bool BrowserView::SplitHandleMoved(views::SingleSplitView* sender) {
-  return true;
 }
 
 gfx::NativeWindow BrowserView::GetNativeWindow() const {
@@ -1177,9 +1155,6 @@ void BrowserView::RotatePaneFocus(bool forwards) {
       forwards ?
           views::FocusManager::kForward : views::FocusManager::kBackward,
       views::FocusManager::kWrap);
-// if (sidebar_container_ && sidebar_container_->visible())
-//    accessible_views.push_back(GetSidebarContainerView());
-
 }
 
 void BrowserView::DestroyBrowser() {
@@ -1520,34 +1495,8 @@ views::View* BrowserView::GetTabContentsContainerView() const {
   return contents_web_view_;
 }
 
-views::View* BrowserView::GetSidebarContainerView() const {
-  if (!sidebar_container_)
-    return NULL;
-  return NULL;//sidebar_container_->GetFocusView();TODO(me)
-}
-
 ToolbarView* BrowserView::GetToolbarView() const {
   return toolbar_;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// BrowserView, content::NotificationObserver implementation:
-
-void BrowserView::Observe(int type,
-                          const content::NotificationSource& source,
-                          const content::NotificationDetails& details) {
-  switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      if (content::Details<SidebarContainer>(details)->web_contents() ==
-          browser_->tab_strip_model()->GetActiveWebContents()) {
-        UpdateSidebar();
-      }
-      break;
-
-    default:
-      NOTREACHED() << "Got a notification we didn't register for!";
-      break;
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1589,7 +1538,6 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     web_contents_close_handler_->ActiveTabChanged();
     contents_web_view_->SetWebContents(nullptr);
     infobar_container_->ChangeInfoBarManager(nullptr);
-    UpdateSidebarForContents(NULL);
     UpdateDevToolsForContents(nullptr, true);
   }
 }
@@ -2059,25 +2007,6 @@ void BrowserView::InitViews() {
   web_contents_close_handler_.reset(
       new WebContentsCloseHandler(contents_web_view_));
 
-  bool sidebar_allowed = SidebarManager::IsSidebarAllowed();
-  if (sidebar_allowed) {
-    sidebar_container_ = new views::WebView(browser_->profile());
-    sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
-    sidebar_container_->SetVisible(false);
-
-    sidebar_split_ = new views::SingleSplitView(
-        contents_web_view_,
-        sidebar_container_,
-        views::SingleSplitView::HORIZONTAL_SPLIT,
-        this);
-    sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
-    sidebar_split_->SetAccessibleName(
-        l10n_util::GetStringUTF16(IDS_ACCNAME_SIDE_BAR));
-    sidebar_split_->set_background(
-        views::Background::CreateSolidBackground(ThemeProperties::GetDefaultColor(
-          ThemeProperties::COLOR_CONTROL_BACKGROUND)));
-  }
-
   devtools_web_view_ = new views::WebView(browser_->profile());
   devtools_web_view_->set_id(VIEW_ID_DEV_TOOLS_DOCKED);
   devtools_web_view_->SetVisible(false);
@@ -2086,7 +2015,6 @@ void BrowserView::InitViews() {
   contents_container_->set_background(views::Background::CreateSolidBackground(
       ThemeProperties::GetDefaultColor(
           ThemeProperties::COLOR_CONTROL_BACKGROUND)));
-
   contents_container_->AddChildView(devtools_web_view_);
   contents_container_->AddChildView(contents_web_view_);
   contents_container_->SetLayoutManager(new ContentsLayoutManager(
@@ -2133,22 +2061,6 @@ void BrowserView::InitViews() {
                             GetContentsLayoutManager(),
                             immersive_mode_controller_.get());
   SetLayoutManager(browser_view_layout);
-
-  views::View* contents_view = top_container_;
-  if (sidebar_allowed)
-    contents_view = sidebar_split_;
-
-  contents_split_ = new views::SingleSplitView(
-      contents_view,
-      devtools_web_view_,
-      views::SingleSplitView::VERTICAL_SPLIT,
-      this);
-  contents_split_->set_id(VIEW_ID_CONTENTS_SPLIT);
-  contents_split_->set_background(
-      views::Background::CreateSolidBackground(ThemeProperties::GetDefaultColor(
-          ThemeProperties::COLOR_CONTROL_BACKGROUND)));
-  AddChildView(contents_split_);
-  set_contents_view(contents_split_);
 
 #if defined(OS_WIN)
   // Create a custom JumpList and add it to an observer of TabRestoreService
@@ -2267,71 +2179,6 @@ bool BrowserView::MaybeShowInfoBar(WebContents* contents) {
   //             InfoBarContainer, DownloadShelfView and WebContents and this
   //             view is sorted out.
   return true;
-}
-
-void BrowserView::UpdateSidebar() {
-  UpdateSidebarForContents(GetActiveWebContents());
-  Layout();
-}
-
-void BrowserView::UpdateSidebarForContents(WebContents* web_contents) {
-  if (!sidebar_container_)
-    return;  // Happens when sidebar is not allowed.
-  if (!SidebarManager::GetInstance())
-    return;  // Happens only in tests.
-
-  WebContents* sidebar_contents = NULL;
-  if (web_contents) {
-    SidebarContainer* client_host = SidebarManager::GetInstance()->
-        GetActiveSidebarContainerFor(
-            static_cast<WebContents*>(web_contents));
-    if (client_host)
-      sidebar_contents = client_host->sidebar_contents();
-  }
-
-  bool visible = NULL != sidebar_contents &&
-                 browser_->SupportsWindowFeature(Browser::FEATURE_SIDEBAR);
-
-  bool should_show = visible && !sidebar_container_->visible();
-  bool should_hide = !visible && sidebar_container_->visible();
-
-  // Update sidebar content.
-  WebContents* old_contents =
-      static_cast<WebContents*>(sidebar_container_->web_contents());
-  sidebar_container_->SetWebContents(sidebar_contents);
-  SidebarManager::GetInstance()->
-      NotifyStateChanges(old_contents, sidebar_contents);
-
-  // Update sidebar UI width.
-  if (should_show) {
-    // Restore split offset.
-    int sidebar_width = g_browser_process->local_state()->GetInteger(
-        prefs::kExtensionSidebarWidth);
-    if (sidebar_width < 0) {
-      // Initial load, set to default value.
-      sidebar_width = sidebar_split_->width() / 7;
-    }
-    // Make sure user can see both panes.
-    int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
-    sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
-                             std::max(min_sidebar_width, sidebar_width));
-
-    sidebar_split_->set_divider_offset(
-        sidebar_split_->width() - sidebar_width);
-
-    sidebar_container_->SetVisible(true);
-    sidebar_split_->InvalidateLayout();
-    Layout();
-  } else if (should_hide) {
-    // Store split offset when hiding sidebar only.
-    g_browser_process->local_state()->SetInteger(
-        prefs::kExtensionSidebarWidth,
-        sidebar_split_->width() - sidebar_split_->divider_offset());
-
-    sidebar_container_->SetVisible(false);
-    sidebar_split_->InvalidateLayout();
-    Layout();
-  }
 }
 
 void BrowserView::UpdateDevToolsForContents(
@@ -2609,7 +2456,7 @@ void BrowserView::ShowAvatarBubbleFromAvatarButton(
     anchor_view = toolbar_->app_menu();
   else if (!frame_->GetAvatarMenuButton()->button_on_right())
     arrow = views::BubbleBorder::TOP_LEFT;
-  
+
   if (switches::IsNewAvatarMenu()) {
     NewAvatarButton* button = frame_->GetNewAvatarMenuButton();
     if (button) {
@@ -2634,7 +2481,6 @@ void BrowserView::ShowAvatarBubbleFromAvatarButton(
                                       views::BubbleBorder::PAINT_NORMAL;
     AvatarMenuBubbleView::ShowBubble(anchor_view, arrow, arrow_paint_type,
                                      alignment, bounds, browser());
-  
   }
   ProfileMetrics::LogProfileOpenMethod(ProfileMetrics::ICON_AVATAR_BUBBLE);
 }
