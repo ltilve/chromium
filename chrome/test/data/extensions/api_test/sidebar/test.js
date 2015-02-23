@@ -5,7 +5,7 @@
 // API test for chrome.experimental.sidebar.
 // browser_tests.exe --gtest_filter=SidebarApiTest.Sidebar
 
-const assertEq = function() {};//chrome.test.assertEq;
+const assertEq = function(one, two) {/*alert([one,two])*/};//chrome.test.assertEq;
 const assertTrue = function() {};//chrome.test.assertTrue;
 const pass = function() {};//chrome.test.callbackPass;
 
@@ -141,6 +141,7 @@ function hideSidebarForCurrentTab(callback) {
 
 showSidebarForCurrentTab(function() {
   expandSidebarForCurrentTab(function() {
+     chrome.sidebar.navigate({path: 'simple_page.html'});
     /*
     collapseSidebarForCurrentTab(function() {
       hideSidebarForCurrentTab(function() {

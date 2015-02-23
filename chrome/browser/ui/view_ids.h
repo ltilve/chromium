@@ -77,9 +77,6 @@ enum ViewID {
   // Docked dev tools.
   VIEW_ID_DEV_TOOLS_DOCKED,
 
-  // The contents split.
-  VIEW_ID_CONTENTS_SPLIT,
-
   // The Infobar container.
   VIEW_ID_INFO_BAR_CONTAINER,
 

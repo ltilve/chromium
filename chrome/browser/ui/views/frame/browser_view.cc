@@ -30,6 +30,8 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/profiles/profiles_state.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
+#include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
@@ -130,6 +132,8 @@
 #include "ui/gfx/screen.h"
 #include "ui/strings/grit/ui_strings.h"
 #include "ui/views/controls/button/menu_button.h"
+#include "ui/views/controls/single_split_view.h"
+#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/textfield/textfield.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/focus/external_focus_tracker.h"
@@ -462,6 +466,9 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
+	registrar_.Add(
+		this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
+		content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -537,6 +544,14 @@ BrowserView* BrowserView::GetBrowserViewForBrowser(const Browser* browser) {
 void BrowserView::InitStatusBubble() {
   status_bubble_.reset(new StatusBubbleViews(contents_web_view_));
   contents_web_view_->SetStatusBubble(status_bubble_.get());
+}
+
+bool BrowserView::SplitHandleMoved(views::SingleSplitView* sender) {
+	for (int i = 0; i < sender->child_count(); ++i)
+		sender->child_at(i)->InvalidateLayout();
+	SchedulePaint();
+	Layout();
+	return false;
 }
 
 void BrowserView::InitPermissionBubbleView() {
@@ -658,6 +673,20 @@ WebContents* BrowserView::GetActiveWebContents() const {
 
 gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
   return *GetThemeProvider()->GetImageSkiaNamed(IDR_OTR_ICON);
+}
+
+void BrowserView::Observe(int type,
+                                 const content::NotificationSource& source,
+                                 const content::NotificationDetails& details) {
+  switch (type) {
+    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
+      UpdateSidebarForContents(
+          content::Details<SidebarContainer>(details)->web_contents());
+      break;
+    default:
+      NOTREACHED();  // we don't ask for anything else!
+      break;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -863,7 +892,7 @@ void BrowserView::OnActiveTabChanged(content::WebContents* old_contents,
   // Layout for DevTools _before_ setting the both main and devtools WebContents
   // to avoid toggling the size of any of them.
   UpdateDevToolsForContents(new_contents, !change_tab_contents);
-
+  UpdateSidebarForContents(new_contents);
   if (change_tab_contents) {
     web_contents_close_handler_->ActiveTabChanged();
     contents_web_view_->SetWebContents(new_contents);
@@ -2031,7 +2060,26 @@ void BrowserView::InitViews() {
   contents_container_->SetLayoutManager(new ContentsLayoutManager(
       devtools_web_view_, contents_web_view_));
   AddChildView(contents_container_);
-  set_contents_view(contents_container_);
+  //set_contents_view(contents_container_);
+  sidebar_web_view_ = new views::WebView(browser_->profile());
+  sidebar_container_ = new views::View();
+  sidebar_container_->AddChildView(sidebar_web_view_);
+  sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
+  sidebar_container_->SetVisible(true);
+
+  sidebar_split_ = new views::SingleSplitView(
+    contents_container_,
+	  sidebar_container_,
+	  views::SingleSplitView::HORIZONTAL_SPLIT,
+      this);
+  sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
+  sidebar_split_->set_background(
+      views::Background::CreateSolidBackground(
+          GetWidget()->GetThemeProvider()->GetColor(
+              ThemeProperties::COLOR_TOOLBAR)));
+  sidebar_split_->set_resize_leading_on_bounds_change(false);
+  AddChildView(sidebar_split_);
+  set_contents_view(sidebar_split_);
 
   // Top container holds tab strip and toolbar and lives at the front of the
   // view hierarchy.
@@ -2068,7 +2116,7 @@ void BrowserView::InitViews() {
                             tabstrip_,
                             toolbar_,
                             infobar_container_,
-                            contents_container_,
+                            sidebar_split_,
                             GetContentsLayoutManager(),
                             immersive_mode_controller_.get());
   SetLayoutManager(browser_view_layout);
@@ -2082,6 +2130,64 @@ void BrowserView::InitViews() {
 #endif
 
   GetLocationBar()->GetOmniboxView()->model()->popup_model()->AddObserver(this);
+}
+
+
+void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
+  if (!sidebar_container_)
+    return;  // Happens when sidebar is not allowed.
+  if (!SidebarManager::GetInstance())
+    return;  // Happens only in tests.s
+
+  WebContents* sidebar_contents = NULL;
+  if (new_contents) {
+    SidebarContainer* client_host = SidebarManager::GetInstance()->
+		GetActiveSidebarContainerFor(new_contents);
+    if (client_host)
+      sidebar_contents = client_host->sidebar_contents();
+  }
+
+  bool visible = NULL != sidebar_contents;
+
+  bool should_show = visible && !sidebar_container_->visible();
+  bool should_hide = !visible && sidebar_container_->visible();
+  // Update sidebar content.
+  WebContents* old_contents =
+	  static_cast<WebContents*>(sidebar_web_view_->web_contents());
+  sidebar_web_view_->SetWebContents(sidebar_contents);
+  SidebarManager::GetInstance()->
+      NotifyStateChanges(old_contents, sidebar_contents);
+
+  // Update sidebar UI width.
+  if (should_show) {
+    // Restore split offset.
+	int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
+        //prefs::kExtensionSidebarWidth);
+    if (sidebar_width < 0) {
+      // Initial load, set to default value.verti
+      sidebar_width = sidebar_split_->width() / 7;
+    }
+    // Make sure user can see both panes.
+    int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
+    sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
+                             std::max(min_sidebar_width, sidebar_width));
+
+	sidebar_split_->set_divider_offset(
+        sidebar_split_->width() - sidebar_width);
+
+    sidebar_container_->SetVisible(true);
+    sidebar_split_->InvalidateLayout();
+    Layout();
+  } else if (should_hide) {
+    // Store split offset when hiding sidebar only.
+    g_browser_process->local_state()->SetInteger(
+        prefs::kExtensionSidebarWidth,
+        sidebar_split_->width() - sidebar_split_->divider_offset());
+
+    sidebar_container_->SetVisible(false);
+    sidebar_split_->InvalidateLayout();
+    Layout();
+  }
 }
 
 void BrowserView::LoadingAnimationCallback() {
