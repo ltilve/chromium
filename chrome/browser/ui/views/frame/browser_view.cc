@@ -676,8 +676,8 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
 }
 
 void BrowserView::Observe(int type,
-                                 const content::NotificationSource& source,
-                                 const content::NotificationDetails& details) {
+                          const content::NotificationSource& source,
+                          const content::NotificationDetails& details) {
   switch (type) {
     case chrome::NOTIFICATION_SIDEBAR_CHANGED:
       UpdateSidebarForContents(
