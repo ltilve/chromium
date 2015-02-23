@@ -516,7 +516,7 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
 
   if (!LoadRequiredFeatures(error))
     return false;
-    
+
   // We don't need to validate because InitExtensionID already did that.
   manifest_->GetString(keys::kPublicKey, &public_key_);
 

@@ -167,7 +167,7 @@ bool ParseHelper(Extension* extension,
        iter != host_data.end();
        ++iter) {
     const std::string& permission_str = *iter;
-    
+
     // Check if it's a host pattern permission.
     URLPattern pattern = URLPattern(kAllowedSchemes);
     URLPattern::ParseResult parse_result = pattern.Parse(permission_str);
