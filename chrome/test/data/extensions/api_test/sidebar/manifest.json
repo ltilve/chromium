@@ -7,7 +7,7 @@
     "page": "test.html"
   },
   "sidebar": {
-  	"default_title": "test sidebar",
+    "default_title": "test sidebar",
     "default_page": "test.html",
     "default_icon": "icon.png"
   },
