@@ -251,10 +251,6 @@ var tests = [
 
   function testSetFunctions() {
     showSidebarForCurrentTab(function() {
-      // TODO(alekseys): test unicode strings.
-      chrome.sidebar.setBadgeText({text: 'Some random text'});
-      chrome.sidebar.setIcon({path: 'icon.png'});
-      chrome.sidebar.setTitle({title: 'Some random title'});
       hideSidebarForCurrentTab(pass());
     });
   }

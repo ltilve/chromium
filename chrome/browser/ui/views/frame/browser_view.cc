@@ -138,6 +138,7 @@
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/focus/external_focus_tracker.h"
 #include "ui/views/focus/view_storage.h"
+#include "ui/views/layout/box_layout.h"
 #include "ui/views/layout/grid_layout.h"
 #include "ui/views/widget/native_widget.h"
 #include "ui/views/widget/root_view.h"
@@ -1580,6 +1581,7 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     infobar_container_->ChangeInfoBarManager(nullptr);
     UpdateDevToolsForContents(nullptr, true);
   }
+  UpdateSidebarForContents(NULL);
 }
 
 void BrowserView::TabDeactivated(WebContents* contents) {
@@ -1931,6 +1933,7 @@ void BrowserView::Layout() {
 
   // TODO(jamescook): Why was this in the middle of layout code?
   toolbar_->location_bar()->omnibox_view()->SetFocusable(IsToolbarVisible());
+  
 }
 
 void BrowserView::PaintChildren(gfx::Canvas* canvas,
@@ -2061,17 +2064,22 @@ void BrowserView::InitViews() {
       devtools_web_view_, contents_web_view_));
   AddChildView(contents_container_);
   //set_contents_view(contents_container_);
+  
   sidebar_web_view_ = new views::WebView(browser_->profile());
+  sidebar_web_view_->set_id(VIEW_ID_SIDE_BAR_VIEW);
+  sidebar_web_view_->SetVisible(false);
+  
   sidebar_container_ = new views::View();
   sidebar_container_->AddChildView(sidebar_web_view_);
   sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
-  sidebar_container_->SetVisible(true);
+  sidebar_container_->SetVisible(false);
 
   sidebar_split_ = new views::SingleSplitView(
-    contents_container_,
-    sidebar_container_,
-    views::SingleSplitView::HORIZONTAL_SPLIT,
+	  contents_container_,
+	  sidebar_container_,
+	  views::SingleSplitView::HORIZONTAL_SPLIT,
     this);
+
   sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
   sidebar_split_->set_background(
       views::Background::CreateSolidBackground(
@@ -2161,23 +2169,33 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
+<<<<<<< HEAD
     int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
+=======
+	  int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
+>>>>>>> Fix navigation and views layout for windows
         //prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
       // Initial load, set to default value.verti
-      sidebar_width = sidebar_split_->width() / 7;
+		sidebar_width = sidebar_split_->width() / 7;
     }
     // Make sure user can see both panes.
     int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
     sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
 
+<<<<<<< HEAD
     sidebar_split_->set_divider_offset(
+=======
+	  sidebar_split_->set_divider_offset(
+>>>>>>> Fix navigation and views layout for windows
         sidebar_split_->width() - sidebar_width);
 
     sidebar_container_->SetVisible(true);
+	sidebar_web_view_->SetVisible(true);
     sidebar_split_->InvalidateLayout();
     Layout();
+	
   } else if (should_hide) {
     // Store split offset when hiding sidebar only.
     g_browser_process->local_state()->SetInteger(
