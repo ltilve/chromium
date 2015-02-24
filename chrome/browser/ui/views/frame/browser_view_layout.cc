@@ -20,12 +20,14 @@
 #include "chrome/browser/ui/views/frame/immersive_mode_controller.h"
 #include "chrome/browser/ui/views/frame/top_container_view.h"
 #include "chrome/browser/ui/views/infobars/infobar_container_view.h"
+#include "chrome/browser/ui/view_ids.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
 #include "components/web_modal/web_contents_modal_dialog_host.h"
 #include "ui/base/hit_test.h"
 #include "ui/gfx/geometry/point.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/scrollbar_size.h"
+#include "ui/views/controls/single_split_view.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/client_view.h"
@@ -366,6 +368,13 @@ void BrowserViewLayout::Layout(views::View* browser_view) {
     latest_dialog_bounds_ = dialog_bounds;
     dialog_host_->NotifyPositionRequiresUpdate();
   }
+
+  views::SingleSplitView* ssplitview = (views::SingleSplitView*)contents_container_;
+  views::View* sidebar_web_view = browser_view_->GetViewByID(VIEW_ID_SIDE_BAR_VIEW);
+  if (ssplitview && sidebar_web_view && sidebar_web_view->visible()) {
+	  int width = (contents_container_->width() - ssplitview->divider_offset());
+	  sidebar_web_view->SetBoundsRect(gfx::Rect(0, 0, width, contents_container_->height()));
+  }
 }
 
 // Return the preferred size which is the size required to give each
@@ -476,6 +485,7 @@ void BrowserViewLayout::LayoutContentsContainerView(int top, int bottom) {
                                       vertical_layout_rect_.width(),
                                       std::max(0, bottom - top));
   contents_container_->SetBoundsRect(contents_container_bounds);
+  
 }
 
 void BrowserViewLayout::UpdateTopContainerBounds() {
