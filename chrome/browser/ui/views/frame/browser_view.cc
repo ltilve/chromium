@@ -2158,11 +2158,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
-<<<<<<< HEAD
-    int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
-=======
 	  int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
->>>>>>> Fix navigation and views layout for windows
         //prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
       // Initial load, set to default value.verti
@@ -2172,16 +2168,11 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
     int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
     sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
-
-<<<<<<< HEAD
-    sidebar_split_->set_divider_offset(
-=======
 	  sidebar_split_->set_divider_offset(
->>>>>>> Fix navigation and views layout for windows
         sidebar_split_->width() - sidebar_width);
 
     sidebar_container_->SetVisible(true);
-	sidebar_web_view_->SetVisible(true);
+	  sidebar_web_view_->SetVisible(true);
     sidebar_split_->InvalidateLayout();
     Layout();
 	
