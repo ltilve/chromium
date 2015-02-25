@@ -2064,10 +2064,10 @@ void BrowserView::InitViews() {
   sidebar_container_->SetVisible(false);
 
   sidebar_split_ = new views::SingleSplitView(
-	  contents_container_,
-	  sidebar_container_,
-	  views::SingleSplitView::HORIZONTAL_SPLIT,
-    this);
+      contents_container_,
+      sidebar_container_,
+      views::SingleSplitView::HORIZONTAL_SPLIT,
+      this);
 
   sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
   sidebar_split_->set_background(
@@ -2158,24 +2158,24 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
-	  int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
+    int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
         //prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
       // Initial load, set to default value.verti
-		sidebar_width = sidebar_split_->width() / 7;
+      sidebar_width = sidebar_split_->width() / 7;
     }
     // Make sure user can see both panes.
     int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
     sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
-	  sidebar_split_->set_divider_offset(
+    sidebar_split_->set_divider_offset(
         sidebar_split_->width() - sidebar_width);
 
     sidebar_container_->SetVisible(true);
-	  sidebar_web_view_->SetVisible(true);
+    sidebar_web_view_->SetVisible(true);
     sidebar_split_->InvalidateLayout();
     Layout();
-	
+
   } else if (should_hide) {
     // Store split offset when hiding sidebar only.
     g_browser_process->local_state()->SetInteger(
