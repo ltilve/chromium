@@ -26,9 +26,7 @@ SidebarContainer::SidebarContainer(content::WebContents* tab,
     : tab_(tab),
       content_id_(content_id),
       delegate_(delegate),
-      icon_(new SkBitmap),
-      navigate_to_default_page_on_expand_(true),
-      use_default_icon_(true) {
+      navigate_to_default_page_on_expand_(true) {
   // Create WebContents for sidebar.
    sidebar_contents_.reset(
        content::WebContents::Create(
@@ -42,27 +40,6 @@ SidebarContainer::~SidebarContainer() {
 
 void SidebarContainer::SidebarClosing() {
   delegate_->UpdateSidebar(this);
-}
-
-void SidebarContainer::LoadDefaults() {
-  const extensions::Extension* extension = GetExtension();
-  if (!extension)
-    return;  // Can be NULL in tests.
-  const ExtensionSidebarDefaults* sidebar_defaults =
-      extension->sidebar_defaults();
-
-  title_ = sidebar_defaults->default_title();
-
-  if (!sidebar_defaults->default_icon_path().empty()) {
-  /*  image_loading_tracker_.reset(new ImageLoadingTracker(this));
-    image_loading_tracker_->LoadImage(
-        extension,
-        extension->GetResource(sidebar_defaults->default_icon_path()),
-        gfx::Size(Extension::kSidebarIconMaxSize,
-                  Extension::kSidebarIconMaxSize),
-        ImageLoadingTracker::CACHE);
-   */
-  }
 }
 
 void SidebarContainer::Show() {
@@ -101,27 +78,9 @@ void SidebarContainer::SetBadgeText(const base::string16& badge_text) {
   badge_text_ = badge_text;
 }
 
-void SidebarContainer::SetIcon(const SkBitmap& bitmap) {
-  use_default_icon_ = false;
-  *icon_ = bitmap;
-}
-
-void SidebarContainer::SetTitle(const base::string16& title) {
-  title_ = title;
-}
-
 content::JavaScriptDialogManager*
 SidebarContainer::GetJavaScriptDialogManager(content::WebContents* source) {
   return app_modal::JavaScriptDialogManager::GetInstance();
-}
-
-void SidebarContainer::OnImageLoaded(SkBitmap* image,
-                                     const extensions::ExtensionResource& resource,
-                                     int index) {
-  if (image && use_default_icon_) {
-    *icon_ = *image;
-     delegate_->UpdateSidebar(this);
-  }
 }
 
 const extensions::Extension* SidebarContainer::GetExtension() const {

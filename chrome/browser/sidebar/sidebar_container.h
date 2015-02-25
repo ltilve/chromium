@@ -12,7 +12,6 @@
 #include "base/memory/scoped_ptr.h"
 #include "base/strings/string16.h"
 #include "extensions/common/extension_resource.h"
-//#include "chrome/browser/extensions/image_loading_tracker.h"
 #include "content/public/browser/web_contents_delegate.h"
 
 class SkBitmap;
@@ -31,7 +30,6 @@ class Extension;
 //  tab it is linked to, mini tab icon, title etc.
 //
 class SidebarContainer : public content::WebContentsDelegate {
-                         //private ImageLoadingTracker::Observer {
  public:
   // Interface to implement to listen for sidebar update notification.
   class Delegate {
@@ -52,9 +50,6 @@ class SidebarContainer : public content::WebContentsDelegate {
   // Does all the necessary cleanup.
   void SidebarClosing();
 
-  // Sets default sidebar parameters, as specified in extension manifest.
-  void LoadDefaults();
-
   // Returns sidebar's content id.
   const std::string& content_id() const { return content_id_; }
 
@@ -66,12 +61,6 @@ class SidebarContainer : public content::WebContentsDelegate {
 
   // Accessor for the badge text.
   const base::string16& badge_text() const { return badge_text_; }
-
-  // Accessor for the icon.
-  const SkBitmap& icon() const { return *icon_; }
-
-  // Accessor for the title.
-  const base::string16& title() const { return title_; }
 
   // Functions supporting chrome.experimental.sidebar API.
 
@@ -90,21 +79,10 @@ class SidebarContainer : public content::WebContentsDelegate {
   // Changes sidebar's badge text.
   void SetBadgeText(const base::string16& badge_text);
 
-  // Changes sidebar's icon.
-  void SetIcon(const SkBitmap& bitmap);
-
-  // Changes sidebar's title.
-  void SetTitle(const base::string16& title);
-
  private:
   // Overridden from content::WebContentsDelegate:
   content::JavaScriptDialogManager* GetJavaScriptDialogManager(
       content::WebContents* source) override;
-
-  // Overridden from ImageLoadingTracker::Observer:
-  virtual void OnImageLoaded(SkBitmap* image,
-                             const extensions::ExtensionResource& resource,
-                             int index); //OVERRIDE;
 
   // Returns an extension this sidebar belongs to.
   const extensions::Extension* GetExtension() const;
@@ -125,25 +103,11 @@ class SidebarContainer : public content::WebContentsDelegate {
   // Badge text displayed on the sidebar's mini tab.
   base::string16 badge_text_;
 
-  // Icon displayed on the sidebar's mini tab.
-  scoped_ptr<SkBitmap> icon_;
-
-  // Sidebar's title, displayed as a tooltip for sidebar's mini tab.
-  base::string16 title_;
-
   // On the first expand sidebar will be automatically navigated to the default
   // page (specified in the extension manifest), but only if the extension has
   // not explicitly navigated it yet. This variable is set to false on the first
   // sidebar navigation.
   bool navigate_to_default_page_on_expand_;
-  // Since the default icon (specified in the extension manifest) is loaded
-  // asynchronously, sidebar icon can already be set by the extension
-  // by the time it's loaded. This variable tracks whether the loaded default
-  // icon should be used or discarded.
-  bool use_default_icon_;
-
-  // Helper to load icons from extension asynchronously.
-  //scoped_ptr<ImageLoadingTracker> image_loading_tracker_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };

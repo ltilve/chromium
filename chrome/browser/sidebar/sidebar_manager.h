@@ -84,16 +84,6 @@ class SidebarManager : public content::NotificationObserver,
                            const std::string& content_id,
                            const base::string16& badge_text);
 
-  // Changes sidebar's icon (displayed on the mini tab).
-  void SetSidebarIcon(content::WebContents* tab,
-                      const std::string& content_id,
-                      const SkBitmap& bitmap);
-
-  // Changes sidebar's title (mini tab's tooltip).
-  void SetSidebarTitle(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::string16& title);
-
  private:
   friend class base::RefCounted<SidebarManager>;
 

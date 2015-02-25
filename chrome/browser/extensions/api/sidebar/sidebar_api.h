@@ -115,28 +115,6 @@ protected:
   DECLARE_EXTENSION_FUNCTION("sidebar.setBadgeText", SIDEBAR_BADGETEXT);
 };
 
-class SidebarSetIconFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
-protected:
-  ~SidebarSetIconFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.setIcon", SIDEBAR_SETICON);
-};
-
-class SidebarSetTitleFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
-protected:
-  ~SidebarSetTitleFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.setTitle", SIDEBAR_SETTITLE);
-};
-
 class SidebarShowFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
