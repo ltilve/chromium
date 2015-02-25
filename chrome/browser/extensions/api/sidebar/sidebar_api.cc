@@ -233,29 +233,6 @@ bool SidebarSetBadgeTextFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool SidebarSetIconFunction::RunImpl(content::WebContents* tab,
-                                     const std::string& content_id,
-                                     const base::DictionaryValue& details) {
-  const base::BinaryValue* binary = 0;
-  EXTENSION_FUNCTION_VALIDATE(details.GetBinary(kImageDataKey, &binary));
-  IPC::Message bitmap_pickle(binary->GetBuffer(), binary->GetSize());
-  PickleIterator iter(bitmap_pickle);
-  scoped_ptr<SkBitmap> bitmap(new SkBitmap);
-  EXTENSION_FUNCTION_VALIDATE(
-      IPC::ReadParam(&bitmap_pickle, &iter, bitmap.get()));
-  SidebarManager::GetInstance()->SetSidebarIcon(tab, content_id, *bitmap);
-  return true;
-}
-
-bool SidebarSetTitleFunction::RunImpl(content::WebContents* tab,
-                                      const std::string& content_id,
-                                      const base::DictionaryValue& details) {
-  base::string16 title;
-  EXTENSION_FUNCTION_VALIDATE(details.GetString(kTitleKey, &title));
-  SidebarManager::GetInstance()->SetSidebarTitle(tab, content_id, title);
-  return true;
-}
-
 bool SidebarShowFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,
                                   const base::DictionaryValue& details) {

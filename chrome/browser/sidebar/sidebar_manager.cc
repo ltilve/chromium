@@ -116,9 +116,6 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   if (!host) {
     host = new SidebarContainer(tab, content_id, this);
     RegisterSidebarContainerFor(tab, host);
-    // It might trigger UpdateSidebar notification, so load them after
-    // the registration.
-    host->LoadDefaults();
   }
 
   host->Show();
@@ -207,23 +204,6 @@ void SidebarManager::SetSidebarBadgeText(
   host->SetBadgeText(badge_text);
 }
 
-void SidebarManager::SetSidebarIcon(
-    content::WebContents* tab, const std::string& content_id,
-    const SkBitmap& bitmap) {
-  SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
-  if (!host)
-    return;
-  host->SetIcon(bitmap);
-}
-
-void SidebarManager::SetSidebarTitle(
-    content::WebContents* tab, const std::string& content_id,
-    const base::string16& title) {
-  SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
-  if (!host)
-    return;
-  host->SetTitle(title);
-}
 
 SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_host_.empty());

@@ -161,61 +161,6 @@
             }
           }
         ]
-      },
-      {
-        "name": "setIcon",
-        "type": "function",
-        "description": "Sets sidebar's mini tab icon for the specified tab.",
-        "parameters": [
-          {
-            "type": "object",
-            "name": "details",
-            "properties": {
-              "tabId": {
-                "type": "integer",
-                "minimum": 0,
-                "optional": true,
-                "description": "Defaults to the selected tab of the <a href='windows.html#current-window'>current window</a>."
-              },
-              "imageData": {
-                "type": "object",
-                "isInstanceOf": "ImageData",
-                "properties": {},
-                "additionalProperties": { "type": "any" },
-                "description": "Pixel data for an image to show on the sidebar's mini tab. Must be an ImageData object (for example, from a <code>canvas</code> element). Only one of the imagePath/imageData parameters all owed. The extension's icon is used by default. The preferred size of the icon is 16x16 pixels, any other size will be scaled to 16x16.",
-                "optional": true
-              },
-              "path": {
-                "type": "string",
-                "optional": true,
-                "description": "Relative path to an image in the extension to show on the sidebar's mini tab. Only one of the imagePath/imageData parameters all owed. The extension's icon is used by default. The preferred size of the icon is 16x16 pixels, any other size will be scaled to 16x16."
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "setTitle",
-        "type": "function",
-        "description": "Sets sidebar's mini tab title for the specified tab.",
-        "parameters": [
-          {
-            "type": "object",
-            "name": "details",
-            "properties": {
-              "tabId": {
-                "type": "integer",
-                "minimum": 0,
-                "optional": true,
-                "description": "Defaults to the selected tab of the <a href='windows.html#current-window'>current window</a>."
-              },
-              "title": {
-                "type": "string",
-                "description": "The sidebar's title. It is displayed in a tooltip over the sidebar's mini tab."
-              }
-            }
-          }
-        ]
       }
     ],
     "events": [
