@@ -34,15 +34,10 @@ const char kNoSidebarError[] =
 const char kNoTabError[] = "No tab with id: *.";
 const char kNoCurrentWindowError[] = "No current browser window was found";
 const char kNoDefaultTabError[] = "No default tab was found";
-//const char kInvalidExpandContextError[] =
-//    "Sidebar can be expanded only in response to an explicit user gesture";
 // Keys.
-const char kBadgeTextKey[] = "text";
-const char kImageDataKey[] = "imageData";
 const char kPathKey[] = "path";
 const char kStateKey[] = "state";
 const char kTabIdKey[] = "tabId";
-const char kTitleKey[] = "title";
 // Events.
 const char kOnStateChanged[] = "experimental.sidebar.onStateChanged";
 }  // namespace
@@ -146,20 +141,6 @@ return true;
 }
 
 
-bool SidebarCollapseFunction::RunImpl(content::WebContents* tab,
-                                      const std::string& content_id,
-                                      const base::DictionaryValue& details) {
-  SidebarManager::GetInstance()->CollapseSidebar(tab, content_id);
-  return true;
-}
-
-bool SidebarExpandFunction::RunImpl(content::WebContents* tab,
-                                    const std::string& content_id,
-                                    const base::DictionaryValue& details) {
-  SidebarManager::GetInstance()->ExpandSidebar(tab, content_id);
-  return true;
-}
-
 bool SidebarGetStateFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
@@ -223,15 +204,6 @@ bool SidebarNavigateFunction::RunImpl(content::WebContents* tab,
   return true;
 }
 
-bool SidebarSetBadgeTextFunction::RunImpl(content::WebContents* tab,
-                                          const std::string& content_id,
-                                          const base::DictionaryValue& details) {
-  base::string16 badge_text;
-  EXTENSION_FUNCTION_VALIDATE(details.GetString(kBadgeTextKey, &badge_text));
-  SidebarManager::GetInstance()->SetSidebarBadgeText(
-      tab, content_id, badge_text);
-  return true;
-}
 
 bool SidebarShowFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,

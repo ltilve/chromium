@@ -102,7 +102,7 @@ class BrowserView : public BrowserWindow,
 
   void set_frame(BrowserFrame* frame) { frame_ = frame; }
   BrowserFrame* frame() const { return frame_; }
-
+  int GetSidebarWidth() const;
   // Returns a pointer to the BrowserView* interface implementation (an
   // instance of this object, typically) for a given native window, or null if
   // there is no such association.
