@@ -1331,6 +1331,12 @@ void BrowserView::ShowOneClickSigninBubble(
 }
 #endif
 
+int BrowserView::GetSidebarWidth() const {
+  if (!sidebar_container_ || !sidebar_container_->visible())
+    return 0;
+  return sidebar_split_->divider_offset();
+}
+
 void BrowserView::SetDownloadShelfVisible(bool visible) {
   // This can be called from the superclass destructor, when it destroys our
   // child views. At that point, browser_ is already gone.

@@ -49,28 +49,6 @@ class SidebarFunction : public ChromeSyncExtensionFunction {
                        const base::DictionaryValue& details) = 0;
 };
 
-class SidebarCollapseFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
- protected:
-  ~SidebarCollapseFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.collapse", SIDEBAR_COLLAPSE);
-};
-
-class SidebarExpandFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
- protected:
-  ~SidebarExpandFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.expand", SIDEBAR_EXPAND);
-};
-
 class SidebarGetStateFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,
@@ -102,17 +80,6 @@ protected:
   ~SidebarNavigateFunction() override {} ;
 
   DECLARE_EXTENSION_FUNCTION("sidebar.navigate", SIDEBAR_NAVIGATE);
-};
-
-class SidebarSetBadgeTextFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
-protected:
-  ~SidebarSetBadgeTextFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.setBadgeText", SIDEBAR_BADGETEXT);
 };
 
 class SidebarShowFunction : public SidebarFunction {
