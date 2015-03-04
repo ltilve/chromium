@@ -97,6 +97,7 @@ bool ParseHelper(Extension* extension,
   // NOTE: We need to get the APIPermission before we check if features
   // associated with them are available because the feature system does not
   // know about aliases.
+
   std::vector<std::string> host_data;
   if (!APIPermissionSet::ParseFromJSON(
           permissions,
