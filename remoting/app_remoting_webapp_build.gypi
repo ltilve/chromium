@@ -6,15 +6,12 @@
   'includes': [
     'remoting_version.gypi',
     'remoting_locales.gypi',
+    'remoting_options.gypi',
     'remoting_webapp_files.gypi',
     'app_remoting_webapp_files.gypi',
   ],
 
   'variables': {
-    'chromium_code': 1,
-
-    'run_jscompile%': 0,
-
     # The ar_service_environment variable is used to define the target
     # environment for the app being built.
     # The allowed values are dev, test, staging, and prod.
@@ -58,6 +55,7 @@
       'ar_generated_html_files': [
         '<(SHARED_INTERMEDIATE_DIR)/>(_target_name)/main.html',
         '<(SHARED_INTERMEDIATE_DIR)/>(_target_name)/wcs_sandbox.html',
+        '<(SHARED_INTERMEDIATE_DIR)/>(_target_name)/feedback_consent.html',
       ],
       'ar_webapp_files': [
         '<@(ar_app_specific_files)',
@@ -187,6 +185,28 @@
           '<(DEPTH)/remoting',
           '--js',
           '<@(remoting_webapp_wcs_sandbox_html_js_files)',
+        ],
+      },
+      {
+        'action_name': 'Build ">(ar_app_name)" feedback_consent.html',
+        'inputs': [
+          '<(DEPTH)/remoting/webapp/build-html.py',
+          '<(ar_feedback_consent_template)',
+          '<@(ar_feedback_consent_template_files)',
+        ],
+        'outputs': [
+          '<(SHARED_INTERMEDIATE_DIR)/>(_target_name)/feedback_consent.html',
+        ],
+        'action': [
+          'python', '<(DEPTH)/remoting/webapp/build-html.py',
+          '<(SHARED_INTERMEDIATE_DIR)/>(_target_name)/feedback_consent.html',
+          '<(ar_feedback_consent_template)',
+          '--template-dir',
+          '<(DEPTH)/remoting',
+          '--templates',
+          '<@(ar_feedback_consent_template_files)',
+          '--js',
+          '<@(ar_feedback_consent_js_files)',
         ],
       },
     ],  # actions

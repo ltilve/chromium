@@ -43,6 +43,8 @@
 #include "chrome/browser/metrics/rappor/sampling.h"
 #include "chrome/browser/nacl_host/nacl_browser_delegate_impl.h"
 #include "chrome/browser/net/chrome_net_log.h"
+#include "chrome/browser/net/spdyproxy/data_reduction_proxy_chrome_settings.h"
+#include "chrome/browser/net/spdyproxy/data_reduction_proxy_chrome_settings_factory.h"
 #include "chrome/browser/notifications/desktop_notification_service.h"
 #include "chrome/browser/notifications/desktop_notification_service_factory.h"
 #include "chrome/browser/notifications/platform_notification_service_impl.h"
@@ -56,14 +58,14 @@
 #include "chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_io_data.h"
+#include "chrome/browser/push_messaging/push_messaging_permission_context.h"
+#include "chrome/browser/push_messaging/push_messaging_permission_context_factory.h"
 #include "chrome/browser/renderer_host/chrome_render_message_filter.h"
 #include "chrome/browser/renderer_host/pepper/chrome_browser_pepper_host_factory.h"
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/search_provider_install_state_message_filter.h"
-#include "chrome/browser/services/gcm/push_messaging_permission_context.h"
-#include "chrome/browser/services/gcm/push_messaging_permission_context_factory.h"
 #include "chrome/browser/signin/principals_message_filter.h"
 #include "chrome/browser/speech/chrome_speech_recognition_manager_delegate.h"
 #include "chrome/browser/speech/tts_controller.h"
@@ -100,6 +102,7 @@
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/permission_request_id.h"
+#include "components/data_reduction_proxy/content/browser/data_reduction_proxy_message_filter.h"
 #include "components/dom_distiller/core/url_constants.h"
 #include "components/google/core/browser/google_util.h"
 #include "components/metrics/client_info.h"
@@ -650,7 +653,7 @@ PermissionContextBase* GetPermissionContext(Profile* profile,
       break;
 #endif
     case content::PERMISSION_PUSH_MESSAGING:
-      return gcm::PushMessagingPermissionContextFactory::GetForProfile(profile);
+      return PushMessagingPermissionContextFactory::GetForProfile(profile);
     case content::PERMISSION_NUM:
       NOTREACHED() << "Invalid RequestPermission for " << permission;
       break;
@@ -678,6 +681,12 @@ ContentSettingsType PermissionToContentSetting(
       NOTREACHED() << "Unknown content setting for permission " << permission;
       return CONTENT_SETTINGS_TYPE_DEFAULT;
   }
+}
+
+void OnRequestPermission(
+    const base::Callback<void(content::PermissionStatus)>& callback,
+    ContentSetting content_setting) {
+  callback.Run(ContentSettingToPermissionStatus(content_setting));
 }
 
 }  // namespace
@@ -937,6 +946,13 @@ void ChromeContentBrowserClient::RenderProcessWillLaunch(
 #endif
   if (switches::IsEnableAccountConsistency())
     host->AddFilter(new PrincipalsMessageFilter(id));
+
+  DataReductionProxyChromeSettings* data_reduction_proxy_settings =
+      DataReductionProxyChromeSettingsFactory::GetForBrowserContext(profile);
+  if (data_reduction_proxy_settings) {
+    host->AddFilter(new data_reduction_proxy::DataReductionProxyMessageFilter(
+        data_reduction_proxy_settings));
+  }
 
   host->Send(new ChromeViewMsg_SetIsIncognitoProcess(
       profile->IsOffTheRecord()));
@@ -1934,7 +1950,7 @@ void ChromeContentBrowserClient::RequestPermission(
     int bridge_id,
     const GURL& requesting_frame,
     bool user_gesture,
-    const base::Callback<void(bool)>& result_callback) {
+    const base::Callback<void(content::PermissionStatus)>& result_callback) {
   int render_process_id = web_contents->GetRenderProcessHost()->GetID();
   int render_view_id = web_contents->GetRenderViewHost()->GetRoutingID();
   const PermissionRequestID request_id(render_process_id,
@@ -1949,7 +1965,8 @@ void ChromeContentBrowserClient::RequestPermission(
     return;
 
   context->RequestPermission(web_contents, request_id, requesting_frame,
-                             user_gesture, result_callback);
+                             user_gesture,
+                             base::Bind(&OnRequestPermission, result_callback));
 }
 
 content::PermissionStatus ChromeContentBrowserClient::GetPermissionStatus(

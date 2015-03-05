@@ -585,7 +585,7 @@ class GLES2DecoderImpl : public GLES2Decoder,
   bool Initialize(const scoped_refptr<gfx::GLSurface>& surface,
                   const scoped_refptr<gfx::GLContext>& context,
                   bool offscreen,
-                  const gfx::Size& size,
+                  const gfx::Size& offscreen_size,
                   const DisallowedFeatures& disallowed_features,
                   const std::vector<int32>& attribs) override;
   void Destroy(bool have_context) override;
@@ -2434,12 +2434,16 @@ bool GLES2DecoderImpl::Initialize(
     const scoped_refptr<gfx::GLSurface>& surface,
     const scoped_refptr<gfx::GLContext>& context,
     bool offscreen,
-    const gfx::Size& size,
+    const gfx::Size& offscreen_size,
     const DisallowedFeatures& disallowed_features,
     const std::vector<int32>& attribs) {
   TRACE_EVENT0("gpu", "GLES2DecoderImpl::Initialize");
   DCHECK(context->IsCurrent(surface.get()));
   DCHECK(!context_.get());
+
+  ContextCreationAttribHelper attrib_parser;
+  if (!attrib_parser.Parse(attribs))
+    return false;
 
   surfaceless_ = surface->IsSurfaceless() && !offscreen;
 
@@ -2457,7 +2461,10 @@ bool GLES2DecoderImpl::Initialize(
   }
 
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kEnableUnsafeES3APIs)) {
+          switches::kEnableUnsafeES3APIs) &&
+      attrib_parser.es3_context_required) {
+    // TODO(zmo): We need to implement capabilities check to ensure we can
+    // actually create ES3 contexts.
     set_unsafe_es3_apis_enabled(true);
   }
 
@@ -2469,10 +2476,6 @@ bool GLES2DecoderImpl::Initialize(
   // SetSurface.
   context_ = context;
   surface_ = surface;
-
-  ContextCreationAttribHelper attrib_parser;
-  if (!attrib_parser.Parse(attribs))
-    return false;
 
   // Create GPU Tracer for timing values.
   gpu_tracer_.reset(new GPUTracer(this));
@@ -2675,11 +2678,14 @@ bool GLES2DecoderImpl::Initialize(
 
     // Allocate the render buffers at their initial size and check the status
     // of the frame buffers is okay.
-    if (!ResizeOffscreenFrameBuffer(size)) {
+    if (!ResizeOffscreenFrameBuffer(offscreen_size)) {
       LOG(ERROR) << "Could not allocate offscreen buffer storage.";
       Destroy(true);
       return false;
     }
+
+    state_.viewport_width = offscreen_size.width();
+    state_.viewport_height = offscreen_size.height();
 
     // Allocate the offscreen saved color texture.
     DCHECK(offscreen_saved_color_format_);
@@ -2720,6 +2726,9 @@ bool GLES2DecoderImpl::Initialize(
       glGetIntegerv(GL_STENCIL_BITS, &v);
       back_buffer_has_stencil_ = attrib_parser.stencil_size != 0 && v > 0;
     }
+
+    state_.viewport_width = surface->GetSize().width();
+    state_.viewport_height = surface->GetSize().height();
   }
 
   // OpenGL ES 2.0 implicitly enables the desktop GL capability
@@ -2741,9 +2750,6 @@ bool GLES2DecoderImpl::Initialize(
   if (!InitializeShaderTranslator()) {
     return false;
   }
-
-  state_.viewport_width = size.width();
-  state_.viewport_height = size.height();
 
   GLint viewport_params[4] = { 0 };
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, viewport_params);
@@ -2956,9 +2962,15 @@ bool GLES2DecoderImpl::InitializeShaderTranslator() {
         features().nv_draw_buffers ? 1 : 0;
   }
 
-  ShShaderSpec shader_spec = force_webgl_glsl_validation_ ? SH_WEBGL_SPEC
-                                                          : SH_GLES2_SPEC;
-  if (shader_spec == SH_WEBGL_SPEC && features().enable_shader_name_hashing)
+  ShShaderSpec shader_spec;
+  if (force_webgl_glsl_validation_) {
+    shader_spec = unsafe_es3_apis_enabled() ? SH_WEBGL2_SPEC : SH_WEBGL_SPEC;
+  } else {
+    shader_spec = unsafe_es3_apis_enabled() ? SH_GLES3_SPEC : SH_GLES2_SPEC;
+  }
+
+  if ((shader_spec == SH_WEBGL_SPEC || shader_spec == SH_WEBGL2_SPEC) &&
+      features().enable_shader_name_hashing)
     resources.HashFunction = &CityHash64;
   else
     resources.HashFunction = NULL;

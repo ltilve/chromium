@@ -251,9 +251,6 @@ char kTSanDefaultSuppressions[] =
 // http://crbug.com/364006
 "race:gfx::ImageFamily::~ImageFamily\n"
 
-// http://crbug.com/364014
-"race:WTF::Latin1Encoding()::globalLatin1Encoding\n"
-
 // https://code.google.com/p/v8/issues/detail?id=3143
 "race:v8::internal::FLAG_track_double_fields\n"
 
@@ -327,9 +324,6 @@ char kTSanDefaultSuppressions[] =
 
 // https://crbug.com/459429
 "race:randomnessPid\n"
-
-// https://crbug.com/460243
-"race:IPC::ChannelMojoHost::OnClientLaunched\n"
 
 // https://crbug.com/454655
 "race:content::BrowserTestBase::PostTaskToInProcessRendererAndWait\n"

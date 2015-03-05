@@ -190,7 +190,7 @@ remoting.AppRemoting.prototype.init = function(connector) {
       method: 'POST',
       url: that.runApplicationUrl(),
       onDone: parseAppHostResponse,
-      oauthToken: token,
+      oauthToken: token
     });
   };
 
@@ -238,9 +238,12 @@ remoting.AppRemoting.prototype.getDefaultRemapKeys = function() {
  * @return {void} Nothing.
  */
 remoting.AppRemoting.prototype.handleConnected = function(clientSession) {
-  remoting.clientSession.sendClientMessage(
-      'setUserDisplayInfo',
-      JSON.stringify({fullName: remoting.identity.getCachedUserFullName()}));
+  remoting.identity.getUserInfo().then(
+      function(userInfo) {
+        remoting.clientSession.sendClientMessage(
+            'setUserDisplayInfo',
+            JSON.stringify({fullName: userInfo.name}));
+      });
 
   // Set up a ping at 10-second intervals to test the connection speed.
   function ping() {

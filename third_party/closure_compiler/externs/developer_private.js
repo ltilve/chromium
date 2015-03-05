@@ -5,7 +5,7 @@
 /** @fileoverview Externs generated from namespace: developerPrivate */
 
 // Note: hand-modified to change Array to !Array in ItemInfo typedef, and add
-// typedef {string} for idl enums.
+// enum definitions.
 
 /**
  * @typedef {string}
@@ -76,30 +76,57 @@ var InspectOptions;
 
 /**
  * @typedef {{
- *   failQuietly: boolean
+ *   failQuietly: (boolean|undefined)
  * }}
  */
 var ReloadOptions;
 
 /**
- * @typedef {string}
+ * @typedef {{
+ *   failQuietly: (boolean|undefined)
+ * }}
  */
-var PackStatus;
+var LoadUnpackedOptions;
 
 /**
- * @typedef {string}
+ * @enum {string}
  */
-var FileType;
+chrome.developerPrivate.PackStatus = {
+  SUCCESS: 'SUCCESS',
+  ERROR: 'ERROR',
+  WARNING: 'WARNING',
+};
 
 /**
- * @typedef {string}
+ * @enum {string}
  */
-var SelectType;
+chrome.developerPrivate.FileType = {
+  LOAD: 'LOAD',
+  PEM: 'PEM',
+};
 
 /**
- * @typedef {string}
+ * @enum {string}
  */
-var EventType;
+chrome.developerPrivate.SelectType = {
+  FILE: 'FILE',
+  FOLDER: 'FOLDER',
+};
+
+/**
+ * @enum {string}
+ */
+chrome.developerPrivate.EventType = {
+  INSTALLED: 'INSTALLED',
+  UNINSTALLED: 'UNINSTALLED',
+  LOADED: 'LOADED',
+  UNLOADED: 'UNLOADED',
+  // New window / view opened.
+  VIEW_REGISTERED: 'VIEW_REGISTERED',
+  // window / view closed.
+  VIEW_UNREGISTERED: 'VIEW_UNREGISTERED',
+  ERROR_ADDED: 'ERROR_ADDED',
+}
 
 /**
  * @typedef {{
@@ -107,7 +134,7 @@ var EventType;
  *   item_path: string,
  *   pem_path: string,
  *   override_flags: number,
- *   status: PackStatus
+ *   status: chrome.developerPrivate.PackStatus
  * }}
  */
 var PackDirectoryResponse;
@@ -121,7 +148,7 @@ var ProjectInfo;
 
 /**
  * @typedef {{
- *   event_type: EventType,
+ *   event_type: chrome.developerPrivate.EventType,
  *   item_id: string
  * }}
  */
@@ -231,9 +258,10 @@ chrome.developerPrivate.allowIncognito = function(extensionId, allow, callback) 
 
 /**
  * Loads a user-selected unpacked item.
+ * @param {LoadUnpackedOptions=} options Additional configuration parameters.
  * @param {Function=} callback
  */
-chrome.developerPrivate.loadUnpacked = function(callback) {};
+chrome.developerPrivate.loadUnpacked = function(options, callback) {};
 
 /**
  * Loads an extension / app.
@@ -244,8 +272,10 @@ chrome.developerPrivate.loadDirectory = function(directory, callback) {};
 
 /**
  * Open Dialog to browse to an entry.
- * @param {SelectType} selectType Select a file or a folder.
- * @param {FileType} fileType Required file type. For example, pem type is for
+ * @param {chrome.developerPrivate.SelectType} selectType
+ *     Select a file or a folder.
+ * @param {chrome.developerPrivate.FileType} fileType
+ *     Required file type. For example, pem type is for
  * private key and load type is for an unpacked item.
  * @param {Function} callback called with selected item's path.
  */

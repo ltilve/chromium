@@ -49,7 +49,6 @@ import org.chromium.content.browser.ContentViewClient;
 import org.chromium.content.browser.ContentViewCore;
 import org.chromium.content.browser.ContentViewStatics;
 import org.chromium.content.browser.SmartClipProvider;
-import org.chromium.content.browser.WebContentsObserver;
 import org.chromium.content.common.CleanupReference;
 import org.chromium.content_public.browser.GestureStateListener;
 import org.chromium.content_public.browser.JavaScriptCallback;
@@ -184,13 +183,14 @@ public class AwContents implements SmartClipProvider,
     /**
      * Visual state callback, see {@link #insertVisualStateCallback} for details.
      *
-     * <p>The {@code requestId} is the id passed to {@link AwContents#insertVisualStateCallback}
-     * which can be used to match requests with the corresponding callbacks.
      */
     @VisibleForTesting
     public abstract static class VisualStateCallback {
+        /**
+         * @param requestId the id passed to {@link AwContents#insertVisualStateCallback}
+         * which can be used to match requests with the corresponding callbacks.
+         */
         public abstract void onComplete(long requestId);
-        public abstract void onFailure(long requestId);
     }
 
     private long mNativeAwContents;
@@ -204,7 +204,7 @@ public class AwContents implements SmartClipProvider,
     private NavigationController mNavigationController;
     private final AwContentsClient mContentsClient;
     private final AwContentViewClient mContentViewClient;
-    private WebContentsObserver mWebContentsObserver;
+    private AwWebContentsObserver mWebContentsObserver;
     private final AwContentsClientBridge mContentsClientBridge;
     private final AwWebContentsDelegateAdapter mWebContentsDelegate;
     private final AwContentsIoThreadClient mIoThreadClient;
@@ -227,6 +227,8 @@ public class AwContents implements SmartClipProvider,
     private boolean mHasRequestedVisitedHistoryFromClient;
     // TODO(boliu): This should be in a global context, not per webview.
     private final double mDIPScale;
+    // Whether the WebView has attempted to do any load (including uncommitted loads).
+    private boolean mDidAttemptLoad = false;
 
     // The base background color, i.e. not accounting for any CSS body from the current page.
     private int mBaseBackgroundColor = Color.WHITE;
@@ -268,6 +270,8 @@ public class AwContents implements SmartClipProvider,
     // we are a child of a ListView. This may cause many toggles of View focus, which we suppress
     // when in this state.
     private boolean mTemporarilyDetached;
+
+    private Handler mHandler;
 
     // True when this AwContents has been destroyed.
     // Do not use directly, call isDestroyed() instead.
@@ -601,6 +605,7 @@ public class AwContents implements SmartClipProvider,
         mContainerView = containerView;
         mContainerView.setWillNotDraw(false);
 
+        mHandler = new Handler();
         mContext = context;
         mInternalAccessAdapter = internalAccessAdapter;
         mNativeGLDelegate = nativeGLDelegate;
@@ -843,7 +848,7 @@ public class AwContents implements SmartClipProvider,
 
     private void installWebContentsObserver() {
         if (mWebContentsObserver != null) {
-            mWebContentsObserver.detachFromWebContents();
+            mWebContentsObserver.destroy();
         }
         mWebContentsObserver = new AwWebContentsObserver(mWebContents, mContentsClient);
     }
@@ -908,6 +913,9 @@ public class AwContents implements SmartClipProvider,
         if (wasWindowFocused) onWindowFocusChanged(wasWindowFocused);
         if (wasFocused) onFocusChanged(true, 0, null);
 
+        // Popups are always assumed as having made a load attempt.
+        mDidAttemptLoad = true;
+
         // Restore injected JavaScript interfaces.
         for (Map.Entry<String, Pair<Object, Class>> entry : javascriptInterfaces.entrySet()) {
             @SuppressWarnings("unchecked")
@@ -936,7 +944,7 @@ public class AwContents implements SmartClipProvider,
             nativeOnDetachedFromWindow(mNativeAwContents);
         }
         mIsDestroyed = true;
-        new Handler().post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 destroyNatives();
@@ -951,7 +959,7 @@ public class AwContents implements SmartClipProvider,
         if (mCleanupReference != null) {
             assert mNativeAwContents != 0;
 
-            mWebContentsObserver.detachFromWebContents();
+            mWebContentsObserver.destroy();
             mWebContentsObserver = null;
             mContentViewCore.destroy();
             mContentViewCore = null;
@@ -1235,6 +1243,19 @@ public class AwContents implements SmartClipProvider,
     public String getUrl() {
         if (isDestroyed()) return null;
         String url =  mWebContents.getUrl();
+        if (url == null || url.trim().isEmpty()) return null;
+        return url;
+    }
+
+    /**
+     * Gets the last committed URL. It represents the current page that is
+     * displayed in WebContents. It represents the current security context.
+     *
+     * @return The URL of the current page or null if it's empty.
+     */
+    public String getLastCommittedUrl() {
+        if (isDestroyed()) return null;
+        String url = mWebContents.getLastCommittedUrl();
         if (url == null || url.trim().isEmpty()) return null;
         return url;
     }
@@ -1838,6 +1859,11 @@ public class AwContents implements SmartClipProvider,
         return ports;
     }
 
+    public boolean hasAccessedInitialDocument() {
+        if (isDestroyed()) return false;
+        return mWebContents.hasAccessedInitialDocument();
+    }
+
     //--------------------------------------------------------------------------------------------
     //  View and ViewGroup method implementations
     //--------------------------------------------------------------------------------------------
@@ -2067,9 +2093,19 @@ public class AwContents implements SmartClipProvider,
      * @param requestId an id that will be returned from the callback invocation to allow
      * callers to match requests with callbacks.
      * @param callback the callback to be inserted
+     * @throw IllegalStateException if this method is invoked after {@link #destroy()} has been
+     * called.
      */
     public void insertVisualStateCallback(long requestId, VisualStateCallback callback) {
+        if (isDestroyed()) throw new IllegalStateException(
+                "insertVisualStateCallback cannot be called after the WebView has been destroyed");
         nativeInsertVisualStateCallback(mNativeAwContents, requestId, callback);
+    }
+
+    public boolean getDidAttemptLoad() {
+        if (mDidAttemptLoad) return mDidAttemptLoad;
+        mDidAttemptLoad = mWebContentsObserver.hasStartedAnyProvisionalLoad();
+        return mDidAttemptLoad;
     }
 
     //--------------------------------------------------------------------------------------------
@@ -2184,17 +2220,13 @@ public class AwContents implements SmartClipProvider,
      */
     @CalledByNative
     public void invokeVisualStateCallback(
-            final VisualStateCallback callback, final long requestId, final boolean result) {
+            final VisualStateCallback callback, final long requestId) {
         // Posting avoids invoking the callback inside invoking_composite_
         // (see synchronous_compositor_impl.cc and crbug/452530).
-        mContainerView.getHandler().post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (result) {
-                    callback.onComplete(requestId);
-                } else {
-                    callback.onFailure(requestId);
-                }
+                callback.onComplete(requestId);
             }
         });
     }

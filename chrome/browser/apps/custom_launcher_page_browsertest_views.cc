@@ -20,8 +20,11 @@
 #include "ui/app_list/views/app_list_main_view.h"
 #include "ui/app_list/views/app_list_view.h"
 #include "ui/app_list/views/contents_view.h"
+#include "ui/app_list/views/search_box_view.h"
 #include "ui/events/test/event_generator.h"
+#include "ui/views/controls/textfield/textfield.h"
 #include "ui/views/controls/webview/webview.h"
+#include "ui/views/focus/focus_manager.h"
 
 namespace {
 
@@ -382,4 +385,52 @@ IN_PROC_BROWSER_TEST_F(CustomLauncherPageBrowserTest, LauncherPageSetEnabled) {
   SetCustomLauncherPageEnabled(true);
   EXPECT_TRUE(model->custom_launcher_page_enabled());
   EXPECT_TRUE(custom_page_view->visible());
+}
+
+// Currently this fails on ChromeOS
+// Disabled test http://crbug.com/463456
+#if defined(OS_CHROMEOS)
+#define MAYBE_LauncherPageFocusTraversal DISABLED_LauncherPageFocusTraversal
+#else
+#define MAYBE_LauncherPageFocusTraversal LauncherPageFocusTraversal
+#endif
+
+IN_PROC_BROWSER_TEST_F(CustomLauncherPageBrowserTest,
+                       MAYBE_LauncherPageFocusTraversal) {
+  LoadAndLaunchPlatformApp(kCustomLauncherPagePath, "Launched");
+  app_list::AppListView* app_list_view = GetAppListView();
+  app_list::ContentsView* contents_view =
+      app_list_view->app_list_main_view()->contents_view();
+  app_list::SearchBoxView* search_box_view =
+      app_list_view->app_list_main_view()->search_box_view();
+
+  ASSERT_TRUE(
+      contents_view->IsStateActive(app_list::AppListModel::STATE_START));
+  EXPECT_EQ(app_list_view->GetFocusManager()->GetFocusedView(),
+            search_box_view->search_box());
+
+  {
+    ExtensionTestMessageListener listener("onPageProgressAt1", false);
+    contents_view->SetActivePage(contents_view->GetPageIndexForState(
+        app_list::AppListModel::STATE_CUSTOM_LAUNCHER_PAGE));
+    listener.WaitUntilSatisfied();
+    EXPECT_TRUE(contents_view->IsStateActive(
+        app_list::AppListModel::STATE_CUSTOM_LAUNCHER_PAGE));
+    EXPECT_EQ(app_list_view->GetFocusManager()->GetFocusedView(),
+              search_box_view->search_box());
+  }
+  {
+    ExtensionTestMessageListener listener("textfieldFocused", false);
+    app_list_view->GetFocusManager()->AdvanceFocus(false);
+    listener.WaitUntilSatisfied();
+    EXPECT_NE(app_list_view->GetFocusManager()->GetFocusedView(),
+              search_box_view->search_box());
+  }
+  {
+    ExtensionTestMessageListener listener("textfieldBlurred", false);
+    app_list_view->GetFocusManager()->AdvanceFocus(false);
+    listener.WaitUntilSatisfied();
+    EXPECT_EQ(app_list_view->GetFocusManager()->GetFocusedView(),
+              search_box_view->search_box());
+  }
 }

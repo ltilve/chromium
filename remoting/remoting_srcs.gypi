@@ -4,6 +4,8 @@
 
 {
   'variables': {
+    'daemon_controller_guid': '655bd819-c08c-4b04-80c2-f160739ff6ef',
+    'rdp_desktop_session_guid': '6a7699f0-ee43-43e7-aa30-a6738f9bd470',
     'remoting_base_sources': [
       'base/auto_thread.cc',
       'base/auto_thread.h',
@@ -41,6 +43,8 @@
       'base/util.h',
       'base/vlog_net_log.cc',
       'base/vlog_net_log.h',
+    ],
+    'remoting_codec_sources': [
       'codec/audio_decoder.cc',
       'codec/audio_decoder.h',
       'codec/audio_decoder_opus.cc',
@@ -152,7 +156,6 @@
       'protocol/negotiating_client_authenticator.h',
       'protocol/negotiating_host_authenticator.cc',
       'protocol/negotiating_host_authenticator.h',
-      'protocol/network_settings.cc',
       'protocol/network_settings.h',
       'protocol/pairing_authenticator_base.cc',
       'protocol/pairing_authenticator_base.h',
@@ -162,6 +165,8 @@
       'protocol/pairing_host_authenticator.h',
       'protocol/pairing_registry.cc',
       'protocol/pairing_registry.h',
+      'protocol/port_range.cc',
+      'protocol/port_range.h',
       'protocol/pseudotcp_channel_factory.cc',
       'protocol/pseudotcp_channel_factory.h',
       'protocol/secure_channel_factory.cc',

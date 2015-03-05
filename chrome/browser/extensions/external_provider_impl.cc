@@ -80,7 +80,8 @@ ExternalProviderImpl::ExternalProviderImpl(
       loader_(loader),
       profile_(profile),
       creation_flags_(creation_flags),
-      auto_acknowledge_(false) {
+      auto_acknowledge_(false),
+      install_immediately_(false) {
   loader_->Init(this);
 }
 
@@ -271,7 +272,8 @@ void ExternalProviderImpl::SetPrefs(base::DictionaryValue* prefs) {
       }
       service_->OnExternalExtensionFileFound(extension_id, &version, path,
                                              crx_location_, creation_flags,
-                                             auto_acknowledge_);
+                                             auto_acknowledge_,
+                                             install_immediately_);
     } else {  // if (has_external_update_url)
       CHECK(has_external_update_url);  // Checking of keys above ensures this.
       if (download_location_ == Manifest::INVALID_LOCATION) {
@@ -423,13 +425,15 @@ void ExternalProviderImpl::CreateExternalProviders(
         chromeos::KioskAppManager::Get();
     DCHECK(kiosk_app_manager);
     if (kiosk_app_manager && !kiosk_app_manager->external_loader_created()) {
-      provider_list->push_back(linked_ptr<ExternalProviderInterface>(
-          new ExternalProviderImpl(service,
-                                   kiosk_app_manager->CreateExternalLoader(),
-                                   profile,
-                                   Manifest::EXTERNAL_PREF,
-                                   Manifest::INVALID_LOCATION,
-                                   Extension::NO_FLAGS)));
+      scoped_ptr<ExternalProviderImpl> kiosk_app_provider(
+          new ExternalProviderImpl(
+              service, kiosk_app_manager->CreateExternalLoader(), profile,
+              Manifest::EXTERNAL_PREF, Manifest::INVALID_LOCATION,
+              Extension::NO_FLAGS));
+      kiosk_app_provider->set_auto_acknowledge(true);
+      kiosk_app_provider->set_install_immediately(true);
+      provider_list->push_back(
+          linked_ptr<ExternalProviderInterface>(kiosk_app_provider.release()));
     }
 #endif
     return;
@@ -473,15 +477,15 @@ void ExternalProviderImpl::CreateExternalProviders(
     int external_apps_path_id = profile->IsSupervised() ?
         chrome::DIR_SUPERVISED_USERS_DEFAULT_APPS :
         chrome::DIR_STANDALONE_EXTERNAL_EXTENSIONS;
+    ExternalPrefLoader::Options pref_load_flags =
+        profile->IsNewProfile()
+            ? ExternalPrefLoader::DELAY_LOAD_UNTIL_PRIORITY_SYNC
+            : ExternalPrefLoader::NONE;
     provider_list->push_back(
         linked_ptr<ExternalProviderInterface>(new ExternalProviderImpl(
-            service,
-            new ExternalPrefLoader(external_apps_path_id,
-                                   ExternalPrefLoader::NONE,
-                                   profile),
-            profile,
-            Manifest::EXTERNAL_PREF,
-            Manifest::EXTERNAL_PREF_DOWNLOAD,
+            service, new ExternalPrefLoader(external_apps_path_id,
+                                            pref_load_flags, profile),
+            profile, Manifest::EXTERNAL_PREF, Manifest::EXTERNAL_PREF_DOWNLOAD,
             bundled_extension_creation_flags)));
 
     // OEM default apps.

@@ -9,19 +9,31 @@
 #include "chrome/browser/extensions/extension_service_test_base.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/test_extension_dir.h"
+#include "chrome/browser/extensions/test_extension_system.h"
 #include "chrome/browser/extensions/unpacked_installer.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/host_desktop.h"
+#include "chrome/common/extensions/api/developer_private.h"
 #include "chrome/test/base/test_browser_window.h"
+#include "content/public/test/test_web_contents_factory.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_set.h"
+#include "extensions/common/manifest_constants.h"
 #include "extensions/common/test_util.h"
 
 namespace extensions {
+
+namespace {
+
+KeyedService* BuildAPI(content::BrowserContext* context) {
+  return new DeveloperPrivateAPI(context);
+}
+
+}  // namespace
 
 class DeveloperPrivateApiUnitTest : public ExtensionServiceTestBase {
  protected:
@@ -42,6 +54,11 @@ class DeveloperPrivateApiUnitTest : public ExtensionServiceTestBase {
   template<typename T>
   void TestExtensionPrefSetting(
       bool (*has_pref)(const std::string&, content::BrowserContext*));
+
+  testing::AssertionResult TestPackExtensionFunction(
+      const base::ListValue& args,
+      api::developer_private::PackStatus expected_status,
+      int expected_flags);
 
   Browser* browser() { return browser_.get(); }
 
@@ -134,6 +151,37 @@ void DeveloperPrivateApiUnitTest::TestExtensionPrefSetting(
   EXPECT_FALSE(has_pref(extension_id, profile()));
 }
 
+testing::AssertionResult DeveloperPrivateApiUnitTest::TestPackExtensionFunction(
+    const base::ListValue& args,
+    api::developer_private::PackStatus expected_status,
+    int expected_flags) {
+  scoped_refptr<UIThreadExtensionFunction> function(
+      new api::DeveloperPrivatePackDirectoryFunction());
+  if (!RunFunction(function, args))
+    return testing::AssertionFailure() << "Could not run function.";
+
+  // Extract the result. We don't have to test this here, since it's verified as
+  // part of the general extension api system.
+  const base::Value* response_value = nullptr;
+  CHECK(function->GetResultList()->Get(0u, &response_value));
+  scoped_ptr<api::developer_private::PackDirectoryResponse> response =
+      api::developer_private::PackDirectoryResponse::FromValue(*response_value);
+  CHECK(response);
+
+  if (response->status != expected_status) {
+    return testing::AssertionFailure() << "Expected status: " <<
+        expected_status << ", found status: " << response->status <<
+        ", message: " << response->message;
+  }
+
+  if (response->override_flags != expected_flags) {
+    return testing::AssertionFailure() << "Expected flags: " <<
+        expected_flags << ", found flags: " << response->override_flags;
+  }
+
+  return testing::AssertionSuccess();
+}
+
 void DeveloperPrivateApiUnitTest::SetUp() {
   ExtensionServiceTestBase::SetUp();
   InitializeEmptyExtensionService();
@@ -143,6 +191,13 @@ void DeveloperPrivateApiUnitTest::SetUp() {
   params.type = Browser::TYPE_TABBED;
   params.window = browser_window_.get();
   browser_.reset(new Browser(params));
+
+  // Allow the API to be created.
+  static_cast<TestExtensionSystem*>(ExtensionSystem::Get(profile()))->
+      SetEventRouter(make_scoped_ptr(
+          new EventRouter(profile(), ExtensionPrefs::Get(profile()))));
+  DeveloperPrivateAPI::GetFactoryInstance()->SetTestingFactory(
+      profile(), &BuildAPI);
 }
 
 void DeveloperPrivateApiUnitTest::TearDown() {
@@ -181,6 +236,140 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateReload) {
 TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateAllowFileAccess) {
   TestExtensionPrefSetting<api::DeveloperPrivateAllowFileAccessFunction>(
       &util::AllowFileAccess);
+}
+
+// Test developerPrivate.packDirectory.
+TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
+  ResetThreadBundle(content::TestBrowserThreadBundle::DEFAULT);
+
+  base::FilePath root_path = data_dir().AppendASCII("good_unpacked");
+  base::FilePath crx_path = data_dir().AppendASCII("good_unpacked.crx");
+  base::FilePath pem_path = data_dir().AppendASCII("good_unpacked.pem");
+
+  // First, test a directory that should pack properly.
+  base::ListValue pack_args;
+  pack_args.AppendString(root_path.AsUTF8Unsafe());
+  EXPECT_TRUE(TestPackExtensionFunction(
+      pack_args, api::developer_private::PACK_STATUS_SUCCESS, 0));
+
+  // Should have created crx file and pem file.
+  EXPECT_TRUE(base::PathExists(crx_path));
+  EXPECT_TRUE(base::PathExists(pem_path));
+
+  // Deliberately don't cleanup the files, and append the pem path.
+  pack_args.AppendString(pem_path.AsUTF8Unsafe());
+
+  // Try to pack again - we should get a warning abot overwriting the crx.
+  EXPECT_TRUE(TestPackExtensionFunction(
+      pack_args,
+      api::developer_private::PACK_STATUS_WARNING,
+      ExtensionCreator::kOverwriteCRX));
+
+  // Try to pack again, with the overwrite flag; this should succeed.
+  pack_args.AppendInteger(ExtensionCreator::kOverwriteCRX);
+  EXPECT_TRUE(TestPackExtensionFunction(
+      pack_args, api::developer_private::PACK_STATUS_SUCCESS, 0));
+
+  // Try to pack a final time when omitting (an existing) pem file. We should
+  // get an error.
+  base::DeleteFile(crx_path, false);
+  EXPECT_TRUE(pack_args.Remove(1u, nullptr));  // Remove the pem key argument.
+  EXPECT_TRUE(pack_args.Remove(1u, nullptr));  // Remove the flags argument.
+  EXPECT_TRUE(TestPackExtensionFunction(
+      pack_args, api::developer_private::PACK_STATUS_ERROR, 0));
+
+  base::DeleteFile(crx_path, false);
+  base::DeleteFile(pem_path, false);
+}
+
+// Test developerPrivate.choosePath.
+TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateChoosePath) {
+  ResetThreadBundle(content::TestBrowserThreadBundle::DEFAULT);
+  content::TestWebContentsFactory web_contents_factory;
+  content::WebContents* web_contents =
+      web_contents_factory.CreateWebContents(profile());
+
+  base::FilePath expected_dir_path = data_dir().AppendASCII("good_unpacked");
+  api::EntryPicker::SkipPickerAndAlwaysSelectPathForTest(&expected_dir_path);
+
+  // Try selecting a directory.
+  base::ListValue choose_args;
+  choose_args.AppendString("FOLDER");
+  choose_args.AppendString("LOAD");
+  scoped_refptr<UIThreadExtensionFunction> function(
+      new api::DeveloperPrivateChoosePathFunction());
+  function->SetRenderViewHost(web_contents->GetRenderViewHost());
+  EXPECT_TRUE(RunFunction(function, choose_args)) << function->GetError();
+  std::string path;
+  EXPECT_TRUE(function->GetResultList() &&
+              function->GetResultList()->GetString(0, &path));
+  EXPECT_EQ(path, expected_dir_path.AsUTF8Unsafe());
+
+  // Try selecting a pem file.
+  base::FilePath expected_file_path =
+      data_dir().AppendASCII("good_unpacked.pem");
+  api::EntryPicker::SkipPickerAndAlwaysSelectPathForTest(&expected_file_path);
+  choose_args.Clear();
+  choose_args.AppendString("FILE");
+  choose_args.AppendString("PEM");
+  function = new api::DeveloperPrivateChoosePathFunction();
+  function->SetRenderViewHost(web_contents->GetRenderViewHost());
+  EXPECT_TRUE(RunFunction(function, choose_args)) << function->GetError();
+  EXPECT_TRUE(function->GetResultList() &&
+              function->GetResultList()->GetString(0, &path));
+  EXPECT_EQ(path, expected_file_path.AsUTF8Unsafe());
+
+  // Try canceling the file dialog.
+  api::EntryPicker::SkipPickerAndAlwaysCancelForTest();
+  function = new api::DeveloperPrivateChoosePathFunction();
+  function->SetRenderViewHost(web_contents->GetRenderViewHost());
+  EXPECT_FALSE(RunFunction(function, choose_args));
+  EXPECT_EQ(std::string("File selection was canceled."), function->GetError());
+}
+
+// Test developerPrivate.loadUnpacked.
+TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateLoadUnpacked) {
+  ResetThreadBundle(content::TestBrowserThreadBundle::DEFAULT);
+  content::TestWebContentsFactory web_contents_factory;
+  content::WebContents* web_contents =
+      web_contents_factory.CreateWebContents(profile());
+
+  base::FilePath path = data_dir().AppendASCII("good_unpacked");
+  api::EntryPicker::SkipPickerAndAlwaysSelectPathForTest(&path);
+
+  // Try loading a good extension (it should succeed, and the extension should
+  // be added).
+  scoped_refptr<UIThreadExtensionFunction> function(
+      new api::DeveloperPrivateLoadUnpackedFunction());
+  function->SetRenderViewHost(web_contents->GetRenderViewHost());
+  ExtensionIdSet current_ids = registry()->enabled_extensions().GetIDs();
+  EXPECT_TRUE(RunFunction(function, base::ListValue())) << function->GetError();
+  // We should have added one new extension.
+  ExtensionIdSet id_difference = base::STLSetDifference<ExtensionIdSet>(
+      registry()->enabled_extensions().GetIDs(), current_ids);
+  ASSERT_EQ(1u, id_difference.size());
+  // The new extension should have the same path.
+  EXPECT_EQ(
+      path,
+      registry()->enabled_extensions().GetByID(*id_difference.begin())->path());
+
+  path = data_dir().AppendASCII("empty_manifest");
+  api::EntryPicker::SkipPickerAndAlwaysSelectPathForTest(&path);
+
+  // Try loading a bad extension (it should fail, and we should get an error).
+  function = new api::DeveloperPrivateLoadUnpackedFunction();
+  function->SetRenderViewHost(web_contents->GetRenderViewHost());
+  base::ListValue unpacked_args;
+  scoped_ptr<base::DictionaryValue> options(new base::DictionaryValue());
+  options->SetBoolean("failQuietly", true);
+  unpacked_args.Append(options.release());
+  current_ids = registry()->enabled_extensions().GetIDs();
+  EXPECT_FALSE(RunFunction(function, unpacked_args));
+  EXPECT_EQ(manifest_errors::kManifestUnreadable, function->GetError());
+  // We should have no new extensions installed.
+  EXPECT_EQ(0u, base::STLSetDifference<ExtensionIdSet>(
+                    registry()->enabled_extensions().GetIDs(),
+                    current_ids).size());
 }
 
 }  // namespace extensions

@@ -34,7 +34,7 @@ vars = {
   'llvm_url': 'http://src.chromium.org/llvm-project',
   'llvm_git': 'https://llvm.googlesource.com',
   'webkit_trunk': 'http://src.chromium.org/blink/trunk',
-  'webkit_revision': '696617be91b7b155c19c098e3c49d861ce8cb655', # from svn revision 191118
+  'webkit_revision': '235b0888f8e3d917c1740915e72197fcdba6d2a5', # from svn revision 191300
   'chromium_git': 'https://chromium.googlesource.com',
   'chromiumos_git': 'https://chromium.googlesource.com/chromiumos',
   'pdfium_git': 'https://pdfium.googlesource.com',
@@ -42,12 +42,12 @@ vars = {
   'boringssl_git': 'https://boringssl.googlesource.com',
   'libvpx_revision': '080710f043a2f85e100d508a53749cd321e4b57b',
   'sfntly_revision': '1bdaae8fc788a5ac8936d68bf24f37d977a13dac',
-  'skia_revision': '8f9e81684fbc9c2c9660137cdfbe30902b4380f1',
+  'skia_revision': 'b8410601e4647e9dea79820436afe7fd4d898875',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling Skia
   # and V8 without interference from each other.
   'v8_branch': 'trunk',
-  'v8_revision': '9ed013342d53b0b5a0c3de5380650d0154558891',
+  'v8_revision': 'fc263505535a175c8efa18f4c787bd92a1d1ab3d',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling WebRTC
   # and V8 without interference from each other.
@@ -58,12 +58,11 @@ vars = {
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling ANGLE
   # and whatever else without interference from each other.
-  'angle_revision': '586465264b5d466f34fcac45aea95ae48f3bc27d',
+  'angle_revision': '019304886ad8b985d67202edec431407bb1b5c53',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling build tools
   # and whatever else without interference from each other.
-  #
-  'buildtools_revision': '93b3d0af1b30db55ee42bd2e983f7753153217db',
+  'buildtools_revision': 'd4dd4f79f60bf019625b3a1436979b0a42c892df',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling PDFium
   # and whatever else without interference from each other.
@@ -135,7 +134,7 @@ deps = {
    Var('chromium_git') + '/chromium/blink.git' + '@' +  Var('webkit_revision'),
 
   'src/third_party/icu':
-   Var('chromium_git') + '/chromium/deps/icu.git' + '@' + 'df1bf389ea55d8e5b87cfb834705f5f9b7c251eb',
+   Var('chromium_git') + '/chromium/deps/icu.git' + '@' + 'eda9e75b1fa17f57ffa369ee3543a2301b68d0a9',
 
   'src/third_party/libexif/sources':
    Var('chromium_git') + '/chromium/deps/libexif/sources.git' + '@' + 'ed98343daabd7b4497f97fda972e132e6877c48a',
@@ -162,7 +161,7 @@ deps = {
     Var('chromium_git') + '/external/grit-i18n.git' + '@' + 'a5890a8118c0c80cc0560e6d8d5cf65e5d725509', # from svn revision 185
 
   'src/tools/gyp':
-    Var('chromium_git') + '/external/gyp.git' + '@' + '34640080d08ab2a37665512e52142947def3056d', # from svn revision 2034
+    Var('chromium_git') + '/external/gyp.git' + '@' + '4a9b712d5cb4a5ba7a9950128a7219569caf7263',
 
   'src/tools/swarming_client':
    Var('chromium_git') + '/external/swarming.client.git' + '@' +  Var('swarming_revision'),
@@ -207,7 +206,7 @@ deps = {
    Var('chromium_git') + '/chromium/third_party/ffmpeg.git' + '@' + 'f5698b4f3e3e8eacad18d77cf69882fe14015de5',
 
   'src/third_party/libjingle/source/talk':
-    Var('chromium_git') + '/external/webrtc/trunk/talk.git' + '@' + 'bbfd3991a4a9b270c352ccba09b5d60b3222ef10',
+    Var('chromium_git') + '/external/webrtc/trunk/talk.git' + '@' + '3b22f077ebf4bcb3195cf74624d17439d2176d5c',
 
   'src/third_party/usrsctp/usrsctplib':
     Var('chromium_git') + '/external/usrsctplib.git' + '@' + '13718c7b9fd376fde092cbd3c5347d15059ac652', # from svn revision 9167
@@ -231,7 +230,7 @@ deps = {
    Var('chromium_git') + '/native_client/src/third_party/scons-2.0.1.git' + '@' + '1c1550e17fc26355d08627fbdec13d8291227067',
 
   'src/third_party/webrtc':
-    Var('chromium_git') + '/external/webrtc/trunk/webrtc.git' + '@' + '1e5b7f78e95daa0e0cb8a6ddfee20011208154b6',
+    Var('chromium_git') + '/external/webrtc/trunk/webrtc.git' + '@' + 'c9dfd1c664e7fd1859efc3d9dd3aaca1894898d6',
 
   'src/third_party/openmax_dl':
     Var('chromium_git') + '/external/webrtc/deps/third_party/openmax.git' + '@' +  Var('openmax_dl_revision'),
@@ -345,6 +344,9 @@ deps_os = {
      Var('chromium_git') + '/external/omaha.git' + '@' + '098c7a3d157218dab4eed595e8f2fbe5a20a0bae',
   },
   'ios': {
+    'src/ios/third_party/gcdwebserver/src':
+     Var('chromium_git') + '/external/github.com/swisspol/GCDWebServer.git' + '@' + '18889793b75d7ee593d62ac88997caad850acdb6',
+
     'src/third_party/google_toolbox_for_mac/src':
       Var('chromium_git') + '/external/google-toolbox-for-mac.git' + '@' + Var('google_toolbox_for_mac_revision'),
 
@@ -404,7 +406,7 @@ deps_os = {
 
     # For Linux and Chromium OS.
     'src/third_party/cros_system_api':
-     Var('chromium_git') + '/chromiumos/platform/system_api.git' + '@' + '01a94923ff6654c584cf755dbe579145d828a6e6',
+     Var('chromium_git') + '/chromiumos/platform/system_api.git' + '@' + 'c5bdf1006816594881f96840c21deeb90794969b',
 
     # Note that this is different from Android's freetype repo.
     'src/third_party/freetype2/src':

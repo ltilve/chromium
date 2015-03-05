@@ -104,12 +104,23 @@ function FileSelection(fileManager, indexes) {
 }
 
 /**
+ * Metadata property names used by FileSelection.
+ * These metadata is expected to be cached to accelerate completeInit() of
+ * FileSelection. crbug.com/458915.
+ * @const {!Array<string>}
+ */
+FileSelection.METADATA_PREFETCH_PROPERTY_NAMES = [
+  'availableOffline',
+  'contentMimeType',
+];
+
+/**
  * Computes data required to get file tasks and requests the tasks.
  * @return {!Promise}
  */
 FileSelection.prototype.completeInit = function() {
   if (!this.asyncInitPromise_) {
-    this.asyncInitPromise_ = this.fileManager_.getFileSystemMetadata().get(
+    this.asyncInitPromise_ = this.fileManager_.getMetadataModel().get(
         this.entries, ['availableOffline', 'contentMimeType']
     ).then(function(props) {
       var present = props.filter(function(p) { return p.availableOffline; });

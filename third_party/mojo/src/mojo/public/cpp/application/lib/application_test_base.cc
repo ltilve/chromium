@@ -47,7 +47,9 @@ class ShellAndArgumentGrabber : public Application {
 
  private:
   // Application implementation.
-  void Initialize(ShellPtr shell, Array<String> args) override {
+  void Initialize(ShellPtr shell,
+                  Array<String> args,
+                  const mojo::String& url) override {
     *args_ = args.Pass();
     g_application_request = binding_.Unbind();
     g_shell = shell.Pass();
@@ -55,7 +57,8 @@ class ShellAndArgumentGrabber : public Application {
 
   void AcceptConnection(const String& requestor_url,
                         InterfaceRequest<ServiceProvider> services,
-                        ServiceProviderPtr exposed_services) override {
+                        ServiceProviderPtr exposed_services,
+                        const String& url) override {
     MOJO_CHECK(false);
   }
 
@@ -137,7 +140,7 @@ void ApplicationTestBase::SetUp() {
                                           g_application_request.Pass());
 
   // Fake application initialization with the given command line arguments.
-  application_impl_->Initialize(g_shell.Pass(), g_args.Clone());
+  application_impl_->Initialize(g_shell.Pass(), g_args.Clone(), "");
 }
 
 void ApplicationTestBase::TearDown() {

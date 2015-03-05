@@ -11,6 +11,7 @@ var remoting = remoting || {};
  * Initialize the host list.
  */
 remoting.initHostlist_ = function() {
+  remoting.hostController = new remoting.HostController();
   remoting.hostList = new remoting.HostList(
       document.getElementById('host-list'),
       document.getElementById('host-list-empty'),
@@ -62,22 +63,6 @@ remoting.initHostlist_ = function() {
         var hostId = urlParams['hostId'];
         remoting.connectMe2Me(hostId);
         return;
-      } else if (urlParams['mode'] === 'hangout') {
-        getCurrentId().then(
-            /** @param {*} id */
-            function(id) {
-              /** @type {string} */
-              var accessCode = urlParams['accessCode'];
-              var connector = remoting.app.getSessionConnector();
-              remoting.setMode(remoting.AppMode.CLIENT_CONNECTING);
-              connector.connectIT2Me(accessCode);
-
-              document.body.classList.add('hangout-remote-desktop');
-              var senderId = /** @type {string} */ (String(id));
-              var hangoutSession = new remoting.HangoutSession(senderId);
-              hangoutSession.init();
-            });
-        return;
       }
     }
     // No valid URL parameters, start up normally.
@@ -104,10 +89,7 @@ function isHostModeSupported_() {
  * and also if the user cancels pin entry or the connection in session mode.
  */
 remoting.initHomeScreenUi = function() {
-  remoting.hostController = new remoting.HostController();
   remoting.setMode(remoting.AppMode.HOME);
-  remoting.hostSetupDialog =
-      new remoting.HostSetupDialog(remoting.hostController);
   var dialog = document.getElementById('paired-clients-list');
   var message = document.getElementById('paired-client-manager-message');
   var deleteAll = document.getElementById('delete-all-paired-clients');

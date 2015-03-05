@@ -6488,6 +6488,80 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   </summary>
 </histogram>
 
+<histogram name="EasyUnlock.AuthProximity.RemoteDeviceModelHash"
+    enum="EasyUnlockDeviceModelHash">
+  <owner>tengs@chromium.org</owner>
+  <owner>xiaowenx@chromium.org</owner>
+  <summary>
+    The hash of the phone model used to successfully sign in or unlock using
+    Smart Lock.
+  </summary>
+  <details>
+    This hash is calculated by taking the first 4 bytes of the MD5 hash of the
+    device model.
+  </details>
+</histogram>
+
+<histogram name="EasyUnlock.AuthProximity.RollingRssi" units="dBm">
+  <owner>tengs@chromium.org</owner>
+  <owner>xiaowenx@chromium.org</owner>
+  <summary>
+    Measures the exponentially weighted rolling average of the received signal
+    strength indicator (RSSI) of the phone when the user successfully unlocks or
+    signs in using Smart Lock.
+  </summary>
+  <details>
+    The exponentially weighted averaging formula is:
+
+      rollingRssi = (1 - weight) * rollingRssi + weight * currentRssi;
+
+    RSSI readings are inherently noisy, so this averaging gives a smoothed RSSI
+    value to work with as a heuristic for proximity.
+
+    If no RSSI was read, then a sentinel value of 127 will be recorded.
+  </details>
+</histogram>
+
+<histogram name="EasyUnlock.AuthProximity.TimeSinceLastZeroRssi"
+    units="milliseconds">
+  <owner>tengs@chromium.org</owner>
+  <owner>xiaowenx@chromium.org</owner>
+  <summary>
+    Measures the time delta in milliseconds since the last zero RSSI value was
+    read to when the user successfully unlocks or signs in using Smart Lock.
+  </summary>
+  <details>
+    A zero RSSI value is special because both Bluetooth devices in a connection
+    attempt to maintain by adjusting their transmit power levels. This time
+    delta can be used as a possible heuristic to determine that the phone is
+    close to the local device.
+
+    If no RSSI was read, then an overflow value will be recorded.
+  </details>
+</histogram>
+
+<histogram name="EasyUnlock.AuthProximity.TransmitPowerDelta" units="dBm">
+  <owner>tengs@chromium.org</owner>
+  <owner>xiaowenx@chromium.org</owner>
+  <summary>
+    Measures the difference between the current transmit power and the maximum
+    transmit power of the local device when the user successfully unlocks or
+    signs in using Smart Lock.
+  </summary>
+  <details>
+    Devices connected using classic Bluetooth adjust their transmit power
+    dynamically to optimize power and signal strength. The difference between
+    the current transmit power and maximum transmit power can be used as a
+    heurstic to determine if the phone is close to the local device.
+
+    According to the Bluetooth specs, there are three classes of devices, with a
+    maximum transmit power of 20, 4, and 0 dBm respectively.
+
+    If no transmit power was read, then a sentinel value of 127 will be
+    recorded.
+  </details>
+</histogram>
+
 <histogram name="EasyUnlock.ClickedButton" enum="EasyUnlockButton">
   <owner>joshwoodward@google.com</owner>
   <owner>tbarzic@chromium.org</owner>
@@ -8365,6 +8439,16 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   <summary>
     The type (if any) of background page the extension has. Recorded for
     installed extensions on startup.
+  </summary>
+</histogram>
+
+<histogram name="Extensions.BadMessageFunctionName" enum="ExtensionFunctions">
+  <owner>kalman@chromium.org</owner>
+  <summary>
+    The number of times each Extension function call sends a bad message,
+    killing the renderer. This may indicate a bug in that API's implementation
+    on the renderer. Note a similar, aggregate metric is BadMessageTerminate_EFD
+    which counts the number of bad messages that are sent overall.
   </summary>
 </histogram>
 
@@ -37652,6 +37736,33 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   </summary>
 </histogram>
 
+<histogram name="Startup.PreMainMessageLoopRunImplStep1Time"
+    units="milliseconds">
+  <owner>rkaplow@chromium.org</owner>
+  <summary>
+    The amount of time that elapsed during the first untracked section of
+    ChromeBrowserMainParts::PreMainMessageLoopRunImpl.
+  </summary>
+</histogram>
+
+<histogram name="Startup.PreMainMessageLoopRunImplStep2Time"
+    units="milliseconds">
+  <owner>rkaplow@chromium.org</owner>
+  <summary>
+    The amount of time that elapsed during the second untracked section of
+    ChromeBrowserMainParts::PreMainMessageLoopRunImpl. Not written for Android.
+  </summary>
+</histogram>
+
+<histogram name="Startup.PreMainMessageLoopRunImplStep3Time"
+    units="milliseconds">
+  <owner>rkaplow@chromium.org</owner>
+  <summary>
+    The amount of time that elapsed during the third untracked section of
+    ChromeBrowserMainParts::PreMainMessageLoopRunImpl. Not written for Android.
+  </summary>
+</histogram>
+
 <histogram name="Startup.PreMainMessageLoopRunImplTime" units="milliseconds">
   <obsolete>
     Deprecated as of 2/2015.
@@ -41153,8 +41264,8 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   <owner>ulan@chromium.org</owner>
   <summary>
     Number of garbage collections that a detached global context survives,
-    recorded after each major garbage collection.
-    Values greater than 7 indicate a memory leak.
+    recorded after each major garbage collection. Values greater than 7 indicate
+    a memory leak.
   </summary>
 </histogram>
 
@@ -43714,6 +43825,16 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   <summary>Number of times that each menu item is clicked.</summary>
 </histogram>
 
+<histogram name="WrenchMenu.OpeningAnimationFrameTimes" units="milliseconds">
+  <owner>kkimlabs@chromium.org</owner>
+  <summary>
+    Frame times of the Android wrench menu opening animation. For example, if
+    the menu opening animation runs exactly at 60fps for a second, then each
+    frame time is 16ms, and a total of 60 values of 16ms are recorded. If the
+    animation is janky, we will see values greater than 16ms in the histogram.
+  </summary>
+</histogram>
+
 <histogram name="WrenchMenu.RecentTabsSubMenu" enum="RecentTabsAction">
   <owner>rpop@chromium.org</owner>
   <summary>
@@ -43731,7 +43852,7 @@ Therefore, the affected-histogram name has to have at least one dot in it.
 </histogram>
 
 <histogram name="WrenchMenu.TouchDuration" units="milliseconds">
-  <owner>kkimlabs@google.com</owner>
+  <owner>kkimlabs@chromium.org</owner>
   <summary>
     Time difference between touch down and touch up on Android wrench button.
   </summary>
@@ -46621,6 +46742,13 @@ Therefore, the affected-histogram name has to have at least one dot in it.
   <int value="7" label="Invalid credentials"/>
   <int value="8" label="Device offline"/>
   <int value="9" label="No recent updates"/>
+</enum>
+
+<enum name="EasyUnlockDeviceModelHash" type="int">
+  <int value="-1168032746" label="Motorola Nexus 6"/>
+  <int value="-617422855" label="LGE Nexus 4"/>
+  <int value="1286382027" label="Motorola XT1095"/>
+  <int value="1881443083" label="LGE Nexus 5"/>
 </enum>
 
 <enum name="EasyUnlockHasSecureScreenLock" type="int">
@@ -52251,6 +52379,7 @@ To add a new entry, add it with any value and run test to compute valid value.
   <int value="-1691668194" label="enable-new-bookmark-apps"/>
   <int value="-1662447331" label="wake-on-packets"/>
   <int value="-1654344175" label="disable-extension-info-dialog"/>
+  <int value="-1630419335" label="enable-download-notification"/>
   <int value="-1619757314" label="touch-scrolling-mode"/>
   <int value="-1614912400" label="enable-link-disambiguation-popup"/>
   <int value="-1605567628" label="disable-overlay-scrollbar"/>
@@ -55637,6 +55766,7 @@ To add a new entry, add it with any value and run test to compute valid value.
   <int value="706893509" label="PPB_ContentDecryptor_Private;0.11"/>
   <int value="714324031" label="PPB_Graphics3D;1.0"/>
   <int value="724664149" label="PPB_Flash_Menu;0.2"/>
+  <int value="732838108" label="PPB_IsolatedFileSystem_Private;0.2"/>
   <int value="760024173" label="PPB_FileIO;1.0"/>
   <int value="760246876" label="PPB_OpenGLES2VertexArrayObject;1.0"/>
   <int value="763746388" label="PPB_NaCl_Private;1.0"/>
@@ -57672,33 +57802,41 @@ To add a new entry, add it with any value and run test to compute valid value.
 </enum>
 
 <enum name="SB2DatabaseFailure" type="int">
-  <int value="0" label="CORRUPT"/>
-  <int value="1" label="CORRUPT_HANDLER"/>
-  <int value="2" label="BROWSE_DB_UPDATE_BEGIN"/>
-  <int value="3" label="BROWSE_DB_UPDATE_FINISH"/>
-  <int value="4" label="FILTER_MISSING"/>
-  <int value="5" label="FILTER_READ"/>
-  <int value="6" label="FILTER_WRITE"/>
-  <int value="7" label="FILTER_DELETE"/>
-  <int value="8" label="STORE_MISSING"/>
-  <int value="9" label="STORE_DELETE"/>
-  <int value="10" label="DOWNLOAD_DB_UPDATE_BEGIN"/>
-  <int value="11" label="DOWNLOAD_DB_UPDATE_FINISH"/>
-  <int value="12" label="CSD_DB_UPDATE_BEGIN"/>
-  <int value="13" label="CSD_DB_UPDATE_FINISH"/>
-  <int value="14" label="BROWSE_PREFIX_SET_MISSING"/>
-  <int value="15" label="BROWSE_PREFIX_SET_READ"/>
-  <int value="16" label="BROWSE_PREFIX_SET_WRITE"/>
-  <int value="17" label="BROWSE_PREFIX_SET_DELETE"/>
-  <int value="18" label="EXTENSION_BLACKLIST_UPDATE_BEGIN"/>
-  <int value="19" label="EXTENSION_BLACKLIST_UPDATE_FINISH"/>
-  <int value="20" label="EXTENSION_BLACKLIST_UPDATE_DELETE"/>
-  <int value="21" label="SIDE_EFFECT_FREE_WHITELIST_UPDATE_BEGIN"/>
-  <int value="22" label="SIDE_EFFECT_FREE_WHITELIST_UPDATE_FINISH"/>
-  <int value="23" label="SIDE_EFFECT_FREE_WHITELIST_DELETE"/>
-  <int value="24" label="SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_READ"/>
-  <int value="25" label="SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_WRITE"/>
-  <int value="26" label="SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_DELETE"/>
+  <int value="0" label="FAILURE_DATABASE_CORRUPT"/>
+  <int value="1" label="FAILURE_DATABASE_CORRUPT_HANDLER"/>
+  <int value="2" label="FAILURE_BROWSE_DATABASE_UPDATE_BEGIN"/>
+  <int value="3" label="FAILURE_BROWSE_DATABASE_UPDATE_FINISH"/>
+  <int value="4" label="FAILURE_DATABASE_FILTER_MISSING_OBSOLETE"/>
+  <int value="5" label="FAILURE_DATABASE_FILTER_READ_OBSOLETE"/>
+  <int value="6" label="FAILURE_DATABASE_FILTER_WRITE_OBSOLETE"/>
+  <int value="7" label="FAILURE_DATABASE_FILTER_DELETE"/>
+  <int value="8" label="FAILURE_DATABASE_STORE_MISSING"/>
+  <int value="9" label="FAILURE_DATABASE_STORE_DELETE"/>
+  <int value="10" label="FAILURE_DOWNLOAD_DATABASE_UPDATE_BEGIN"/>
+  <int value="11" label="FAILURE_DOWNLOAD_DATABASE_UPDATE_FINISH"/>
+  <int value="12" label="FAILURE_WHITELIST_DATABASE_UPDATE_BEGIN"/>
+  <int value="13" label="FAILURE_WHITELIST_DATABASE_UPDATE_FINISH"/>
+  <int value="14" label="FAILURE_BROWSE_PREFIX_SET_READ"/>
+  <int value="15" label="FAILURE_BROWSE_PREFIX_SET_WRITE"/>
+  <int value="16" label="FAILURE_BROWSE_PREFIX_SET_DELETE"/>
+  <int value="17" label="FAILURE_EXTENSION_BLACKLIST_UPDATE_BEGIN"/>
+  <int value="18" label="FAILURE_EXTENSION_BLACKLIST_UPDATE_FINISH"/>
+  <int value="19" label="FAILURE_EXTENSION_BLACKLIST_DELETE"/>
+  <int value="20" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_UPDATE_BEGIN"/>
+  <int value="21" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_UPDATE_FINISH"/>
+  <int value="22" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_DELETE"/>
+  <int value="23" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_READ"/>
+  <int value="24" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_WRITE"/>
+  <int value="25" label="FAILURE_SIDE_EFFECT_FREE_WHITELIST_PREFIX_SET_DELETE"/>
+  <int value="26" label="FAILURE_IP_BLACKLIST_UPDATE_BEGIN"/>
+  <int value="27" label="FAILURE_IP_BLACKLIST_UPDATE_FINISH"/>
+  <int value="28" label="FAILURE_IP_BLACKLIST_UPDATE_INVALID"/>
+  <int value="29" label="FAILURE_IP_BLACKLIST_DELETE"/>
+  <int value="30" label="FAILURE_UNWANTED_SOFTWARE_DATABASE_UPDATE_BEGIN"/>
+  <int value="31" label="FAILURE_UNWANTED_SOFTWARE_DATABASE_UPDATE_FINISH"/>
+  <int value="32" label="FAILURE_UNWANTED_SOFTWARE_PREFIX_SET_READ"/>
+  <int value="33" label="FAILURE_UNWANTED_SOFTWARE_PREFIX_SET_WRITE"/>
+  <int value="34" label="FAILURE_UNWANTED_SOFTWARE_PREFIX_SET_DELETE"/>
 </enum>
 
 <enum name="SB2DownloadChecks" type="int">

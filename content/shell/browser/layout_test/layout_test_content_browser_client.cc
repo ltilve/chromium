@@ -6,10 +6,12 @@
 
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
+#include "content/public/browser/navigator_connect_context.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/shell/browser/layout_test/layout_test_browser_context.h"
 #include "content/shell/browser/layout_test/layout_test_message_filter.h"
+#include "content/shell/browser/layout_test/layout_test_navigator_connect_service_factory.h"
 #include "content/shell/browser/layout_test/layout_test_notification_manager.h"
 #include "content/shell/browser/shell_browser_context.h"
 #include "content/shell/common/shell_messages.h"
@@ -22,7 +24,7 @@ LayoutTestContentBrowserClient* g_layout_test_browser_client;
 
 void RequestDesktopNotificationPermissionOnIO(
     const GURL& source_origin,
-    const base::Callback<void(bool)>& callback) {
+    const base::Callback<void(PermissionStatus)>& callback) {
   LayoutTestNotificationManager* manager =
       LayoutTestContentBrowserClient::Get()->GetLayoutTestNotificationManager();
   bool allowed = manager ? manager->RequestPermission(source_origin)
@@ -32,7 +34,8 @@ void RequestDesktopNotificationPermissionOnIO(
   BrowserThread::PostTask(
       BrowserThread::UI,
       FROM_HERE,
-      base::Bind(callback, allowed));
+      base::Bind(callback,
+                 allowed ? PERMISSION_STATUS_GRANTED : PERMISSION_STATUS_ASK));
 }
 
 }  // namespace
@@ -84,7 +87,7 @@ void LayoutTestContentBrowserClient::RequestPermission(
     int bridge_id,
     const GURL& requesting_frame,
     bool user_gesture,
-    const base::Callback<void(bool)>& result_callback) {
+    const base::Callback<void(PermissionStatus)>& callback) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   if (permission == content::PERMISSION_NOTIFICATIONS) {
     BrowserThread::PostTask(
@@ -92,7 +95,7 @@ void LayoutTestContentBrowserClient::RequestPermission(
         FROM_HERE,
         base::Bind(&RequestDesktopNotificationPermissionOnIO,
                    requesting_frame,
-                   result_callback));
+                   callback));
     return;
   }
   ShellContentBrowserClient::RequestPermission(permission,
@@ -100,12 +103,18 @@ void LayoutTestContentBrowserClient::RequestPermission(
                                                bridge_id,
                                                requesting_frame,
                                                user_gesture,
-                                               result_callback);
+                                               callback);
 }
 
 PlatformNotificationService*
 LayoutTestContentBrowserClient::GetPlatformNotificationService() {
   return layout_test_notification_manager_.get();
+}
+
+void LayoutTestContentBrowserClient::GetAdditionalNavigatorConnectServices(
+    const scoped_refptr<NavigatorConnectContext>& context) {
+  context->AddFactory(
+      make_scoped_ptr(new LayoutTestNavigatorConnectServiceFactory));
 }
 
 }  // namespace content

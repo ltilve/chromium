@@ -1857,9 +1857,25 @@ Psst! Incognito mode <ph name="SHORTCUT_KEY">$1<ex>(Ctrl+Shift+N)</ex></ph> may 
                desc="When starting a download, let the user know we're starting the download.">
         Starting...
       </message>
+      <message name="IDS_DOWNLOAD_STATUS_IN_PROGRESS_TITLE"
+               desc=".">
+               Downloading <ph name="FILE_NAME">$1<ex>somedocument.pdf</ex></ph>
+      </message>
+      <message name="IDS_DOWNLOAD_STATUS_DOWNLOADED_TITLE"
+               desc=".">
+               <ph name="FILE_NAME">$1<ex>somedocument.pdf</ex></ph> downloaded
+      </message>
+      <message name="IDS_DOWNLOAD_STATUS_DOWNLOAD_FAILED_TITLE"
+               desc=".">
+               <ph name="FILE_NAME">$1<ex>somedocument.pdf</ex></ph> download unsuccessful
+      </message>
       <message name="IDS_DOWNLOAD_STATUS_IN_PROGRESS"
                desc="Size and units downloaded, time remaining.">
         <ph name="DOWNLOAD_RECEIVED">$1<ex>54/154 MB</ex></ph>, <ph name="TIME_LEFT">$2<ex>5s</ex></ph>
+      </message>
+      <message name="IDS_DOWNLOAD_STATUS_IN_PROGRESS_WITH_DOMAIN"
+               desc="Size and units downloaded, time remaining.">
+        <ph name="DOWNLOAD_RECEIVED">$1<ex>54/154 MB</ex></ph> from <ph name="DOWNLOAD_DOMAIN">$2<ex>example.com</ex></ph>, <ph name="TIME_LEFT">$3<ex>5s</ex></ph>
       </message>
       <message name="IDS_DOWNLOAD_STATUS_SIZES"
                desc="Size and units downloaded.">
@@ -6215,6 +6231,12 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_FLAGS_ENABLE_DOWNLOAD_RESUMPTION_DESCRIPTION" desc="Description for the flag to enable the download resume feature.">
         Allow downloads that have been interrupted to be continued or restarted, using the Resume context menu item.
       </message>
+      <message name="IDS_FLAGS_ENABLE_DOWNLOAD_NOTIFICATION_NAME" desc="Title for the flag to enable experimental download notification feature.">
+        Download Status in Notification Center
+      </message>
+      <message name="IDS_FLAGS_ENABLE_DOWNLOAD_NOTIFICATION_DESCRIPTION" desc="Description for the flag to enable experimental download notification feature.">
+        If enabled, download status is displayed as a notification, instead of an item in download bar.
+      </message>
       <message name="IDS_FLAGS_DISABLE_SOFTWARE_RASTERIZER_NAME" desc="Title for the flag to disable using a software rasterizer.">
         Disable 3D software rasterizer
       </message>
@@ -9998,13 +10020,13 @@ I don't think this site should be blocked!
         Connect to Wi-Fi
       </message>
       <message name="IDS_CAPTIVE_PORTAL_PRIMARY_PARAGRAPH_WIRED" desc="The primary explanatory paragraph for the captive portal error page for wired network connections.">
-        The network you are using may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$1<ex>example.com</ex></ph><ph name="END_BOLD">&lt;strong&gt;</ph>.
+        The network you are using may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$1<ex>example.com</ex></ph><ph name="END_BOLD">&lt;/strong&gt;</ph>.
       </message>
       <message name="IDS_CAPTIVE_PORTAL_PRIMARY_PARAGRAPH_WIFI" desc="The primary explanatory paragraph for the captive portal error page for Wi-Fi connections.">
-        The Wi-Fi you are using may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$1<ex>example.com</ex></ph><ph name="END_BOLD">&lt;strong&gt;</ph>.
+        The Wi-Fi you are using may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$1<ex>example.com</ex></ph><ph name="END_BOLD">&lt;/strong&gt;</ph>.
       </message>
       <message name="IDS_CAPTIVE_PORTAL_PRIMARY_PARAGRAPH_WIFI_SSID" desc="The primary explanatory paragraph for the captive portal error page for Wi-Fi connections, displaying the Wi-Fi name.">
-        The Wi-Fi you are using (<ph name="WIFI_NAME">$1<ex>Google Guest</ex></ph>) may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$2<ex>example.com</ex></ph><ph name="END_BOLD">&lt;strong&gt;</ph>.
+        The Wi-Fi you are using (<ph name="WIFI_NAME">$1<ex>Google Guest</ex></ph>) may require you to visit <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="LOGIN_URL">$2<ex>example.com</ex></ph><ph name="END_BOLD">&lt;/strong&gt;</ph>.
       </message>
       <message name="IDS_CAPTIVE_PORTAL_PRIMARY_PARAGRAPH_NO_LOGIN_URL_WIRED" desc="The primary explanatory paragraph for the captive portal error page for network connections when the captive portal login url isn't available.">
         The network you are using may require you to visit its login page.
@@ -11184,6 +11206,15 @@ Chrome ran out of memory.
       </message>
       <message name="IDS_AUTOFILL_CARD_UNMASK_PROMPT_STORAGE_CHECKBOX" desc="Text for checkbox in card unmasking dialog that allows user to store a Wallet card on their local device. If checked, the dialog won't show up again for the given credit card.">
         Don't ask again for this card
+      </message>
+      <message name="IDS_AUTOFILL_CARD_UNMASK_PROMPT_ERROR_TRY_AGAIN" desc="Error message that encourages the user to try to re-enter their credit card CVC after a previous failed attempt.">
+        There was a problem verifying your card. Check your information and try again.
+      </message>
+      <message name="IDS_AUTOFILL_CARD_UNMASK_PROMPT_ERROR_PERMANENT" desc="Error message to show when a credit card cannot be verified and the user isn't allowed to retry.">
+        Chrome was unable to verify your card at this time. Please try again later.
+      </message>
+      <message name="IDS_AUTOFILL_CARD_UNMASK_PROMPT_ERROR_NETWORK" desc="Error message to show when a credit card cannot be verified because Wallet servers can't be reached.">
+        There was a problem verifying your card. Check your internet connection and try again.
       </message>
 
       <message name="IDS_APPEARANCE_GROUP_NAME" desc="The title of the appearance group">

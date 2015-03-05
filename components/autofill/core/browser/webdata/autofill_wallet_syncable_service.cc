@@ -84,6 +84,7 @@ AutofillProfile ProfileFromSpecifics(
   profile.SetRawInfo(ADDRESS_HOME_STREET_ADDRESS,
                      base::UTF8ToUTF16(JoinString(street_address, '\n')));
 
+  profile.SetRawInfo(NAME_FULL, base::UTF8ToUTF16(address.recipient_name()));
   profile.SetRawInfo(COMPANY_NAME, base::UTF8ToUTF16(address.company_name()));
   profile.SetRawInfo(ADDRESS_HOME_STATE,
                      base::UTF8ToUTF16(address.address_1()));
@@ -259,10 +260,8 @@ syncer::SyncMergeResult AutofillWalletSyncableService::SetSyncData(
       &AutofillTable::SetServerCreditCards,
       &prev_card_count);
   bool changed_addresses = SetDataIfChanged(
-      table, wallet_addresses,
-      &AutofillTable::GetAutofillServerProfiles,
-      &AutofillTable::SetAutofillServerProfiles,
-      &prev_address_count);
+      table, wallet_addresses, &AutofillTable::GetServerProfiles,
+      &AutofillTable::SetServerProfiles, &prev_address_count);
 
   syncer::SyncMergeResult merge_result(syncer::AUTOFILL_WALLET_DATA);
   merge_result.set_num_items_before_association(

@@ -384,8 +384,7 @@ cr.define('extensions', function() {
       // The 'allow file:// access' checkbox.
       row.setupColumn('.file-access-control input', 'localUrls', 'click',
                       function(e) {
-        chrome.send('extensionSettingsAllowFileAccess',
-                    [extension.id, String(e.target.checked)]);
+        chrome.developerPrivate.allowFileAccess(extension.id, e.target.checked);
       });
 
       // The 'Options' button or link, depending on its behaviour.
@@ -467,6 +466,17 @@ cr.define('extensions', function() {
                                     function() {
           // TODO(devlin): What should we do if the uninstall fails?
           this.uninstallIsShowing_ = false;
+
+          if (trash.classList.contains('mouse-clicked'))
+            trash.blur();
+
+          if (chrome.runtime.lastError) {
+            // The uninstall failed (e.g. a cancel). Allow the trash to close.
+            trash.classList.remove('open');
+          } else {
+            // Leave the trash open if the uninstall succeded. Otherwise it can
+            // half-close right before it's removed when the DOM is modified.
+          }
         }.bind(this));
       }.bind(this));
       row.querySelector('.enable-controls').appendChild(trash);
@@ -898,13 +908,6 @@ cr.define('extensions', function() {
       // after its showing animation? Makes very little sense to me.
       overlay.setInitialFocus();
     },
-  };
-
-  ExtensionList.uninstallCancel = function() {
-    var trash = document.querySelector('.trash.open');
-    if (trash.classList.contains('mouse-clicked'))
-      trash.blur();
-    trash.classList.remove('open');
   };
 
   return {

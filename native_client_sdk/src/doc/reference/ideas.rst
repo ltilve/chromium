@@ -28,6 +28,18 @@ native-client-discuss_ mailing list so that we can help you find a mentor.
 
 .. _native-client-discuss: https://groups.google.com/group/native-client-discuss
 
+Google Summer of Code
+=====================
+
+PNaCl participates in the `2015 Google Summer of Code`_ (see the `PNaCl GSoC
+page`_). `Student applications`_ are open March 16–27. Discuss project ideas no
+native-client-discuss_, and submit your proposal on the GSoC page by the
+deadline.
+
+.. _PNaCl GSoC page: https://www.google-melange.com/gsoc/org2/google/gsoc2015/pnacl
+.. _2015 Google Summer of Code: https://www.google-melange.com/gsoc/homepage/google/gsoc2015
+.. _Student applications: https://www.google-melange.com/gsoc/document/show/gsoc_program/google/gsoc2015/help_page#4._How_does_a_student_apply
+
 Ideas
 =====
 
@@ -311,6 +323,22 @@ Security-enhanced PNaCl
 * **Knowledge Prerequisite:** Security.
 * **Mentor:** JF Bastien.
 
+Sanitizer Support
+^^^^^^^^^^^^^^^^^
+
+* **Project:** Sanitizer support for untrusted code.
+* **Brief explanation:** LLVM supports many sanitizers_ for C/C++ using the
+  ``-fsanitize=<name>``. Some of these sanitizers currently work, and some don't
+  because they use clever tricks to perform their work, such as using ``mmap``
+  to allocate a special shadow memory region with a specific address. This
+  project requires adding full support to all of LLVM's sanitizers for untrusted
+  user code within PNaCl.
+* **Expected results:** The sanitizer tests successfully run as untrusted code
+  within PNaCl.
+* **Knowledge Prerequisite:** Compilers.
+* **Mentor:** JF Bastien.
+
+.. _sanitizers: http://clang.llvm.org/docs/UsersManual.html#controlling-code-generation
 
 NaCl
 ----

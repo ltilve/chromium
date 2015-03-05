@@ -10,6 +10,7 @@
 #include "chrome/browser/extensions/extension_keybinding_registry.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/ui/browser_window.h"
+#include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
 #include "chrome/browser/ui/search/search_model_observer.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "ui/base/ui_base_types.h"
@@ -33,6 +34,7 @@ class Extension;
 
 class BrowserWindowCocoa :
     public BrowserWindow,
+    public ExclusiveAccessContext,
     public extensions::ExtensionKeybindingRegistry::Delegate,
     public content::NotificationObserver,
     public SearchModelObserver {
@@ -79,7 +81,7 @@ class BrowserWindowCocoa :
                        ExclusiveAccessBubbleType type,
                        bool with_toolbar) override;
   void ExitFullscreen() override;
-  void UpdateFullscreenExitBubbleContent(
+  void UpdateExclusiveAccessExitBubbleContent(
       const GURL& url,
       ExclusiveAccessBubbleType bubble_type) override;
   bool ShouldHideUIForFullscreen() const override;
@@ -162,6 +164,14 @@ class BrowserWindowCocoa :
   void Observe(int type,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
+
+  ExclusiveAccessContext* GetExclusiveAccessContext() override;
+
+  // ExclusiveAccessContext interface
+  Profile* GetProfile() override;
+  content::WebContents* GetActiveWebContents() override;
+  void UnhideDownloadShelf() override;
+  void HideDownloadShelf() override;
 
   // Overridden from ExtensionKeybindingRegistry::Delegate:
   extensions::ActiveTabPermissionGranter* GetActiveTabPermissionGranter()

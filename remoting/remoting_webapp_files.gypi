@@ -73,10 +73,8 @@
       'webapp/unittests/dns_blackhole_checker_unittest.js',
       'webapp/unittests/event_hook_unittest.js',
       'webapp/unittests/fallback_signal_strategy_unittest.js',
+      'webapp/unittests/host_table_entry_unittest.js',
       'webapp/unittests/ipc_unittest.js',
-      'webapp/unittests/it2me_helpee_channel_unittest.js',
-      'webapp/unittests/it2me_helper_channel_unittest.js',
-      'webapp/unittests/it2me_service_unittest.js',
       'webapp/unittests/l10n_unittest.js',
       'webapp/unittests/menu_button_unittest.js',
       'webapp/unittests/xhr_unittest.js',
@@ -154,8 +152,8 @@
       'webapp/crd/js/client_screen.js',
       'webapp/crd/js/client_session.js',
       'webapp/crd/js/clipboard.js',
+      'webapp/crd/js/credentials_provider.js',
       'webapp/crd/js/desktop_connected_view.js',
-      'webapp/crd/js/hangout_session.js',
       'webapp/crd/js/host_desktop.js',
       'webapp/crd/js/session_connector.js',
       'webapp/crd/js/session_connector_impl.js',
@@ -205,6 +203,7 @@
       'webapp/crd/js/host_list_api.js',
       'webapp/crd/js/host_list_api_impl.js',
       'webapp/crd/js/host_table_entry.js',
+      'webapp/crd/js/local_host_section.js',
     ],
     # Logging and stats JavaScript files.
     'remoting_webapp_js_logging_files': [
@@ -290,14 +289,10 @@
       'webapp/crd/js/background.js',
       'webapp/crd/js/client_session.js',
       'webapp/crd/js/error.js',
-      'webapp/crd/js/hangout_consent_dialog.js',
       'webapp/crd/js/host_installer.js',
       'webapp/crd/js/host_session.js',
       'webapp/crd/js/identity.js',
-      'webapp/crd/js/it2me_helpee_channel.js',
-      'webapp/crd/js/it2me_helper_channel.js',
       'webapp/crd/js/it2me_host_facade.js',
-      'webapp/crd/js/it2me_service.js',
       'webapp/crd/js/l10n.js',
       'webapp/crd/js/oauth2.js',
       'webapp/crd/js/oauth2_api.js',
@@ -321,8 +316,6 @@
       '<@(remoting_webapp_background_js_files)',
       # JS files for message_window.html
       'webapp/base/js/message_window.js',
-      # JS files for dialog_hangout_consent.html
-      'webapp/crd/js/hangout_consent_dialog_main.js',
       # JS files for wcs_sandbox.html.
       # Use r_w_js_wcs_sandbox_files instead of r_w_wcs_sandbox_html_js_files
       # so that we don't double include error.js and plugin_settings.js.
@@ -366,8 +359,6 @@
       'webapp/base/resources/open_sans.woff',
       'webapp/base/resources/spinner.gif',
       'webapp/crd/html/butter_bar.css',
-      'webapp/crd/html/dialog_hangout_consent.html',
-      'webapp/crd/html/dialog_hangout_consent.css',
       'webapp/crd/html/toolbar.css',
       'webapp/crd/html/menu_button.css',
       'webapp/crd/html/window_frame.css',

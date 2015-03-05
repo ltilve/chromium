@@ -446,7 +446,8 @@ Browser::Browser(const CreateParams& params)
 #endif  // defined(OS_WIN)
   }
 
-  exclusive_access_manager_.reset(new ExclusiveAccessManager(this));
+  exclusive_access_manager_.reset(
+      new ExclusiveAccessManager(window_->GetExclusiveAccessContext()));
 
   // Must be initialized after window_.
   // Also: surprise! a modal dialog host is not necessary to host modal dialogs
@@ -1339,8 +1340,7 @@ void Browser::ShowDownload(content::DownloadItem* download) {
     return;
 
   // GetDownloadShelf creates the download shelf if it was not yet created.
-  DownloadShelf* shelf = window()->GetDownloadShelf();
-  shelf->AddDownload(download);
+  window()->GetDownloadShelf()->AddDownload(download);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1348,6 +1348,12 @@ void Browser::ShowDownload(content::DownloadItem* download) {
 
 WebContents* Browser::OpenURLFromTab(WebContents* source,
                                      const OpenURLParams& params) {
+  if (is_devtools()) {
+    DevToolsWindow* window = DevToolsWindow::AsDevToolsWindow(source);
+    DCHECK(window);
+    return window->OpenURLFromTab(source, params);
+  }
+
   chrome::NavigateParams nav_params(this, params.url, params.transition);
   FillNavigateParamsFromOpenURLParams(&nav_params, params);
   nav_params.source_contents = source;

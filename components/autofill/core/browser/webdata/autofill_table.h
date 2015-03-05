@@ -174,6 +174,7 @@ struct FormFieldData;
 //
 //   id                 String assigned by the server to identify this address.
 //                      This is opaque to the client.
+//   recipient_name     Added in v63.
 //   company_name
 //   street_address     The combined lines of the street address.
 //   address_1          Also known as "administrative area". This is normally
@@ -280,12 +281,11 @@ class AutofillTable : public WebDatabaseTable {
   // Retrieves local/server profiles in the database. Caller owns the returned
   // profiles.
   virtual bool GetAutofillProfiles(std::vector<AutofillProfile*>* profiles);
-  virtual bool GetAutofillServerProfiles(
-      std::vector<AutofillProfile*>* profiles);
+  virtual bool GetServerProfiles(std::vector<AutofillProfile*>* profiles);
 
   // Sets the server profiles. All old profiles are deleted and replaced with
   // the given ones.
-  void SetAutofillServerProfiles(const std::vector<AutofillProfile>& profiles);
+  void SetServerProfiles(const std::vector<AutofillProfile>& profiles);
 
   // Records a single credit card in the credit_cards table.
   bool AddCreditCard(const CreditCard& credit_card);
@@ -365,6 +365,7 @@ class AutofillTable : public WebDatabaseTable {
   bool MigrateToVersion60AddServerCards();
   bool MigrateToVersion61AddUsageStats();
   bool MigrateToVersion62AddUsageStatsForUnmaskedCards();
+  bool MigrateToVersion63AddServerRecipientName();
 
   // Max data length saved in the table;
   static const size_t kMaxDataLength;

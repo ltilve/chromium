@@ -60,10 +60,10 @@
 #include "chrome/browser/profiles/profile_info_cache.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_metrics.h"
+#include "chrome/browser/push_messaging/push_messaging_service_factory.h"
+#include "chrome/browser/push_messaging/push_messaging_service_impl.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/services/gcm/gcm_profile_service.h"
-#include "chrome/browser/services/gcm/gcm_profile_service_factory.h"
-#include "chrome/browser/services/gcm/push_messaging_service_impl.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/signin/signin_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
@@ -691,7 +691,7 @@ void ProfileImpl::DoFinalInit() {
   model->AddObserver(new BookmarkModelLoadedObserver(this));
 #endif
 
-  gcm::PushMessagingServiceImpl::InitializeForProfile(this);
+  PushMessagingServiceImpl::InitializeForProfile(this);
 
 #if !defined(OS_ANDROID) && !defined(OS_CHROMEOS) && !defined(OS_IOS)
   signin_ui_util::InitializePrefsForProfile(this);
@@ -851,11 +851,10 @@ void ProfileImpl::OnPrefsLoaded(bool success) {
     return;
   }
 
-  // TODO(mirandac): remove migration code after 6 months (crbug.com/69995).
+  // Migrate obsolete prefs.
   if (g_browser_process->local_state())
-    chrome::MigrateBrowserPrefs(this, g_browser_process->local_state());
-  // TODO(ivankr): remove cleanup code eventually (crbug.com/165672).
-  chrome::MigrateUserPrefs(this);
+    chrome::MigrateObsoleteBrowserPrefs(this, g_browser_process->local_state());
+  chrome::MigrateObsoleteProfilePrefs(this);
 
   // |kSessionExitType| was added after |kSessionExitedCleanly|. If the pref
   // value is empty fallback to checking for |kSessionExitedCleanly|.
@@ -1067,8 +1066,7 @@ storage::SpecialStoragePolicy* ProfileImpl::GetSpecialStoragePolicy() {
 }
 
 content::PushMessagingService* ProfileImpl::GetPushMessagingService() {
-  return gcm::GCMProfileServiceFactory::GetForProfile(
-      this)->push_messaging_service();
+  return PushMessagingServiceFactory::GetForProfile(this);
 }
 
 content::SSLHostStateDelegate* ProfileImpl::GetSSLHostStateDelegate() {

@@ -5,28 +5,20 @@
 /**
  * Data model for gallery.
  *
- * @param {!MetadataCache} metadataCache Metadata cache.
- * @param {!FileSystemMetadata} fileSystemMetadata
+ * @param {!MetadataModel} metadataModel
  * @param {!EntryListWatcher=} opt_watcher Entry list watcher.
  * @constructor
  * @extends {cr.ui.ArrayDataModel}
  */
-function GalleryDataModel(metadataCache, fileSystemMetadata, opt_watcher) {
+function GalleryDataModel(metadataModel, opt_watcher) {
   cr.ui.ArrayDataModel.call(this, []);
 
   /**
-   * Metadata cache.
-   * @private {!MetadataCache}
-   * @const
-   */
-  this.metadataCache_ = metadataCache;
-
-  /**
    * File system metadata.
-   * @private {!FileSystemMetadata}
+   * @private {!MetadataModel}
    * @const
    */
-  this.fileSystemMetadata_ = fileSystemMetadata;
+  this.metadataModel_ = metadataModel;
 
   /**
    * Directory where the image is saved if the image is located in a read-only
@@ -72,11 +64,13 @@ GalleryDataModel.prototype = {
 GalleryDataModel.prototype.saveItem = function(
     volumeManager, item, canvas, overwrite) {
   var oldEntry = item.getEntry();
-  var oldMetadata = item.getMetadata();
+  var oldMetadataItem = item.getMetadataItem();
+  var oldThumbnailMetadataItem = item.getThumbnailMetadataItem();
   var oldLocationInfo = item.getLocationInfo();
   return new Promise(function(fulfill, reject) {
     item.saveToFile(
         volumeManager,
+        this.metadataModel_,
         this.fallbackSaveDirectory,
         overwrite,
         canvas,
@@ -91,7 +85,7 @@ GalleryDataModel.prototype.saveItem = function(
           var event = new Event('content');
           event.item = item;
           event.oldEntry = oldEntry;
-          event.metadata = item.getMetadata();
+          event.thumbnailChanged = true;
           this.dispatchEvent(event);
 
           if (!util.isSameEntry(oldEntry, item.getEntry())) {
@@ -100,9 +94,8 @@ GalleryDataModel.prototype.saveItem = function(
             var anotherItem = new Gallery.Item(
                 oldEntry,
                 oldLocationInfo,
-                oldMetadata,
-                this.metadataCache_,
-                this.fileSystemMetadata_,
+                oldMetadataItem,
+                oldThumbnailMetadataItem,
                 item.isOriginal());
             // The item must be added behind the existing item so that it does
             // not change the index of the existing item.

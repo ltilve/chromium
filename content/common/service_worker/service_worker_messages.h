@@ -75,7 +75,6 @@ IPC_STRUCT_TRAITS_BEGIN(content::ServiceWorkerCacheQueryParams)
   IPC_STRUCT_TRAITS_MEMBER(ignore_search)
   IPC_STRUCT_TRAITS_MEMBER(ignore_method)
   IPC_STRUCT_TRAITS_MEMBER(ignore_vary)
-  IPC_STRUCT_TRAITS_MEMBER(prefix_match)
   IPC_STRUCT_TRAITS_MEMBER(cache_name)
 IPC_STRUCT_TRAITS_END()
 
@@ -426,9 +425,8 @@ IPC_MESSAGE_CONTROL5(
     std::vector<int> /* new_routing_ids */)
 
 // Sent via EmbeddedWorker to dispatch events.
-IPC_MESSAGE_CONTROL2(ServiceWorkerMsg_InstallEvent,
-                     int /* request_id */,
-                     int /* active_version_id */)
+IPC_MESSAGE_CONTROL1(ServiceWorkerMsg_InstallEvent,
+                     int /* request_id */)
 IPC_MESSAGE_CONTROL1(ServiceWorkerMsg_ActivateEvent,
                      int /* request_id */)
 IPC_MESSAGE_CONTROL2(ServiceWorkerMsg_FetchEvent,

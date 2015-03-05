@@ -296,20 +296,14 @@ class DeveloperPrivateShowPermissionsDialogFunction
   std::string extension_id_;
 };
 
-class DeveloperPrivateChooseEntryFunction : public ChromeAsyncExtensionFunction,
+class DeveloperPrivateChooseEntryFunction : public UIThreadExtensionFunction,
                                             public EntryPickerClient {
  protected:
   ~DeveloperPrivateChooseEntryFunction() override;
-  bool RunAsync() override;
   bool ShowPicker(ui::SelectFileDialog::Type picker_type,
-                  const base::FilePath& last_directory,
                   const base::string16& select_title,
                   const ui::SelectFileDialog::FileTypeInfo& info,
                   int file_type_index);
-
-  // EntryPickerClient functions.
-  void FileSelected(const base::FilePath& path) override = 0;
-  void FileSelectionCanceled() override = 0;
 };
 
 
@@ -318,14 +312,24 @@ class DeveloperPrivateLoadUnpackedFunction
  public:
   DECLARE_EXTENSION_FUNCTION("developerPrivate.loadUnpacked",
                              DEVELOPERPRIVATE_LOADUNPACKED);
+  DeveloperPrivateLoadUnpackedFunction();
 
  protected:
   ~DeveloperPrivateLoadUnpackedFunction() override;
-  bool RunAsync() override;
+  ResponseAction Run() override;
 
-  // EntryPickerCLient implementation.
+  // EntryPickerClient:
   void FileSelected(const base::FilePath& path) override;
   void FileSelectionCanceled() override;
+
+  // Callback for the UnpackedLoader.
+  void OnLoadComplete(const Extension* extension,
+                      const base::FilePath& file_path,
+                      const std::string& error);
+
+ private:
+  // Whether or not we should fail quietly in the event of a load error.
+  bool fail_quietly_;
 };
 
 class DeveloperPrivateChoosePathFunction
@@ -336,15 +340,15 @@ class DeveloperPrivateChoosePathFunction
 
  protected:
   ~DeveloperPrivateChoosePathFunction() override;
-  bool RunAsync() override;
+  ResponseAction Run() override;
 
-  // EntryPickerClient functions.
+  // EntryPickerClient:
   void FileSelected(const base::FilePath& path) override;
   void FileSelectionCanceled() override;
 };
 
 class DeveloperPrivatePackDirectoryFunction
-    : public ChromeAsyncExtensionFunction,
+    : public DeveloperPrivateAPIFunction,
       public PackExtensionJob::Client {
 
  public:
@@ -361,7 +365,7 @@ class DeveloperPrivatePackDirectoryFunction
 
  protected:
   ~DeveloperPrivatePackDirectoryFunction() override;
-  bool RunAsync() override;
+  ResponseAction Run() override;
 
  private:
   scoped_refptr<PackExtensionJob> pack_job_;

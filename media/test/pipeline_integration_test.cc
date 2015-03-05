@@ -659,6 +659,10 @@ class PipelineIntegrationTest : public PipelineIntegrationTestHost {
         .WillRepeatedly(SaveArg<0>(&metadata_));
     EXPECT_CALL(*this, OnBufferingStateChanged(BUFFERING_HAVE_ENOUGH))
         .Times(AtMost(1));
+
+    // Encrypted content not used, so this is never called.
+    EXPECT_CALL(*this, OnWaitingForDecryptionKey()).Times(0);
+
     demuxer_ = source->GetDemuxer().Pass();
     pipeline_->Start(
         demuxer_.get(), CreateRenderer(),
@@ -673,7 +677,9 @@ class PipelineIntegrationTest : public PipelineIntegrationTestHost {
         base::Bind(&PipelineIntegrationTest::OnVideoFramePaint,
                    base::Unretained(this)),
         base::Closure(), base::Bind(&PipelineIntegrationTest::OnAddTextTrack,
-                                    base::Unretained(this)));
+                                    base::Unretained(this)),
+        base::Bind(&PipelineIntegrationTest::OnWaitingForDecryptionKey,
+                   base::Unretained(this)));
     message_loop_.Run();
     EXPECT_EQ(PIPELINE_OK, pipeline_status_);
   }
@@ -694,6 +700,10 @@ class PipelineIntegrationTest : public PipelineIntegrationTestHost {
         .Times(AtMost(1));
     EXPECT_CALL(*this, DecryptorAttached(true));
 
+    // Encrypted content used but keys provided in advance, so this is
+    // never called.
+    EXPECT_CALL(*this, OnWaitingForDecryptionKey()).Times(0);
+
     demuxer_ = source->GetDemuxer().Pass();
 
     pipeline_->SetCdm(encrypted_media->GetCdmContext(),
@@ -713,7 +723,9 @@ class PipelineIntegrationTest : public PipelineIntegrationTestHost {
         base::Bind(&PipelineIntegrationTest::OnVideoFramePaint,
                    base::Unretained(this)),
         base::Closure(), base::Bind(&PipelineIntegrationTest::OnAddTextTrack,
-                                    base::Unretained(this)));
+                                    base::Unretained(this)),
+        base::Bind(&PipelineIntegrationTest::OnWaitingForDecryptionKey,
+                   base::Unretained(this)));
 
     source->set_encrypted_media_init_data_cb(
         base::Bind(&FakeEncryptedMedia::OnEncryptedMediaInitData,
@@ -1637,6 +1649,15 @@ TEST_F(PipelineIntegrationTest, P444_VP9_WebM) {
   Play();
   ASSERT_TRUE(WaitUntilOnEnded());
   EXPECT_VIDEO_FORMAT_EQ(last_video_frame_format_, VideoFrame::YV24);
+}
+
+// Verify that frames of VP9 video in the BT.709 color space have the YV12HD
+// format.
+TEST_F(PipelineIntegrationTest, BT709_VP9_WebM) {
+  ASSERT_EQ(PIPELINE_OK, Start("bear-vp9-bt709.webm"));
+  Play();
+  ASSERT_TRUE(WaitUntilOnEnded());
+  EXPECT_VIDEO_FORMAT_EQ(last_video_frame_format_, VideoFrame::YV12HD);
 }
 
 // Verify that videos with an odd frame size playback successfully.

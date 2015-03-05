@@ -58,8 +58,6 @@ namespace mojo {
 template <typename Interface>
 class Binding : public ErrorHandler {
  public:
-  using Client = typename Interface::Client;
-
   // Constructs an incomplete binding that will use the implementation |impl|.
   // The binding may be completed with a subsequent call to the |Bind| method.
   // Does not take ownership of |impl|, which must outlive the binding.
@@ -102,10 +100,8 @@ class Binding : public ErrorHandler {
   // Tears down the binding, closing the message pipe and leaving the interface
   // implementation unbound.
   ~Binding() override {
-    delete proxy_;
     if (internal_router_) {
-      internal_router_->set_error_handler(nullptr);
-      delete internal_router_;
+      DestroyRouter();
     }
   }
 
@@ -115,17 +111,15 @@ class Binding : public ErrorHandler {
   void Bind(
       ScopedMessagePipeHandle handle,
       const MojoAsyncWaiter* waiter = Environment::GetDefaultAsyncWaiter()) {
+    MOJO_DCHECK(!internal_router_);
     internal::FilterChain filters;
     filters.Append<internal::MessageHeaderValidator>();
     filters.Append<typename Interface::RequestValidator_>();
-    filters.Append<typename Client::ResponseValidator_>();
 
     internal_router_ =
         new internal::Router(handle.Pass(), filters.Pass(), waiter);
     internal_router_->set_incoming_receiver(&stub_);
     internal_router_->set_error_handler(this);
-
-    proxy_ = new typename Client::Proxy_(internal_router_);
   }
 
   // Completes a binding that was constructed with only an interface
@@ -159,17 +153,23 @@ class Binding : public ErrorHandler {
     return internal_router_->WaitForIncomingMessage();
   }
 
-  // Closes the message pipe that was previously bound.
+  // Closes the message pipe that was previously bound. Put this object into a
+  // state where it can be rebound to a new pipe.
   void Close() {
     MOJO_DCHECK(internal_router_);
     internal_router_->CloseMessagePipe();
+    DestroyRouter();
   }
 
   // Unbinds the underlying pipe from this binding and returns it so it can be
   // used in another context, such as on another thread or with a different
-  // implementation.
+  // implementation. Put this object into a state where it can be rebound to a
+  // new pipe.
   InterfaceRequest<Interface> Unbind() {
-    return MakeRequest<Interface>(internal_router_->PassMessagePipe());
+    InterfaceRequest<Interface> request =
+        MakeRequest<Interface>(internal_router_->PassMessagePipe());
+    DestroyRouter();
+    return request.Pass();
   }
 
   // Sets an error handler that will be called if a connection error occurs on
@@ -188,9 +188,6 @@ class Binding : public ErrorHandler {
   // does not take ownership.
   Interface* impl() { return impl_; }
 
-  // Returns the client's interface.
-  Client* client() { return proxy_; }
-
   // Indicates whether the binding has been completed (i.e., whether a message
   // pipe has been bound to the implementation).
   bool is_bound() const { return !!internal_router_; }
@@ -199,8 +196,13 @@ class Binding : public ErrorHandler {
   internal::Router* internal_router() { return internal_router_; }
 
  private:
+  void DestroyRouter() {
+    internal_router_->set_error_handler(nullptr);
+    delete internal_router_;
+    internal_router_ = nullptr;
+  }
+
   internal::Router* internal_router_ = nullptr;
-  typename Client::Proxy_* proxy_ = nullptr;
   typename Interface::Stub_ stub_;
   Interface* impl_;
   ErrorHandler* error_handler_ = nullptr;

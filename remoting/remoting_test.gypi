@@ -5,6 +5,7 @@
 {
   'targets': [
     {
+      # GN version: //remoting:test_support
       'target_name': 'remoting_test_common',
       'type': 'static_library',
       'dependencies': [
@@ -20,6 +21,7 @@
         'remoting_resources',
       ],
       'sources': [
+        # Note: sources list duplicated in GN build.
         'host/fake_desktop_capturer.cc',
         'host/fake_desktop_capturer.h',
         'host/fake_desktop_environment.cc',
@@ -71,6 +73,9 @@
 
     # Remoting unit tests
     {
+      # GN version: //remoting:remoting_unittests
+      # Note that many of the sources are broken out into subdir-specific unit
+      # test source set targets that then GN version then brings together.
       'target_name': 'remoting_unittests',
       'type': '<(gtest_target_type)',
       'dependencies': [
@@ -107,6 +112,7 @@
         '../testing/gmock/include',
       ],
       'sources': [
+        # Note: sources list duplicated in GN build.
         'base/auto_thread_task_runner_unittest.cc',
         'base/auto_thread_unittest.cc',
         'base/breakpad_win_unittest.cc',
@@ -187,6 +193,7 @@
         'host/setup/oauth_helper_unittest.cc',
         'host/setup/pin_validator_unittest.cc',
         'host/shaped_desktop_capturer_unittest.cc',
+        'host/third_party_auth_config_unittest.cc',
         'host/token_validator_factory_impl_unittest.cc',
         'host/video_frame_pump_unittest.cc',
         'host/video_frame_recorder_unittest.cc',
@@ -214,8 +221,8 @@
         'protocol/monitored_video_stub_unittest.cc',
         'protocol/mouse_input_filter_unittest.cc',
         'protocol/negotiating_authenticator_unittest.cc',
-        'protocol/network_settings_unittest.cc',
         'protocol/pairing_registry_unittest.cc',
+        'protocol/port_range_unittest.cc',
         'protocol/ppapi_module_stub.cc',
         'protocol/ssl_hmac_channel_authenticator_unittest.cc',
         'protocol/third_party_authenticator_unittest.cc',
