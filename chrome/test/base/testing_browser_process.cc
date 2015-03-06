@@ -190,10 +190,6 @@ SidebarManager* TestingBrowserProcess::sidebar_manager() {
   return NULL;
 }
 
-SidebarManager* TestingBrowserProcess::sidebar_manager() {
-  return NULL;
-}
-
 GpuModeManager* TestingBrowserProcess::gpu_mode_manager() {
   return nullptr;
 }
