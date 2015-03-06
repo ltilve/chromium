@@ -415,10 +415,6 @@ void WrenchMenuModel::ExecuteCommand(int command_id, int event_flags) {
       return;
     }
   }
-  if (IDC_SHOW_BOOKMARK_BAR == command_id) {
-    WebContents* current_tab = browser_->tab_strip_model()->GetActiveWebContents();
-    return;
-  }
   LogMenuMetrics(command_id);
   chrome::ExecuteCommand(browser_, command_id);
 }
