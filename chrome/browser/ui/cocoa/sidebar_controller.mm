@@ -38,11 +38,10 @@ const int kMinWebWidth = 50;
 - (id)init {
   if ((self = [super init])) {
     splitView_.reset([[NSSplitView alloc] initWithFrame:NSZeroRect]);
-    [splitView_ setDividerStyle:NSSplitViewDividerStyleThin];
+    [splitView_ setDividerStyle:NSSplitViewDividerStylePaneSplitter];
     [splitView_ setVertical:YES];
     [splitView_ setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
     [splitView_ setDelegate:self];
-
   }
   return self;
 }
