@@ -64,11 +64,11 @@ class SidebarManager : public content::NotificationObserver,
   void ShowSidebar(content::WebContents* tab, const std::string& content_id);
 
   // Expands sidebar identified by |tab| and |content_id|.
-  // void ExpandSidebar(content::WebContents* tab, const std::string& content_id);
+  void ExpandSidebar(content::WebContents* tab, const std::string& content_id);
 
   // Collapses sidebar identified by |tab| and |content_id| (has no effect
   // if sidebar is not expanded).
-  // void CollapseSidebar(content::WebContents* tab, const std::string& content_id);
+  void CollapseSidebar(content::WebContents* tab, const std::string& content_id);
 
   // Hides sidebar identified by |tab| and |content_id| (removes sidebar's
   // mini tab).

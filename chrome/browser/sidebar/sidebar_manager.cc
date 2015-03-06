@@ -119,14 +119,14 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   }
 
   host->Show();
-  host->Expand();
+  ExpandSidebar(tab, content_id);
 
   Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
   ExtensionSidebarEventRouter::OnStateChanged(
       profile, tab, content_id,
       extension_sidebar_constants::kShownState);
 }
-/*
+
 void SidebarManager::ExpandSidebar(content::WebContents* tab,
                                    const std::string& content_id) {
   DCHECK(!content_id.empty());
@@ -164,7 +164,7 @@ void SidebarManager::CollapseSidebar(content::WebContents* tab,
 
   host->Collapse();
 }
-*/
+
 void SidebarManager::HideSidebar(WebContents* tab,
                                  const std::string& content_id) {
   DCHECK(!content_id.empty());
@@ -176,7 +176,7 @@ void SidebarManager::HideSidebar(WebContents* tab,
 
   SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
   DCHECK(host);
-  host->Collapse();
+  CollapseSidebar(tab, content_id);
   UnregisterSidebarContainerFor(tab, content_id);
 
   Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());

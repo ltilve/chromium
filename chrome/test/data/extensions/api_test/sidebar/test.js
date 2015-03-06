@@ -32,35 +32,6 @@ function showSidebar(id, callback) {
 }
 
 /**
-* A helper function to expand sidebar. Verifies that sidebar was shown
-* before and is expanded after the call (provided the specified tab
-* is currently selected).
-* @param {id} tab id to expand sidebar for.
-* @param {function} callback Closure.
-*/
-function expandSidebar(id, callback) {
-  chrome.sidebar.getState({tabId: id}, function(state) {
-    assertEq('shown', state);
-    chrome.sidebar.expand({tabId: id});
-    chrome.sidebar.getState({tabId: id}, function(state) {
-      if (undefined == id) {
-        assertEq('active', state);
-        callback();
-      } else {
-        chrome.tabs.get(id, function(tab) {
-          if (tab.selected) {
-            assertEq('active', state);
-          } else {
-            assertEq('shown', state);
-          }
-          callback();
-        });
-      }
-    });
-  });
-}
-
-/**
 * A helper function to collapse sidebar. Verifies that sidebar was active
 * before (provided the specified tab is currently selected) and is not active
 * after the call.
@@ -116,14 +87,6 @@ function showSidebarForCurrentTab(callback) {
 }
 
 /**
-* A helper function to expand sidebar for the current tab.
-* @param {function} callback Closure.
-*/
-function expandSidebarForCurrentTab(callback) {
-  expandSidebar(undefined, callback);
-}
-
-/**
 * A helper function to collapse sidebar for the current tab.
 * @param {function} callback Closure.
 */
@@ -140,7 +103,6 @@ function hideSidebarForCurrentTab(callback) {
 }
 
 showSidebarForCurrentTab(function() {
-  expandSidebarForCurrentTab(function() {
      chrome.sidebar.navigate({path: 'simple_page.html'});
     /*
     collapseSidebarForCurrentTab(function() {
@@ -150,13 +112,11 @@ showSidebarForCurrentTab(function() {
         });
       });
     });*/
-  });
 });
 /*
 var tests = [
   function showHideSidebar() {
     showSidebarForCurrentTab(function() {
-      expandSidebarForCurrentTab(function() {
         collapseSidebarForCurrentTab(function() {
           hideSidebarForCurrentTab(function() {
             showSidebarForCurrentTab(function() {
@@ -164,13 +124,11 @@ var tests = [
             });
           });
         });
-      });
     });
   },
 
   function switchingTabs() {
     showSidebarForCurrentTab(function() {
-      expandSidebarForCurrentTab(function() {
         chrome.tabs.getSelected(null, function(tabWithSidebar) {
           chrome.tabs.create({}, function(tab) {
             // Make sure sidebar is not visible on this new tab.
@@ -185,7 +143,6 @@ var tests = [
             });
           });
         });
-      });
     });
   },
 
@@ -194,7 +151,6 @@ var tests = [
     chrome.tabs.getAllInWindow(null, function(tabs) {
       assertEq(2, tabs.length);
       showSidebar(tabs[1].id, function() {
-        expandSidebar(tabs[1].id, function() {
           // Make sure sidebar is not visible on the current tab.
           chrome.sidebar.getState({}, function(state) {
             assertEq('hidden', state);
@@ -215,18 +171,15 @@ var tests = [
               });
             });
           });
-        });
       });
     });
   },
 
   function navigateSidebar() {
     showSidebarForCurrentTab(function() {
-      expandSidebarForCurrentTab(function() {
         chrome.sidebar.navigate({path: 'simple_page.html'});
         hideSidebarForCurrentTab(pass());
       });
-    });
   },
 
   function crashTest() {
