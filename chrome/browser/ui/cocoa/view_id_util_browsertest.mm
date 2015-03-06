@@ -55,10 +55,6 @@ class ViewIDTest : public InProcessBrowserTest {
         static_cast<content::WebContents*>(
             browser()->tab_strip_model()->GetActiveWebContents()),
         sidebar_content_id);
-    SidebarManager::GetInstance()->ExpandSidebar(
-        static_cast<content::WebContents*>(
-            browser()->tab_strip_model()->GetActiveWebContents()),
-        sidebar_content_id);
 
     // Make sure docked devtools is created to test VIEW_ID_DEV_TOOLS_DOCKED
     DevToolsWindow* devtools_window =
