@@ -679,10 +679,11 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
 void BrowserView::Observe(int type,
                           const content::NotificationSource& source,
                           const content::NotificationDetails& details) {
+ content::WebContents* target = content::Details<SidebarContainer>(details)->web_contents();
   switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      UpdateSidebarForContents(
-          content::Details<SidebarContainer>(details)->web_contents());
+    case chrome::NOTIFICATION_SIDEBAR_CHANGED:     
+      if (GetActiveWebContents() == target)
+        UpdateSidebarForContents(target);
       break;
     default:
       NOTREACHED();  // we don't ask for anything else!

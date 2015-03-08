@@ -42,7 +42,7 @@ class SidebarTest : public ExtensionBrowserTest {
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
     extension_path = extension_path.AppendASCII("sidebar");
-
+	
     ASSERT_TRUE(LoadExtension(extension_path));
 
     // For now content_id == extension_id.
