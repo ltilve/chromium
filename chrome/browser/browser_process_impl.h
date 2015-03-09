@@ -72,7 +72,6 @@ class BrowserProcessImpl : public BrowserProcess,
   // framework, rather than in the destructor, so that we can
   // interleave cleanup with threads being stopped.
   void StartTearDown();
-
   void PostDestroyThreads();
 
   // BrowserProcess implementation.
