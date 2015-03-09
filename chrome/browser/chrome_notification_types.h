@@ -363,6 +363,7 @@ enum NotificationType {
   // The source is a SidebarManager instance, the details are the changed
   // SidebarContainer object.
   NOTIFICATION_SIDEBAR_CHANGED,
+  
   // Sync --------------------------------------------------------------------
 
   // The sync service has finished the datatype configuration process. The
