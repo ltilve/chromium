@@ -77,7 +77,7 @@ class ViewIDTest : public InProcessBrowserTest {
 
     for (int i = VIEW_ID_TOOLBAR; i < VIEW_ID_PREDEFINED_COUNT; ++i) {
       // Mac implementation does not support following ids yet.
-      if (i == VIEW_ID_STAR_BUTTON || 
+      if (i == VIEW_ID_STAR_BUTTON ||
           i == VIEW_ID_BROWSER_ACTION ||
           i == VIEW_ID_SIDE_BAR_SPLIT ||
           i == VIEW_ID_FEEDBACK_BUTTON ||
