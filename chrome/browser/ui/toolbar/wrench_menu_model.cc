@@ -48,7 +48,6 @@
 #include "components/signin/core/common/profile_management_switches.h"
 #include "components/ui/zoom/zoom_controller.h"
 #include "components/ui/zoom/zoom_event_manager.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "content/public/browser/host_zoom_map.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/notification_service.h"
@@ -415,6 +414,7 @@ void WrenchMenuModel::ExecuteCommand(int command_id, int event_flags) {
       return;
     }
   }
+
   LogMenuMetrics(command_id);
   chrome::ExecuteCommand(browser_, command_id);
 }
@@ -444,7 +444,6 @@ void WrenchMenuModel::LogMenuMetrics(int command_id) {
     // Bookmarks sub menu.
     case IDC_SHOW_BOOKMARK_BAR:
       if (!uma_action_recorded_) {
-
         UMA_HISTOGRAM_MEDIUM_TIMES("WrenchMenu.TimeToAction.ShowBookmarkBar",
                                    delta);
       }
