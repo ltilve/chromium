@@ -15,6 +15,7 @@
 #include "chrome/common/chrome_switches.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/notification_service.h"
+#include "extensions/common/switches.h"
 #include "url/gurl.h"
 
 using content::WebContents;
@@ -33,8 +34,8 @@ SidebarManager* SidebarManager::GetInstance() {
 
 // static
 bool SidebarManager::IsSidebarAllowed() {
-  return true;//base::CommandLine::ForCurrentProcess()->HasSwitch(
-      //switches::kEnableExperimentalExtensionApis);
+  return base::CommandLine::ForCurrentProcess()->HasSwitch(
+    extensions::switches::kEnableExperimentalExtensionApis);
 }
 
 SidebarManager::SidebarManager() {
