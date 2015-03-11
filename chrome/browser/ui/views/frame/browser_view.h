@@ -121,7 +121,7 @@ class BrowserView : public BrowserWindow,
   // Returns a Browser instance of this view.
   Browser* browser() { return browser_.get(); }
   const Browser* browser() const { return browser_.get(); }
-  
+
   void Observe(int type,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
@@ -713,7 +713,7 @@ class BrowserView : public BrowserWindow,
   base::RepeatingTimer<BrowserView> loading_animation_timer_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
-  
+
   views::WebView* sidebar_web_view_;
 
   views::View* sidebar_container_;
