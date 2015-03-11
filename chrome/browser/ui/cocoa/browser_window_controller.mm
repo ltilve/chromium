@@ -327,7 +327,6 @@ using content::WebContents;
     [[devToolsController_ view] setFrame:[[self tabContentArea] bounds]];
     [[self tabContentArea] addSubview:[devToolsController_ view]];
 
-
     // Create a sub-controller for the docked sidebar and add its view to the
     // hierarchy.  This must happen before the previewable contents controller
     // is instantiated.
@@ -458,7 +457,6 @@ using content::WebContents;
 
     // We are done initializing now.
     initializing_ = NO;
-
   }
   return self;
 }
@@ -1667,10 +1665,9 @@ using content::WebContents;
   // Update all the UI bits.
   windowShim_->UpdateTitleBar();
 
-  // Update the bookmark bar.
-
   [sidebarController_ updateSidebarForTabContents:
       static_cast<content::WebContents*>(contents)];
+  // Update the bookmark bar.
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?
   windowShim_->BookmarkBarStateChanged(
