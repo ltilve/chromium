@@ -95,7 +95,7 @@ enum ViewID {
 
   // The sidebar view.
   VIEW_ID_SIDE_BAR_VIEW,
-  
+
   // Used in chrome/browser/ui/cocoa/view_id_util_browsertest.mm.
   // If you add new ids, make sure the above test passes.
   VIEW_ID_PREDEFINED_COUNT,
