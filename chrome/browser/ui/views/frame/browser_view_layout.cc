@@ -485,7 +485,6 @@ void BrowserViewLayout::LayoutContentsContainerView(int top, int bottom) {
                                       vertical_layout_rect_.width(),
                                       std::max(0, bottom - top));
   contents_container_->SetBoundsRect(contents_container_bounds);
-  
 }
 
 void BrowserViewLayout::UpdateTopContainerBounds() {
