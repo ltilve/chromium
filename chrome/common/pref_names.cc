@@ -1521,7 +1521,6 @@ const char kNtpAppPageNames[] = "ntp.app_page_names";
 
 const char kExtensionSidebarWidth[] = "extensions.sidebar.width";
 
-
 // Keeps track of currently open tabs collapsed state in the Other Devices menu.
 const char kNtpCollapsedCurrentlyOpenTabs[] = "ntp.collapsed_open_tabs";
 

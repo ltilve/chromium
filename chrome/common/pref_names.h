@@ -541,7 +541,6 @@ extern const char kDisableExtensions[];
 extern const char kDisablePluginFinder[];
 extern const char kExtensionSidebarWidth[];
 
-
 extern const char kNtpAppPageNames[];
 extern const char kNtpCollapsedCurrentlyOpenTabs[];
 extern const char kNtpCollapsedForeignSessions[];
