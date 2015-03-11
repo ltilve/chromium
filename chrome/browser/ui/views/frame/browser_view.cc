@@ -681,7 +681,7 @@ void BrowserView::Observe(int type,
                           const content::NotificationDetails& details) {
  content::WebContents* target = content::Details<SidebarContainer>(details)->web_contents();
   switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:     
+    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
       if (GetActiveWebContents() == target)
         UpdateSidebarForContents(target);
       break;
@@ -894,6 +894,7 @@ void BrowserView::OnActiveTabChanged(content::WebContents* old_contents,
   // Layout for DevTools _before_ setting the both main and devtools WebContents
   // to avoid toggling the size of any of them.
   UpdateDevToolsForContents(new_contents, !change_tab_contents);
+
   UpdateSidebarForContents(new_contents);
   if (change_tab_contents) {
     web_contents_close_handler_->ActiveTabChanged();
@@ -1929,7 +1930,6 @@ void BrowserView::Layout() {
 
   // TODO(jamescook): Why was this in the middle of layout code?
   toolbar_->location_bar()->omnibox_view()->SetFocusable(IsToolbarVisible());
-  
 }
 
 void BrowserView::PaintChildren(gfx::Canvas* canvas,
@@ -2059,12 +2059,11 @@ void BrowserView::InitViews() {
   contents_container_->SetLayoutManager(new ContentsLayoutManager(
       devtools_web_view_, contents_web_view_));
   AddChildView(contents_container_);
-  //set_contents_view(contents_container_);
-  
+
   sidebar_web_view_ = new views::WebView(browser_->profile());
   sidebar_web_view_->set_id(VIEW_ID_SIDE_BAR_VIEW);
   sidebar_web_view_->SetVisible(false);
-  
+
   sidebar_container_ = new views::View();
   sidebar_container_->AddChildView(sidebar_web_view_);
   sidebar_container_->set_id(VIEW_ID_SIDE_BAR_CONTAINER);
