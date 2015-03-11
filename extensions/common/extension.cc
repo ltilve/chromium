@@ -536,11 +536,13 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
     manifest_->GetBoolean(keys::kConvertedFromUserScript,
                           &converted_from_user_script_);
   }
+
   if (!LoadSidebarFeatures(error))
     return false;
 
   if (!LoadSharedFeatures(error))
     return false;
+
   permissions_parser_->Finalize(this);
   permissions_parser_.reset();
 
