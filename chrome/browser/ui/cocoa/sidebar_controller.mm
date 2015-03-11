@@ -4,8 +4,6 @@
 
 #import "chrome/browser/ui/cocoa/sidebar_controller.h"
 
-#include <algorithm>
-
 #include <Cocoa/Cocoa.h>
 
 #include "base/prefs/pref_service.h"

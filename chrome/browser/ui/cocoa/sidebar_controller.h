@@ -6,8 +6,6 @@
 #define CHROME_BROWSER_UI_COCOA_SIDEBAR_CONTROLLER_H_
 #pragma once
 
-#import <Foundation/Foundation.h>
-
 #import "base/mac/cocoa_protocols.h"
 #include "base/mac/scoped_nsobject.h"
 #import "chrome/browser/ui/cocoa/tab_contents/tab_contents_controller.h"
