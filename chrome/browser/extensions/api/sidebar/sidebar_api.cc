@@ -62,7 +62,7 @@ void ExtensionSidebarEventRouter::OnStateChanged(
   args.Set(0, details);
   std::string json_args;
   base::JSONWriter::Write(&args, &json_args);
-  
+
   scoped_ptr<base::ListValue> event_args(new base::ListValue());
   event_args->Append(new base::StringValue(json_args));
 
@@ -137,7 +137,7 @@ bool SidebarFunction::RunSync() {
   std::string content_id(extension()->id());
   return RunImpl(static_cast<content::WebContents*>(web_contents),
                  content_id, *details);
-return true;
+  return true;
 }
 
 
@@ -192,7 +192,7 @@ bool SidebarHideFunction::RunImpl(content::WebContents* tab,
 bool SidebarNavigateFunction::RunImpl(content::WebContents* tab,
                                       const std::string& content_id,
                                       const base::DictionaryValue& details) {
- std::string path_string;
+  std::string path_string;
   EXTENSION_FUNCTION_VALIDATE(details.GetString(kPathKey, &path_string));
 
   GURL url = extension_sidebar_utils::ResolveRelativePath(
