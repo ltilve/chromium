@@ -79,11 +79,6 @@ class SidebarManager : public content::NotificationObserver,
                        const std::string& content_id,
                        const GURL& url);
 
-  // Changes sidebar's badge text (displayed on the mini tab).
-  void SetSidebarBadgeText(content::WebContents* tab,
-                           const std::string& content_id,
-                           const base::string16& badge_text);
-
  private:
   friend class base::RefCounted<SidebarManager>;
 

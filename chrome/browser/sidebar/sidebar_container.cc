@@ -74,10 +74,6 @@ void SidebarContainer::Navigate(const GURL& url) {
       std::string());
 }
 
-void SidebarContainer::SetBadgeText(const base::string16& badge_text) {
-  badge_text_ = badge_text;
-}
-
 content::JavaScriptDialogManager*
 SidebarContainer::GetJavaScriptDialogManager(content::WebContents* source) {
   return app_modal::JavaScriptDialogManager::GetInstance();

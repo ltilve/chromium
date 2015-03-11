@@ -196,16 +196,6 @@ void SidebarManager::NavigateSidebar(content::WebContents* tab,
   host->Navigate(url);
 }
 
-void SidebarManager::SetSidebarBadgeText(
-    content::WebContents* tab, const std::string& content_id,
-    const base::string16& badge_text) {
-  SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
-  if (!host)
-    return;
-  host->SetBadgeText(badge_text);
-}
-
-
 SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_host_.empty());
   DCHECK(sidebar_host_to_tab_.empty());

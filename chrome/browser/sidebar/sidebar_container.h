@@ -59,9 +59,6 @@ class SidebarContainer : public content::WebContentsDelegate {
   // Returns sidebar's TabContents.
   content::WebContents* sidebar_contents() const { return sidebar_contents_.get(); }
 
-  // Accessor for the badge text.
-  const base::string16& badge_text() const { return badge_text_; }
-
   // Functions supporting chrome.experimental.sidebar API.
 
   // Notifies hosting window that this sidebar was expanded.
@@ -75,9 +72,6 @@ class SidebarContainer : public content::WebContentsDelegate {
 
   // Navigates sidebar contents to the |url|.
   void Navigate(const GURL& url);
-
-  // Changes sidebar's badge text.
-  void SetBadgeText(const base::string16& badge_text);
 
  private:
   // Overridden from content::WebContentsDelegate:
@@ -99,9 +93,6 @@ class SidebarContainer : public content::WebContentsDelegate {
 
   // Sidebar contents.
   scoped_ptr<content::WebContents> sidebar_contents_;
-
-  // Badge text displayed on the sidebar's mini tab.
-  base::string16 badge_text_;
 
   // On the first expand sidebar will be automatically navigated to the default
   // page (specified in the extension manifest), but only if the extension has
