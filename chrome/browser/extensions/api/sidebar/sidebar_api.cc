@@ -137,7 +137,6 @@ bool SidebarFunction::RunSync() {
   std::string content_id(extension()->id());
   return RunImpl(static_cast<content::WebContents*>(web_contents),
                  content_id, *details);
-  return true;
 }
 
 
