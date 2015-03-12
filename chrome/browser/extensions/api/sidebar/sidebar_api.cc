@@ -5,25 +5,17 @@
 #include "chrome/browser/extensions/api/sidebar/sidebar_api.h"
 
 #include "base/json/json_writer.h"
-#include "base/strings/string16.h"
 #include "base/strings/string_number_conversions.h"
-#include "base/strings/string_util.h"
-#include "base/values.h"
 #include "extensions/browser/event_router.h"
 #include "chrome/browser/extensions/chrome_extension_function.h"
-#include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/sidebar/sidebar_manager.h"
-#include "extensions/common/extension.h"
-#include "chrome/common/extensions/extension_constants.h"
 #include "extensions/common/error_utils.h"
 #include "extensions/common/extension_sidebar_utils.h"
-#include "chrome/common/render_messages.h"
 #include "content/public/browser/web_contents.h"
-#include "ipc/ipc_message_utils.h"
-#include "third_party/skia/include/core/SkBitmap.h"
+
 
 using content::WebContents;
 
