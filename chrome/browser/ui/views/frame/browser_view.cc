@@ -2143,7 +2143,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
     return;  // Happens only in tests.s
 
   WebContents* sidebar_contents = NULL;
-  if (new_contents) {
+  if (new_contents && SidebarManager::IsSidebarAllowed()) {
     SidebarContainer* client_host = SidebarManager::GetInstance()->
         GetActiveSidebarContainerFor(new_contents);
     if (client_host)
