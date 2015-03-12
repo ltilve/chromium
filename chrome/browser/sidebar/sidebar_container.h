@@ -10,11 +10,8 @@
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
-#include "base/strings/string16.h"
-#include "extensions/common/extension_resource.h"
 #include "content/public/browser/web_contents_delegate.h"
 
-class SkBitmap;
 namespace content {
 class WebContents;
 }

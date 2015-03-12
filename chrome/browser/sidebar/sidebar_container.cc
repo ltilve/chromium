@@ -11,14 +11,9 @@
 #include "extensions/common/extension_resource.h"
 #include "extensions/common/extension_sidebar_defaults.h"
 #include "extensions/common/extension_sidebar_utils.h"
-#include "content/public/browser/render_view_host.h"
-#include "content/public/browser/navigation_controller.h"
-#include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
 #include "components/app_modal/javascript_dialog_manager.h"
 #include "url/gurl.h"
-#include "third_party/skia/include/core/SkBitmap.h"
-
 
 SidebarContainer::SidebarContainer(content::WebContents* tab,
                                    const std::string& content_id,
