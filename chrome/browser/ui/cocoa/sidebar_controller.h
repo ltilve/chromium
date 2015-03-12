@@ -28,14 +28,8 @@ class WebContents;
   base::scoped_nsobject<TabContentsController> contentsController_;
 }
 
-- (id)init;
-
-// This controller's view.
-- (NSSplitView*)view;
-
-// The compiler seems to have trouble handling a function named "view" that
-// returns an NSSplitView, so provide a differently-named method.
-- (NSSplitView*)splitView;
+- (id)initWithParentViewController: (id) parentController
+             andContentsController: (id) contentsController;
 
 // Depending on |contents|'s state, decides whether the sidebar
 // should be shown or hidden and adjusts its width (|delegate_| handles

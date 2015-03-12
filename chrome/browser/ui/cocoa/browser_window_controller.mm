@@ -327,21 +327,16 @@ using content::WebContents;
     [[devToolsController_ view] setFrame:[[self tabContentArea] bounds]];
     [[self tabContentArea] addSubview:[devToolsController_ view]];
 
-    // Create a sub-controller for the docked sidebar and add its view to the
-    // hierarchy.  This must happen before the previewable contents controller
-    // is instantiated.
-    //TODO(me):here self should be another
-    sidebarController_.reset([[SidebarController alloc] init]);
-    [[sidebarController_ view] setFrame:[[devToolsController_ view] bounds]];
-    [[devToolsController_ view] addSubview:[sidebarController_ view]];
     // Create the overlayable contents controller.  This provides the switch
     // view that TabStripController needs.
     overlayableContentsController_.reset(
         [[OverlayableContentsController alloc] initWithBrowser:browser]);
-    [[overlayableContentsController_ view]
-        setFrame:[[sidebarController_ view] bounds]];
-    [[sidebarController_ view]
-        addSubview:[overlayableContentsController_ view]];
+
+    // Create a sub-controller for the docked sidebar and add its view to the
+    // hierarchy.
+    sidebarController_.reset([[SidebarController alloc]
+                               initWithParentViewController: devToolsController_
+                                      andContentsController: overlayableContentsController_]);
 
     // Create a controller for the tab strip, giving it the model object for
     // this window's Browser and the tab strip view. The controller will handle

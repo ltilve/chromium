@@ -16,7 +16,8 @@
 namespace {
 
 // By default sidebar width is 1/7th of the current page content width.
-const CGFloat kDefaultSidebarWidthRatio = 1.0 / 7;
+const CGFloat kDefaultSidebarWidthRatio = 1.0f / 7.0f;
+const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
 // Never make the web part of the tab contents smaller than this (needed if the
 // window is only a few pixels wide).
@@ -30,16 +31,35 @@ const int kMinWebWidth = 50;
 - (void)resizeSidebarToNewWidth:(CGFloat)width;
 @end
 
+@interface SidebarSplitView : NSSplitView
+@end
+
+@implementation SidebarSplitView
+- (NSColor*)dividerColor
+{
+  return [NSColor controlColor];
+}
+@end
+
 
 @implementation SidebarController
 
-- (id)init {
-  if ((self = [super init])) {
-    splitView_.reset([[NSSplitView alloc] initWithFrame:NSZeroRect]);
-    [splitView_ setDividerStyle:NSSplitViewDividerStylePaneSplitter];
-    [splitView_ setVertical:YES];
-    [splitView_ setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+- (id)initWithParentViewController: (id) parentController
+             andContentsController: (id) contentsController
+{
+  DCHECK(parentController);
+
+  if (self = [super init]) {
+    splitView_.reset([[SidebarSplitView alloc]
+                       initWithFrame: [[parentController view] bounds]]);
     [splitView_ setDelegate:self];
+    [splitView_ setVertical:YES];
+    [splitView_ setDividerStyle:NSSplitViewDividerStyleThin];
+    [splitView_ setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+    [[parentController view] addSubview: splitView_];
+
+    [splitView_ addSubview: [contentsController view]];
+    [splitView_ adjustSubviews];
   }
   return self;
 }
@@ -47,14 +67,6 @@ const int kMinWebWidth = 50;
 - (void)dealloc {
   [splitView_ setDelegate:nil];
   [super dealloc];
-}
-
-- (NSSplitView*)view {
-  return splitView_.get();
-}
-
-- (NSSplitView*)splitView {
-  return splitView_.get();
 }
 
 - (void)updateSidebarForTabContents:(content::WebContents*)contents {
@@ -114,6 +126,7 @@ const int kMinWebWidth = 50;
         sidebarWidth =
             NSWidth([splitView_ frame]) * kDefaultSidebarWidthRatio;
       }
+
       [splitView_ addSubview:[contentsController_ view]];
     } else {
       DCHECK_EQ([subviews count], 2u);
@@ -164,14 +177,59 @@ const int kMinWebWidth = 50;
   [splitView_ adjustSubviews];
 }
 
-// NSSplitViewDelegate protocol.
+/* NSSplitViewDelegate Support
+ *
+ * Sidebar behavior:
+ * - initial sidebar is the greater of kMinWebWidth and
+ *   kDefaultSidebarWidthRatio * width of the split-view's frame
+ * - sidebar width is not allowed to be smaller than kMinWebWidth
+ * - sidebar width is not allowed to be greater than 50% of width of the
+ *   the split-view's frame
+ *
+ */
+
 - (BOOL)splitView:(NSSplitView *)splitView
-    shouldAdjustSizeOfSubview:(NSView *)subview {
-  // Return NO for the sidebar view to indicate that it should not be resized
-  // automatically.  The sidebar keeps the width set by the user.
-  if ([[splitView_ subviews] indexOfObject:subview] == 1)
-    return NO;
+shouldAdjustSizeOfSubview:(NSView *)subview
+{
+  if ([[splitView_ subviews] indexOfObject:subview] == 1) {
+    return NSWidth([subview bounds]) > kMinWebWidth;
+  }
   return YES;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView
+shouldHideDividerAtIndex:(NSInteger)dividerIndex
+{
+  return NO;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView
+canCollapseSubview:(NSView *)subview
+{
+  return NO;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView
+shouldCollapseSubview:(NSView *)subview
+forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+{
+  return NO;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView
+constrainMinCoordinate:(CGFloat)proposedMinimumPosition
+         ofSubviewAt:(NSInteger)dividerIndex
+{
+  return  std::max(proposedMinimumPosition,
+                   kMaximumSidebarWidthRatio * NSWidth([splitView_ frame]));
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView
+constrainMaxCoordinate:(CGFloat)proposedMaximumPosition
+         ofSubviewAt:(NSInteger)dividerIndex
+{
+  return std::min(proposedMaximumPosition,
+                  NSWidth([splitView_ frame]) - kMinWebWidth);
 }
 
 @end
