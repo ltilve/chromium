@@ -16,7 +16,6 @@
 
 class GURL;
 class SidebarContainer;
-class SkBitmap;
 
 namespace content {
 class WebContents;
