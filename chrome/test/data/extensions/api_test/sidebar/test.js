@@ -11,7 +11,7 @@ var assertTrue = chrome.test.assertTrue;
 chrome.test.runTests([
   // ensure that showing the sidebar changes its
   // state from 'hidden' to 'active'
-  function testShowSetsStateToActive(id, callback) {
+  function testShowSetsStateToActive(id) {
     chrome.sidebar.getState({tabId: id}, pass(function(state) {
       assertEq('hidden', state);
       chrome.sidebar.show({tabId: id});
