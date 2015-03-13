@@ -108,6 +108,8 @@ chrome.test.runTests([
     chrome.sidebar.getState({tabId: id},
                             pass(function(state) {
                               assertEq('object', typeof state, "getState should no longer return a string");
+                              // typeof null == object, make sure we don't get that either
+                              assertTrue(state !== null, "state should not be null");
                             }));
   },
   // ensure getState returns shown
