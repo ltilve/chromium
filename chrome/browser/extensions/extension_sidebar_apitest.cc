@@ -6,6 +6,7 @@
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "extensions/common/switches.h"
 
+namespace extensions {
 class SidebarApiTest : public ExtensionApiTest {
  public:
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -18,3 +19,4 @@ class SidebarApiTest : public ExtensionApiTest {
 IN_PROC_BROWSER_TEST_F(SidebarApiTest, Sidebar) {
   ASSERT_TRUE(RunExtensionTest("sidebar")) << message_;
 }
+} // namespace extensions
