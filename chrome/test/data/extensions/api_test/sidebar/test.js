@@ -101,5 +101,66 @@ chrome.test.runTests([
         }));
       }));
     }));
+  },
+  // state result was changed: should return
+  // an object with 'shown' and 'pinned' members
+  function testGetStateReturnsAnObject(id) {
+    chrome.sidebar.getState({tabId: id},
+                            pass(function(state) {
+                              assertEq('object', typeof state, "getState should no longer return a string");
+                            }));
+  },
+  // ensure getState returns shown
+  function testGetStateReturnsShown(id) {
+    chrome.sidebar.getState({tabId: id},
+                            pass(function(state) {
+                              assertFalse(state.shown === undefined, "getState should include 'shown'");
+                            }));
+  },
+  // ensure getState returns pinned
+  function testGetStateReturnsPinned(id) {
+    chrome.sidebar.getState({tabId: id},
+                            pass(function(state) {
+                              assertFalse(state.pinned === undefined, "getState should include 'pinned'");
+                            }));
+  },
+  // navigate was removed from the API
+  function testNavigateIsUndefined(id) {
+    assertTrue(chrome.sidebar.navigate === undefined, 'chrome.sidebar.navigate should not be defined');
+    chrome.sidebar.getState(null, pass(function(state){}));
+  },
+  // setIcon was removed from the API
+  function testSetIconIsUndefined(id) {
+    assertTrue(chrome.sidebar.setIcon === undefined, 'chrome.sidebar.setIcon should not be defined');
+    chrome.sidebar.getState(null, pass(function(state){}));
+  },
+  // setTitle was removed from the API
+  function testSetTitleIsUndefined(id) {
+    assertTrue(chrome.sidebar.setTitle === undefined, 'chrome.sidebar.setTitle should not be defined');
+    chrome.sidebar.getState(null, pass(function(state){}));
+  },
+  // test that navigation works via show
+  function testCanNavigateViaShow(id) {
+    chrome.sidebar.show({tabId: id, sidebar:"./simple_page.html"});
+    chrome.sidebar.getState({tabId:id},
+                            pass(function(state) {
+                              assertEq('active', state);
+                              // TODO check we're on the right page
+                            }));
+  },
+  // test that width works in show
+  function testWidthWorksInShow(id) {
+    chrome.sidebar.show({tabId: id, sidebar:"./simple_page.html", width: "100px"});
+    chrome.sidebar.getState({tabId:id},
+                            pass(function(state) {
+                              assertEq('active', state);
+                              // TODO check the contents is properly sized
+                            }));
+  },
+  // test that onStateChanged gets called when tab state
+  // changes; ensure returned details include tabId and state
+  function testOnStateChangedGetsCalledOnStateChange(id) {
+    // TODO write this test
+    assertTrue(false, "unimplemented");
   }
 ]);
