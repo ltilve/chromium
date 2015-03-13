@@ -19,5 +19,20 @@ chrome.test.runTests([
         assertEq('active', state);
       });
     }));
+  },
+  // ensure that hiding the sidebar changes its
+  // state from 'active' to 'hidden'
+  function testHideSetsStateToHidden(id) {
+    chrome.sidebar.getState({tabId: id}, pass(function(state) {
+      assertEq('active',state);
+      chrome.sidebar.hide({tabId: id});
+      chrome.sidebar.getState({tabId: id}, function(state) {
+        assertEq('hidden', state);
+      });
+      chrome.sidebar.hide({tabId: id});
+      chrome.sidebar.getState({tabId: id}, function(state) {
+        assertEq('hidden', state);
+      });
+    }));
   }
 ]);
