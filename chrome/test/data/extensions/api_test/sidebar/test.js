@@ -9,34 +9,34 @@ var assertFalse = chrome.test.assertFalse;
 var assertTrue = chrome.test.assertTrue;
 
 /**
- * A helper function to show sidebar. Verifies that sidebar was hidden before
- * and is shown after the call.
+ * A helper function to show sidebar. Verifies that sidebar was not
+ * shown before and is shown after the call.
  * @param {id} tab id to expand sidebar for.
  * @param {function} callback Closure.
  */
 function showSidebar(id, callback) {
   chrome.sidebar.getState({tabId: id}, function(state) {
-    assertEq('hidden', state);
+    assertFalse(state.shown);
     chrome.sidebar.show({tabId: id, sidebar: ""});
     chrome.sidebar.getState({tabId: id}, function(state) {
-      assertEq('shown', state);
+      assertTrue(state.shown);
       callback();
     });
   });
 };
 
 /**
- * A helper function to hide sidebar. Verifies that sidebar was not hidden
- * before and is hidden after the call.
+ * A helper function to hide sidebar. Verifies that sidebar was
+ * shown before and is not shown after the call.
  * @param {id} tab id to hide sidebar for.
  * @param {function} callback Closure.
  */
 function hideSidebar(id, callback) {
   chrome.sidebar.getState({tabId: id}, function(state) {
-    assertTrue('hidden' != state);
+    assertTrue(state.shown);
     chrome.sidebar.hide({tabId: id});
     chrome.sidebar.getState({tabId: id}, function(state) {
-      assertEq('hidden', state);
+      assertFalse(state.shown);
       callback();
     });
   });
@@ -63,28 +63,28 @@ function hideSidebarForCurrentTab(callback) {
 
 chrome.test.runTests([
   // ensure that showing the sidebar changes its
-  // state from 'hidden' to 'active'
+  // state from shown.false to shown.true
   function testShowSetsStateToActive(id) {
     chrome.sidebar.getState({tabId: id}, pass(function(state) {
-      assertEq('hidden', state);
+      assertFalse(state.shown);
       chrome.sidebar.show({tabId: id, sidebar: ""});
       chrome.sidebar.getState({tabId: id}, pass(function(state) {
-        assertEq('active', state);
+        assertTrue(state.shown);
       }));
     }));
   },
   // ensure that hiding the sidebar changes its
-  // state from 'active' to 'hidden'
-  function testHideSetsStateToHidden(id) {
+  // state from shown==true to shown==false
+  function testHideSetsShownStateToFalse(id) {
     chrome.sidebar.getState({tabId: id}, pass(function(state) {
-      assertEq('active',state);
+      assertTrue(state.shown);
       chrome.sidebar.hide({tabId: id});
       chrome.sidebar.getState({tabId: id}, pass(function(state) {
-        assertEq('hidden', state);
+        assertFalse(state.shown);
       }));
       chrome.sidebar.hide({tabId: id});
       chrome.sidebar.getState({tabId: id}, pass(function(state) {
-        assertEq('hidden', state);
+        assertFalse(state.shown);
       }));
     }));
   },
@@ -92,12 +92,12 @@ chrome.test.runTests([
   // to chrome.sidebar.getState
   function testGetStateWithUndefined(id) {
     chrome.sidebar.getState(undefined, pass(function(state) {
-      assertEq('hidden', state);
+      assertFalse(state.shown);
       chrome.sidebar.getState(null, pass(function(state) {
-        assertEq('hidden', state);
+        assertFalse(state.shown);
         chrome.sidebar.show({tabId: id, sidebar: ""});
         chrome.sidebar.getState(null, pass(function(state) {
-          assertEq('active', state);
+          assertTrue(state.shown);
         }));
       }));
     }));
