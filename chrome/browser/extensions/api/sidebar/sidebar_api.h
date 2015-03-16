@@ -19,9 +19,11 @@ class WebContents;
 }
 
 namespace extension_sidebar_constants {
-extern const char kActiveState[];
-extern const char kHiddenState[];
-extern const char kShownState[];
+extern const char kActiveState[]; // TODO(kfowler) remove
+extern const char kHiddenState[]; // TODO(kfowler) remove
+extern const char kShownState[]; // TODO(kfowler) remove
+extern const char kShownFlag[];
+extern const char kPinnedFlag[];
 }  // namespace extension_sidebar_constants
 
 // Event router class for events related to the sidebar API.

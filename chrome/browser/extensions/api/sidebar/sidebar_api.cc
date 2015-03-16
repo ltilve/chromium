@@ -35,9 +35,11 @@ const char kOnStateChanged[] = "experimental.sidebar.onStateChanged";
 
 namespace extension_sidebar_constants {
 // Sidebar states.
-const char kActiveState[] = "active";
-const char kHiddenState[] = "hidden";
-const char kShownState[] = "shown";
+const char kActiveState[] = "active"; // TODO(kfowler) remove
+const char kHiddenState[] = "hidden"; // TODO(kfowler) remove
+const char kShownState[] = "shown";   // TODO(kfowler) remove
+const char kShownFlag[] = "shown";
+const char kPinnedFlag[] = "pinned";
 }  // namespace extension_sidebar_constants
 
 // static
@@ -136,9 +138,8 @@ bool SidebarGetStateFunction::RunImpl(content::WebContents* tab,
                                       const base::DictionaryValue& details) {
   SidebarManager* manager = SidebarManager::GetInstance();
 
-  const char* result = extension_sidebar_constants::kHiddenState;
+  bool is_active = false;  
   if (manager->GetSidebarTabContents(tab, content_id)) {
-    bool is_active = false;
     // Sidebar is considered active only if tab is selected, sidebar UI
     // is expanded and this extension's content is displayed on it.
     SidebarContainer* active_sidebar =
@@ -163,12 +164,13 @@ bool SidebarGetStateFunction::RunImpl(content::WebContents* tab,
         }
       }
     }
-
-    result = is_active ? extension_sidebar_constants::kActiveState :
-                         extension_sidebar_constants::kShownState;
   }
 
-  SetResult(new base::StringValue(result));
+  base::DictionaryValue* sidebar_state = new base::DictionaryValue;
+  sidebar_state->SetBoolean(extension_sidebar_constants::kShownFlag, is_active);
+  sidebar_state->SetBoolean(extension_sidebar_constants::kPinnedFlag, false);
+  SetResult(sidebar_state);
+
   return true;
 }
 
