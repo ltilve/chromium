@@ -115,8 +115,18 @@
                 "minimum": 0
               },
               "state": {
-                "type": "string",
-                "enum": ["hidden", "shown", "active"]
+                "name": "details",
+                "type": "object",
+                "properties": {
+                  "shown": {
+                    "type": "boolean",
+                    "description": "'shown' indicates that a sidebar is defined displayed for the specified tab."
+                  },
+                  "pinned": {
+                    "type": "boolean",
+                    "description": "'pinned' indicates the pin button is depressed."
+                  }
+                }
               }
             }
           }
