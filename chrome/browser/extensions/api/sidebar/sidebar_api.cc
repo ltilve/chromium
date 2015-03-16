@@ -27,7 +27,6 @@ const char kNoTabError[] = "No tab with id: *.";
 const char kNoCurrentWindowError[] = "No current browser window was found";
 const char kNoDefaultTabError[] = "No default tab was found";
 // Keys.
-const char kPathKey[] = "path";
 const char kStateKey[] = "state";
 const char kTabIdKey[] = "tabId";
 // Events.
@@ -179,22 +178,6 @@ bool SidebarHideFunction::RunImpl(content::WebContents* tab,
   SidebarManager::GetInstance()->HideSidebar(tab, content_id);
   return true;
 }
-
-bool SidebarNavigateFunction::RunImpl(content::WebContents* tab,
-                                      const std::string& content_id,
-                                      const base::DictionaryValue& details) {
-  std::string path_string;
-  EXTENSION_FUNCTION_VALIDATE(details.GetString(kPathKey, &path_string));
-
-  GURL url = extension_sidebar_utils::ResolveRelativePath(
-      path_string, extension(), &error_);
-  if (!url.is_valid())
-    return false;
-
-  SidebarManager::GetInstance()->NavigateSidebar(tab, content_id, url);
-  return true;
-}
-
 
 bool SidebarShowFunction::RunImpl(content::WebContents* tab,
                                   const std::string& content_id,

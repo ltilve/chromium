@@ -102,6 +102,15 @@ chrome.test.runTests([
       }));
     }));
   },
+  // navigate was removed from the API
+  // TODO Remove this test once the API is finalized
+  function testNavigateIsUndefined(id) {
+    assertFalse(chrome.sidebar === undefined, 'chrome.sidebar should be defined');
+    assertTrue(typeof chrome.sidebar.navigate === "undefined", 'chrome.sidebar.navigate should not be defined');
+    chrome.sidebar.getState({tabId: id}, pass(function(state){
+      assertTrue(true);
+    }));
+  },
   // state result was changed: should return
   // an object with 'shown' and 'pinned' members
   function testGetStateReturnsAnObject(id) {
@@ -125,11 +134,6 @@ chrome.test.runTests([
                             pass(function(state) {
                               assertFalse(state.pinned === undefined, "getState should include 'pinned'");
                             }));
-  },
-  // navigate was removed from the API
-  function testNavigateIsUndefined(id) {
-    assertTrue(chrome.sidebar.navigate === undefined, 'chrome.sidebar.navigate should not be defined');
-    chrome.sidebar.getState(null, pass(function(state){}));
   },
   // setIcon was removed from the API
   function testSetIconIsUndefined(id) {

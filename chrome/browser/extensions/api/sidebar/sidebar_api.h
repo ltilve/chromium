@@ -71,17 +71,6 @@ protected:
   DECLARE_EXTENSION_FUNCTION("sidebar.hide", SIDEBAR_HIDE);
 };
 
-class SidebarNavigateFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
-protected:
-  ~SidebarNavigateFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.navigate", SIDEBAR_NAVIGATE);
-};
-
 class SidebarShowFunction : public SidebarFunction {
  private:
   bool RunImpl(content::WebContents* tab,

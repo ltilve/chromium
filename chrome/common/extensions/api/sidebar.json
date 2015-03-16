@@ -45,29 +45,6 @@
         ]
       },
       {
-        "name": "navigate",
-        "type": "function",
-        "description": "Loads the the specified html file into the sidebar for the specified tab.",
-        "parameters": [
-          {
-            "type": "object",
-            "name": "details",
-            "properties": {
-              "tabId": {
-                "type": "integer",
-                "minimum": 0,
-                "optional": true,
-                "description": "Defaults to the selected tab of the <a href='windows.html#current-window'>current window</a>."
-              },
-              "path": {
-                "type": "string",
-                "description": "Relative path to the html file in the extension to show in the sidebar."
-              }
-            }
-          }
-        ]
-      },
-      {
         "name": "getState",
         "type": "function",
         "description": "Returns current sidebar state for the specified tab.",
