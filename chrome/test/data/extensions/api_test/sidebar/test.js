@@ -17,7 +17,7 @@ var assertTrue = chrome.test.assertTrue;
 function showSidebar(id, callback) {
   chrome.sidebar.getState({tabId: id}, function(state) {
     assertEq('hidden', state);
-    chrome.sidebar.show({tabId: id});
+    chrome.sidebar.show({tabId: id, sidebar: ""});
     chrome.sidebar.getState({tabId: id}, function(state) {
       assertEq('shown', state);
       callback();
@@ -67,7 +67,7 @@ chrome.test.runTests([
   function testShowSetsStateToActive(id) {
     chrome.sidebar.getState({tabId: id}, pass(function(state) {
       assertEq('hidden', state);
-      chrome.sidebar.show({tabId: id});
+      chrome.sidebar.show({tabId: id, sidebar: ""});
       chrome.sidebar.getState({tabId: id}, pass(function(state) {
         assertEq('active', state);
       }));
@@ -95,7 +95,7 @@ chrome.test.runTests([
       assertEq('hidden', state);
       chrome.sidebar.getState(null, pass(function(state) {
         assertEq('hidden', state);
-        chrome.sidebar.show({tabId: id});
+        chrome.sidebar.show({tabId: id, sidebar: ""});
         chrome.sidebar.getState(null, pass(function(state) {
           assertEq('active', state);
         }));
@@ -110,6 +110,45 @@ chrome.test.runTests([
     chrome.sidebar.getState({tabId: id}, pass(function(state){
       assertTrue(true);
     }));
+  },
+  // API change: pass width to show()
+  function testShowAcceptsWidthProperty(id) {
+    chrome.sidebar.show({tabId: id, width: 400, sidebar: ""});
+    chrome.sidebar.getState({tabId: id},
+                        pass(function(state) {
+                          assertTrue(true);
+                        }));
+  },
+  // let's not crash if width is weird
+  function testShowAcceptsNullWidthProperty(id) {
+    chrome.sidebar.show({tabId: id, width: null, sidebar: ""});
+    chrome.sidebar.getState({tabId: id},
+                        pass(function(state) {
+                          assertTrue(true);
+                        }));
+  },
+  // API change: pass sidebar (URL) to show()
+  function testShowAcceptsSidebarProperty(id) {
+    chrome.sidebar.show({tabId: id, sidebar: "http://www.chromium.org/"});
+    chrome.sidebar.getState({tabId: id},
+                        pass(function(state) {
+                          assertTrue(true);
+                        }));
+  },
+  // let's not crash if sidebar is null
+  function testShowDisallowsNullSidebarProperty(id) {
+    try {
+      chrome.sidebar.show({tabId: id, sidebar: null});
+      chrome.sidebar.getState({tabId: id},
+                              pass(function(state) {
+                                assertFalse(true);
+                              }));
+    } catch (e) {
+      chrome.sidebar.getState({tabId: id},
+                              pass(function(state) {
+                                assertTrue(true);
+                              }));
+    }
   },
   // state result was changed: should return
   // an object with 'shown' and 'pinned' members

@@ -39,6 +39,17 @@
                 "minimum": 0,
                 "optional": true,
                 "description": "Defaults to the selected tab of the <a href='windows.html#current-window'>current window</a>."
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 0,
+                "optional": true,
+                "description": "The width in pixels for the sidebar display area. If not specified, the sidebar will be sized to fit its contents. <a href='windows.html#current-window'>current window</a>."
+              },
+              "sidebar": {
+                "type": "string",
+                "optional": false,
+                "description": "URL to which to navigate the sidebar."
               }
             }
           }
