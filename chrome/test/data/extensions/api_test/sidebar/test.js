@@ -205,7 +205,19 @@ chrome.test.runTests([
   // test that onStateChanged gets called when tab state
   // changes; ensure returned details include tabId and state
   function testOnStateChangedGetsCalledOnStateChange(id) {
-    // TODO write this test
-    assertTrue(false, "unimplemented");
+    var listened = false;
+    chrome.sidebar.onStateChanged.addListener(
+      function(details) {
+        assertFalse(listened);
+        listened = true;
+      });
+    chrome.sidebar.show({tabId:id, sidebar:"./simple_page.html"});
+    chrome.sidebar.hide({tabId:id});
+    while(!listened) {
+    }
+    chrome.sidebar.getState({tabId:id},
+                            pass(function(state) {
+                              assertTrue(listened);
+                            }));
   }
 ]);

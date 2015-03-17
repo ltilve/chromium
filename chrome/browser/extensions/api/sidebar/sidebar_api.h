@@ -22,8 +22,6 @@ namespace extension_sidebar_constants {
 extern const char kActiveState[]; // TODO(kfowler) remove
 extern const char kHiddenState[]; // TODO(kfowler) remove
 extern const char kShownState[]; // TODO(kfowler) remove
-extern const char kShownFlag[];
-extern const char kPinnedFlag[];
 }  // namespace extension_sidebar_constants
 
 // Event router class for events related to the sidebar API.
@@ -38,50 +36,34 @@ class ExtensionSidebarEventRouter {
   DISALLOW_COPY_AND_ASSIGN(ExtensionSidebarEventRouter);
 };
 
-// Base class for sidebar function APIs.
-class SidebarFunction : public ChromeSyncExtensionFunction {
- public:
-  bool RunSync() override;
- protected:
-  ~SidebarFunction() override {};
-
- private:
-  virtual bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) = 0;
-};
-
-class SidebarGetStateFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
-protected:
-  ~SidebarGetStateFunction() override {} ;
-
+class SidebarGetStateFunction : public ChromeSyncExtensionFunction {
+public:
   DECLARE_EXTENSION_FUNCTION("sidebar.getState", SIDEBAR_GETSTATE);
-};
 
-class SidebarHideFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
 protected:
-  ~SidebarHideFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.hide", SIDEBAR_HIDE);
+  ~SidebarGetStateFunction() override {}
+  bool RunSync() override;
 };
 
-class SidebarShowFunction : public SidebarFunction {
- private:
-  bool RunImpl(content::WebContents* tab,
-                       const std::string& content_id,
-                       const base::DictionaryValue& details) override;
+/*
+ * Uses deprecated ChromeSyncExtensionFunction because we need
+ * access to Browser and Profile.
+ */
+class SidebarHideFunction : public ChromeSyncExtensionFunction {
+public:
+  DECLARE_EXTENSION_FUNCTION("sidebar.hide", SIDEBAR_HIDE);
+
+protected:
+  ~SidebarHideFunction() override {}
+  bool RunSync() override;
+};
+    
+class SidebarShowFunction : public ChromeSyncExtensionFunction {
+public:
+  DECLARE_EXTENSION_FUNCTION("sidebar.show", SIDEBAR_SHOW);
+  
 protected:
   ~SidebarShowFunction() override {} ;
-
-  DECLARE_EXTENSION_FUNCTION("sidebar.show", SIDEBAR_SHOW);
+  bool RunSync() override;
 };
-
 #endif  // CHROME_BROWSER_EXTENSIONS_EXTENSION_SIDEBAR_API_H_
