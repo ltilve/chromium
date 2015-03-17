@@ -189,16 +189,16 @@ chrome.test.runTests([
     chrome.sidebar.show({tabId: id, sidebar:"./simple_page.html"});
     chrome.sidebar.getState({tabId:id},
                             pass(function(state) {
-                              assertEq('active', state);
+                              assertTrue(state.shown);
                               // TODO check we're on the right page
                             }));
   },
   // test that width works in show
   function testWidthWorksInShow(id) {
-    chrome.sidebar.show({tabId: id, sidebar:"./simple_page.html", width: "100px"});
+    chrome.sidebar.show({tabId: id, sidebar:"./simple_page.html", width: 100});
     chrome.sidebar.getState({tabId:id},
                             pass(function(state) {
-                              assertEq('active', state);
+                              assertTrue(state.shown);
                               // TODO check the contents is properly sized
                             }));
   },
