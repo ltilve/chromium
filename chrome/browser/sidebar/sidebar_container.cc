@@ -47,7 +47,7 @@ void SidebarContainer::Expand() {
     // Check whether a default page is specified for this sidebar.
     const extensions::Extension* extension = GetExtension();
     if (extension) {  // Can be NULL in tests.
-      //  TODO(me):no member sidebar defaults
+      LOG(INFO) << extension->sidebar_defaults()->default_page();
       if (extension->sidebar_defaults()->default_page().is_valid())
         Navigate(extension->sidebar_defaults()->default_page());
     }

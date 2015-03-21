@@ -33,8 +33,8 @@ SidebarManager* SidebarManager::GetInstance() {
 
 // static
 bool SidebarManager::IsSidebarAllowed() {
-  return base::CommandLine::ForCurrentProcess()->HasSwitch(
-    extensions::switches::kEnableExperimentalExtensionApis);
+  return true;//base::CommandLine::ForCurrentProcess()->HasSwitch(
+    //extensions::switches::kEnableExperimentalExtensionApis);
 }
 
 SidebarManager::SidebarManager() {
