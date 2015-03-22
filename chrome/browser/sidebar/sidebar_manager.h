@@ -69,6 +69,7 @@ class SidebarManager : public content::NotificationObserver,
   // if sidebar is not expanded).
   void CollapseSidebar(content::WebContents* tab, const std::string& content_id);
 
+  SidebarContainer* MigrateSidebarTo(content::WebContents* tab);
   // Hides sidebar identified by |tab| and |content_id| (removes sidebar's
   // mini tab).
   void HideSidebar(content::WebContents* tab, const std::string& content_id);

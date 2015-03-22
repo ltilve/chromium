@@ -66,6 +66,8 @@ const int kMinWebWidth = 50;
   if (contents && SidebarManager::IsSidebarAllowed()) {
     SidebarContainer* activeSidebar =
         SidebarManager::GetInstance()->GetActiveSidebarContainerFor(contents);
+    if (!activeSidebar)
+      activeSidebar = SidebarManager::GetInstance()->MigrateSidebarTo(contents);
     if (activeSidebar)
       sidebarContents = activeSidebar->sidebar_contents();
   }

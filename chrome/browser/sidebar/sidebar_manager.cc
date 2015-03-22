@@ -43,8 +43,9 @@ SidebarManager::SidebarManager() {
 SidebarContainer* SidebarManager::GetActiveSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarHostMap::iterator it = tab_to_sidebar_host_.find(tab);
-  if (it == tab_to_sidebar_host_.end())
+  if (it == tab_to_sidebar_host_.end()) {
     return NULL;
+  }
   if (it->second.active_content_id.empty())
     return NULL;
   ContentIdToSidebarHostMap::iterator host_it =
@@ -53,12 +54,19 @@ SidebarContainer* SidebarManager::GetActiveSidebarContainerFor(
   return host_it->second;
 }
 
+SidebarContainer* SidebarManager::MigrateSidebarTo(WebContents* tab) {
+  if (tab_to_sidebar_host_.empty())
+    return NULL;
+  return GetActiveSidebarContainerFor(tab_to_sidebar_host_.begin()->first);
+}
+
 SidebarContainer* SidebarManager::GetSidebarContainerFor(
     WebContents* tab, const std::string& content_id) {
   DCHECK(!content_id.empty());
   TabToSidebarHostMap::iterator it = tab_to_sidebar_host_.find(tab);
-  if (it == tab_to_sidebar_host_.end())
+  if (it == tab_to_sidebar_host_.end()) {
     return NULL;
+  }
   ContentIdToSidebarHostMap::iterator host_it =
       it->second.content_id_to_sidebar_host.find(content_id);
   if (host_it == it->second.content_id_to_sidebar_host.end())
