@@ -15,31 +15,31 @@
 // as defined in the extension manifest.
 class ExtensionSidebarDefaults {
  public:
-  ExtensionSidebarDefaults() {}
+  ExtensionSidebarDefaults();
+  ~ExtensionSidebarDefaults();
   // Default title, stores manifest default_title key value.
-  void set_default_title(const base::string16& title) {
-    default_title_ = title;
-  }
+  void set_default_scope(const base::string16& scope);
+  // Default title, stores manifest default_title key value.
+  void set_default_title(const base::string16& title);
   const base::string16& default_title() const { return default_title_; }
+  const base::string16& default_scope() const { return default_scope_; }
 
   // Default icon path, stores manifest default_icon key value.
-  void set_default_icon_path(const std::string& path) {
-    default_icon_path_ = path;
-  }
+  void set_default_icon_path(const std::string& path);
   const std::string& default_icon_path() const {
     return default_icon_path_;
   }
 
   // A resolved |url| to extension resource (manifest default_page key value)
   // to navigate sidebar to by default.
-  void set_default_page(const GURL& url) {
-    default_page_ = url;
-  }
+  void set_default_page(const GURL& url);
   const GURL& default_page() const {
     return default_page_;
   }
 
  private:
+  
+  base::string16 default_scope_;
   base::string16 default_title_;
   std::string default_icon_path_;
   GURL default_page_;

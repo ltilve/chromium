@@ -138,6 +138,7 @@ const char kSidebar[] = "sidebar";
 const char kSidebarDefaultIcon[] = "default_icon";
 const char kSidebarDefaultPage[] = "default_page";
 const char kSidebarDefaultTitle[] = "default_title";
+const char kSidebarDefaultScope[] = "scope";
 const char kSignature[] = "signature";
 const char kSockets[] = "sockets";
 const char kSpellcheck[] = "spellcheck";
@@ -266,6 +267,8 @@ const char kInvalidSidebar[] =
     "kInvalidSidebar";
 const char kInvalidSidebarDefaultTitle[] =
     "kInvalidSidebarDefaultTitle";
+const char kInvalidSidebarDefaultScope[] =
+    "kInvalidSidebarDefaultScope";
 const char kCannotChangeExtensionID[] =
     "Installed extensions cannot change their IDs.";
 const char kCannotClaimAllHostsInExtent[] =

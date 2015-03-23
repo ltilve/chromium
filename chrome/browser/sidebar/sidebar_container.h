@@ -56,7 +56,7 @@ class SidebarContainer : public content::WebContentsDelegate {
   // Returns sidebar's TabContents.
   content::WebContents* sidebar_contents() const { return sidebar_contents_.get(); }
 
-  // Functions supporting chrome.experimental.sidebar API.
+  bool HasGlobalScope() const;
 
   // Notifies hosting window that this sidebar was expanded.
   void Show();

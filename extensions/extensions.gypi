@@ -61,6 +61,7 @@
       'common/extension_resource.h',
       'common/extension_set.cc',
       'common/extension_set.h',
+      'common/extension_sidebar_defaults.cc',
       'common/extension_sidebar_defaults.h',
       'common/extension_sidebar_utils.cc',
       'common/extension_sidebar_utils.h',

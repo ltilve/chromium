@@ -716,6 +716,17 @@ ExtensionSidebarDefaults* Extension::LoadExtensionSidebarDefaults(
   }
   result->set_default_title(default_title);
 
+  // Read sidebar's |default_scope|.
+  base::string16 default_scope;
+  if (extension_sidebar->HasKey(keys::kSidebarDefaultScope)) {
+    if (!extension_sidebar->GetString(keys::kSidebarDefaultScope,
+                                      &default_scope)) {
+      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultScope);
+      return NULL;
+    }
+  }
+  result->set_default_scope(default_scope);
+
   // Read sidebar's |default_page| (optional).
   // TODO(rdevlin.cronin): Continue removing std::string errors and replace
   //  with string16

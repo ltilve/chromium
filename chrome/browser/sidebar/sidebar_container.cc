@@ -4,6 +4,7 @@
 
 #include "chrome/browser/sidebar/sidebar_container.h"
 
+#include "base/strings/utf_string_conversions.h"
 #include "extensions/browser/extension_system.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
@@ -14,7 +15,9 @@
 #include "content/public/browser/web_contents.h"
 #include "components/app_modal/javascript_dialog_manager.h"
 #include "url/gurl.h"
-
+namespace {
+  const char kGlobalScopeName[] = "global";
+}
 SidebarContainer::SidebarContainer(content::WebContents* tab,
                                    const std::string& content_id,
                                    Delegate* delegate)
@@ -39,6 +42,11 @@ void SidebarContainer::SidebarClosing() {
 
 void SidebarContainer::Show() {
   delegate_->UpdateSidebar(this);
+}
+
+bool SidebarContainer::HasGlobalScope() const {
+  const extensions::Extension* extension = GetExtension();
+  return (std::string(base::UTF16ToUTF8(extension->sidebar_defaults()->default_scope())) == kGlobalScopeName);
 }
 
 void SidebarContainer::Expand() {
