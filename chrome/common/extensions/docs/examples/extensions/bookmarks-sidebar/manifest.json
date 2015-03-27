@@ -1,0 +1,37 @@
+{
+  "name": "Bookmarks Sidebar",
+  "version": "0.1.0",
+  "description": "Bookmarks Sidebar Google Chrome™.",
+  "manifest_version": 2,
+  "minimum_chrome_version": "43.0.2323",
+  "icons": {
+    "16": "img/bookmarks-icon-16.png",
+    "128": "img/bookmarks-icon-128.png"
+  },
+  "background": {
+    "page": "html/background.html"
+  },
+  "sidebar": {
+    "default_title": "Bookmarks",
+    "default_page": "html/background.html",
+    "default_icon": "img/bookmarks-icon-16.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "img/bookmarks-button-icon-32.png",
+      "19": "img/bookmarks-button-icon-32.png",
+      "38": "img/bookmarks-button-icon-64.png"
+    }
+  },
+  "web_accessible_resources": [
+    "html/background.html"
+  ],
+  "permissions": [
+    "tabs",
+    "sidebar",
+    "bookmarks",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "incognito": "split"
+}
