@@ -4,6 +4,7 @@
 
 #include "chrome/browser/extensions/api/sidebar/sidebar_api.h"
 
+#include "common/extensions/api/sidebar.h"
 #include "base/json/json_writer.h"
 #include "base/strings/string_number_conversions.h"
 #include "extensions/browser/event_router.h"
@@ -15,6 +16,7 @@
 #include "extensions/common/error_utils.h"
 #include "extensions/common/extension_sidebar_utils.h"
 #include "content/public/browser/web_contents.h"
+
 
 
 using content::WebContents;
@@ -29,8 +31,8 @@ const char kNoDefaultTabError[] = "No default tab was found";
 // Keys.
 const char kStateKey[] = "state";
 const char kTabIdKey[] = "tabId";
-// Events.
-const char kOnStateChanged[] = "experimental.sidebar.onStateChanged";
+const char kShownFlag[] = "shown";
+const char kPinnedFlag[] = "pinned";
 }  // namespace
 
 namespace extension_sidebar_constants {
@@ -38,8 +40,6 @@ namespace extension_sidebar_constants {
 const char kActiveState[] = "active"; // TODO(kfowler) remove
 const char kHiddenState[] = "hidden"; // TODO(kfowler) remove
 const char kShownState[] = "shown";   // TODO(kfowler) remove
-const char kShownFlag[] = "shown";
-const char kPinnedFlag[] = "pinned";
 }  // namespace extension_sidebar_constants
 
 // static
@@ -61,7 +61,7 @@ void ExtensionSidebarEventRouter::OnStateChanged(
 
   extensions::EventRouter* router = extensions::EventRouter::Get(profile);
   scoped_ptr<extensions::Event> event(new extensions::Event(
-      kOnStateChanged, event_args.Pass()));
+      extensions::api::sidebar::OnStateChanged::kEventName, event_args.Pass()));
   event->restrict_to_browser_context = profile;
 
   router->DispatchEventToExtension(
@@ -69,121 +69,212 @@ void ExtensionSidebarEventRouter::OnStateChanged(
       event.Pass());
 }
 
-
-// List is considered empty if it is actually empty or contains just one value,
-// either 'null' or 'undefined'.
-static bool IsArgumentListEmpty(const base::ListValue* arguments) {
-  if (arguments->empty())
-    return true;
-  if (arguments->GetSize() == 1) {
-    const base::Value* first_value = 0;
-    if (!arguments->Get(0, &first_value))
-      return true;
-    if (first_value->GetType() == base::Value::TYPE_NULL)
-      return true;
-  }
-  return false;
-}
-
-
-bool SidebarFunction::RunSync() {
+bool SidebarGetStateFunction::RunSync() {
   if (!extension()->sidebar_defaults()) {
     error_ = kNoSidebarError;
     return false;
   }
 
-  if (!args_.get())
+  if (!args_.get()) {
     return false;
-
-  base::DictionaryValue* details = NULL;
-  base::DictionaryValue default_details;
-  if (IsArgumentListEmpty(args_.get())) {
-    details = &default_details;
-  } else {
-    EXTENSION_FUNCTION_VALIDATE(args_->GetDictionary(0, &details));
   }
 
-  int tab_id;
-  content::WebContents* web_contents = NULL;
-  if (details->HasKey(kTabIdKey)) {
-    EXTENSION_FUNCTION_VALIDATE(details->GetInteger(kTabIdKey, &tab_id));
-    if (!extensions::ExtensionTabUtil::GetTabById(tab_id, GetProfile(), include_incognito(),
-                                      NULL, NULL, &web_contents, NULL)) {
-      error_ = extensions::ErrorUtils::FormatErrorMessage(
-          kNoTabError, base::IntToString(tab_id));
-      return false;
-    }
-  } else {
+  scoped_ptr<extensions::api::sidebar::GetState::Params>
+      params(extensions::api::sidebar::GetState::Params::Create(*args_));
+  EXTENSION_FUNCTION_VALIDATE(params.get());
+
+  int active_tab_id = -1;
+  if (params->tab_id == 0L) {
+    VLOG(1) << "getState called with no tabId, will use active tab on frontmost window.";
     Browser* browser = GetCurrentBrowser();
     if (!browser) {
+      VLOG(1) << "error: no current window (" << kNoCurrentWindowError << ")";
       error_ = kNoCurrentWindowError;
       return false;
     }
-    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &web_contents, &tab_id)) {
+    content::WebContents* web_contents = 0L;
+    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &web_contents, &active_tab_id)) {
+      VLOG(1) << "error: no default tab.";
       error_ = kNoDefaultTabError;
       return false;
     }
+    VLOG(1) << "Found tabId: " << active_tab_id;
+  } else {
+    active_tab_id = *params->tab_id;
   }
-  if (!web_contents)
-    return false;
-
-  std::string content_id(extension()->id());
-  return RunImpl(static_cast<content::WebContents*>(web_contents),
-                 content_id, *details);
-}
-
-
-bool SidebarGetStateFunction::RunImpl(content::WebContents* tab,
-                                      const std::string& content_id,
-                                      const base::DictionaryValue& details) {
+  VLOG(1) << "getState of tab_id = " << active_tab_id;
+  
   SidebarManager* manager = SidebarManager::GetInstance();
+  base::DictionaryValue* sidebar_state = new base::DictionaryValue;
+  sidebar_state->SetBoolean(kShownFlag, false);
+  sidebar_state->SetBoolean(kPinnedFlag, false);
 
-  bool is_active = false;  
-  if (manager->GetSidebarTabContents(tab, content_id)) {
-    // Sidebar is considered active only if tab is selected, sidebar UI
-    // is expanded and this extension's content is displayed on it.
-    SidebarContainer* active_sidebar =
-        manager->GetActiveSidebarContainerFor(tab);
-    // Check if sidebar UI is expanded and this extension's content
-    // is displayed on it.
-    if (active_sidebar && active_sidebar->content_id() == content_id) {
-      if (!details.HasKey(kTabIdKey)) {
-        is_active = NULL != GetCurrentBrowser();
-      } else {
-        int tab_id;
-        EXTENSION_FUNCTION_VALIDATE(details.GetInteger(kTabIdKey, &tab_id));
-
-        // Check if this tab is selected.
-        Browser* browser = GetCurrentBrowser();
-        content::WebContents* contents = NULL;
-        int default_tab_id = -1;
-        if (browser &&
-            extensions::ExtensionTabUtil::GetDefaultTab(browser, &contents,
-                                            &default_tab_id)) {
-          is_active = default_tab_id == tab_id;
-        }
-      }
-    }
+  content::WebContents* web_contents = NULL;
+  if (!extensions::ExtensionTabUtil::GetTabById(active_tab_id,
+                                                GetProfile(), include_incognito(),
+                                                NULL, NULL, &web_contents, NULL)) {
+    error_ = extensions::ErrorUtils::FormatErrorMessage(
+        kNoTabError, base::IntToString(active_tab_id));
+    VLOG(1) << "Could not find tab for " << active_tab_id << " " << error_;
+    return false;
+  }
+  if (!web_contents) {
+    VLOG(1) << "No web contents.";
+    return false;
   }
 
-  base::DictionaryValue* sidebar_state = new base::DictionaryValue;
-  sidebar_state->SetBoolean(extension_sidebar_constants::kShownFlag, is_active);
-  sidebar_state->SetBoolean(extension_sidebar_constants::kPinnedFlag, false);
+  manager->GetSidebarTabContents(web_contents, extension()->id());
   SetResult(sidebar_state);
 
   return true;
 }
 
-bool SidebarHideFunction::RunImpl(content::WebContents* tab,
-                                  const std::string& content_id,
-                                  const base::DictionaryValue& details) {
-  SidebarManager::GetInstance()->HideSidebar(tab, content_id);
+bool SidebarHideFunction::RunSync() {
+  if (!extension()->sidebar_defaults()) {
+    error_ = kNoSidebarError;
+    return false;
+  }
+
+  if (!args_.get()) {
+    return false;
+  }
+
+  scoped_ptr<extensions::api::sidebar::Hide::Params>
+      params(extensions::api::sidebar::Hide::Params::Create(*args_));
+  EXTENSION_FUNCTION_VALIDATE(params.get());
+
+  int active_tab_id = -1;
+  if (params->tab_id == 0L) {
+    VLOG(1) << "hide called with no tabId, will use active tab on frontmost window.";
+    Browser* browser = GetCurrentBrowser();
+    if (!browser) {
+      VLOG(1) << "error: no current window (" << kNoCurrentWindowError << ")";
+      error_ = kNoCurrentWindowError;
+      return false;
+    }
+    content::WebContents* web_contents = 0L;
+    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &web_contents, &active_tab_id)) {
+      VLOG(1) << "error: no default tab.";
+      error_ = kNoDefaultTabError;
+      return false;
+    }
+    VLOG(1) << "Found tabId: " << active_tab_id;
+  } else {
+
+    active_tab_id = *params->tab_id;
+  }
+  VLOG(1) << "hide tab with tab_id = " << active_tab_id;
+
+  content::WebContents* web_contents = NULL;
+  if (!extensions::ExtensionTabUtil::GetTabById(active_tab_id,
+                                                GetProfile(), include_incognito(),
+                                                NULL, NULL, &web_contents, NULL)) {
+    error_ = extensions::ErrorUtils::FormatErrorMessage(
+        kNoTabError, base::IntToString(active_tab_id));
+    VLOG(1) << "Could not find tab for " << active_tab_id << " " << error_;
+    return false;
+  }
+  if (!web_contents) {
+    VLOG(1) << "No web contents.";
+    return false;
+  }
+
+  SidebarManager::GetInstance()->HideSidebar(web_contents, extension()->id());
   return true;
 }
 
-bool SidebarShowFunction::RunImpl(content::WebContents* tab,
-                                  const std::string& content_id,
-                                  const base::DictionaryValue& details) {
-  SidebarManager::GetInstance()->ShowSidebar(tab, content_id);
+bool SidebarShowFunction::RunSync() {
+  
+  if (!extension()->sidebar_defaults()) {
+    VLOG(1) << "No sidebar";
+    error_ = kNoSidebarError;
+    return false;
+  }
+
+  if (!args_.get()) {
+    VLOG(1) << "No args";
+    return false;
+  }
+
+  scoped_ptr<extensions::api::sidebar::Show::Params>
+      params(extensions::api::sidebar::Show::Params::Create(*args_));
+  EXTENSION_FUNCTION_VALIDATE(params.get());
+
+  // extract tab_id or use active tab id
+  int active_tab_id = -1;
+  if (params->details == 0L) {
+    VLOG(1) << "No details. Bail.";
+    return false;
+  }
+
+  /*
+   * tabId ( optional integer )
+   * The tab id for the tab to show the sidebar for. Uses the current
+   * selected tab when omitted.
+  */
+  if (params->details->tab_id == 0L) {
+    VLOG(1) << "hide called with no tabId, will use active tab on frontmost window.";
+    Browser* browser = GetCurrentBrowser();
+    if (!browser) {
+      VLOG(1) << "error: no current window (" << kNoCurrentWindowError << ")";
+      error_ = kNoCurrentWindowError;
+      return false;
+    }
+    content::WebContents* web_contents = 0L;
+    if (!extensions::ExtensionTabUtil::GetDefaultTab(browser, &web_contents, &active_tab_id)) {
+      VLOG(1) << "error: no default tab.";
+      error_ = kNoDefaultTabError;
+      return false;
+    }
+    VLOG(1) << "Found tabId: " << active_tab_id;
+  } else {
+    active_tab_id = *params->details->tab_id;
+  }
+
+
+  /* 
+   * width ( optional integer )
+   * The width in pixels for the sidebar display area. If not
+   * specified, the sidebar can contain any HTML contents that you
+   * like, and it's automatically sized to fit its contents.
+   *
+   * -1 indicates width was not supplied
+   */
+  const int width(params->details->width ? *params->details->width : -1);
+
+  /*
+   * sidebar ( string ) // required
+   * URL to navigate sidebar content to.
+   */
+  VLOG(1) << "params->details->sidebar = " << params->details->sidebar;
+  const GURL sidebarUrl = extension_sidebar_utils::ResolveRelativePath(
+      params->details->sidebar, extension(), &error_);
+  
+  if (!sidebarUrl.is_valid()) {
+    VLOG(1) << "invalid URL (" << sidebarUrl << ") "
+            << "passed to chrome.sidebar.show()";
+    return false;
+  }
+  
+  VLOG(1) << "show tab with tab_id = " << active_tab_id
+          << " width = " << width
+          << " sidebar = " << sidebarUrl;
+
+  content::WebContents* web_contents = NULL;
+  if (!extensions::ExtensionTabUtil::GetTabById(active_tab_id,
+                                                GetProfile(), include_incognito(),
+                                                NULL, NULL, &web_contents, NULL)) {
+    error_ = extensions::ErrorUtils::FormatErrorMessage(
+        kNoTabError, base::IntToString(active_tab_id));
+    VLOG(1) << "Could not find tab for " << active_tab_id << " " << error_;
+    return false;
+  }
+  if (!web_contents) {
+    VLOG(1) << "No web contents.";
+    return false;
+  }
+
+  SidebarManager::GetInstance()->ShowSidebar(web_contents, extension()->id());
+  SidebarManager::GetInstance()->NavigateSidebar(web_contents, extension()->id(), sidebarUrl);
   return true;
 }
