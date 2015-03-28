@@ -8,7 +8,6 @@
 
 #include "base/command_line.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/extensions/api/sidebar/sidebar_api.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/chrome_notification_types.h"
@@ -88,40 +87,6 @@ content::WebContents* SidebarManager::GetSidebarTabContents(
   return sidebar_host->sidebar_contents();
 }
 
-void SidebarManager::NotifyStateChanges(
-    content::WebContents* was_active_sidebar_contents,
-    content::WebContents* active_sidebar_contents) {
-  if (was_active_sidebar_contents == active_sidebar_contents)
-    return;
-
-  SidebarContainer* was_active_host =
-      was_active_sidebar_contents == NULL ? NULL :
-          FindSidebarContainerFor(was_active_sidebar_contents);
-  SidebarContainer* active_host =
-      active_sidebar_contents == NULL ? NULL :
-          FindSidebarContainerFor(active_sidebar_contents);
-
-  if (was_active_host != NULL) {
-    Profile* profile = Profile::FromBrowserContext(
-        was_active_sidebar_contents->GetBrowserContext());
-    ExtensionSidebarEventRouter::OnStateChanged(
-        profile,
-        was_active_host->web_contents(),
-        was_active_host->content_id(),
-        extension_sidebar_constants::kShownState);
-  }
-
-  if (active_host != NULL) {
-    Profile* profile = Profile::FromBrowserContext(
-        active_sidebar_contents->GetBrowserContext());
-    ExtensionSidebarEventRouter::OnStateChanged(
-        profile,
-        active_host->web_contents(),
-        active_host->content_id(),
-        extension_sidebar_constants::kActiveState);
-  }
-}
-
 void SidebarManager::ShowSidebar(content::WebContents* tab,
                                  const std::string& content_id) {
   DCHECK(!content_id.empty());
@@ -133,11 +98,6 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
 
   host->Show();
   ExpandSidebar(tab, content_id);
-
-  Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
-  ExtensionSidebarEventRouter::OnStateChanged(
-      profile, tab, content_id,
-      extension_sidebar_constants::kShownState);
 }
 
 void SidebarManager::ExpandSidebar(content::WebContents* tab,
@@ -191,11 +151,6 @@ void SidebarManager::HideSidebar(WebContents* tab,
   DCHECK(host);
   CollapseSidebar(tab, content_id);
   UnregisterSidebarContainerFor(tab, content_id);
-
-  Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
-  ExtensionSidebarEventRouter::OnStateChanged(
-      profile, tab, content_id,
-      extension_sidebar_constants::kHiddenState);
 }
 
 void SidebarManager::NavigateSidebar(content::WebContents* tab,
