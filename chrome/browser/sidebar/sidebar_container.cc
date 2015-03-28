@@ -46,6 +46,8 @@ void SidebarContainer::Show() {
 
 bool SidebarContainer::HasGlobalScope() const {
   const extensions::Extension* extension = GetExtension();
+  if (!extension || extension->sidebar_defaults())
+    return false;
   return (std::string(base::UTF16ToUTF8(extension->sidebar_defaults()->default_scope())) == kGlobalScopeName);
 }
 
@@ -54,7 +56,7 @@ void SidebarContainer::Expand() {
     navigate_to_default_page_on_expand_ = false;
     // Check whether a default page is specified for this sidebar.
     const extensions::Extension* extension = GetExtension();
-    if (extension) {  // Can be NULL in tests.
+    if (extension && extension->sidebar_defaults()) {  // Can be NULL in tests.
       LOG(INFO) << extension->sidebar_defaults()->default_page();
       if (extension->sidebar_defaults()->default_page().is_valid())
         Navigate(extension->sidebar_defaults()->default_page());
