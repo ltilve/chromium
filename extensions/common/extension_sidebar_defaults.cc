@@ -16,17 +16,3 @@ ExtensionSidebarDefaults::~ExtensionSidebarDefaults() {
 void ExtensionSidebarDefaults::set_default_scope(const base::string16& scope) {
     default_scope_ = scope;
 }
-
-// Default title, stores manifest default_title key value.
-void ExtensionSidebarDefaults::set_default_title(const base::string16& title) {
-  default_title_ = title;
-}
-
-// Default icon path, stores manifest default_icon key value.
-void ExtensionSidebarDefaults::set_default_icon_path(const std::string& path) {
-  default_icon_path_ = path;
-}
-
-void ExtensionSidebarDefaults::set_default_page(const GURL& url) {
-  default_page_ = url;
-}

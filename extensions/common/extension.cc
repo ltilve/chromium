@@ -693,29 +693,6 @@ ExtensionSidebarDefaults* Extension::LoadExtensionSidebarDefaults(
     const base::DictionaryValue* extension_sidebar, base::string16* error) {
   scoped_ptr<ExtensionSidebarDefaults> result(new ExtensionSidebarDefaults());
 
-  std::string default_icon;
-  // Read sidebar's |default_icon| (optional).
-  if (extension_sidebar->HasKey(keys::kSidebarDefaultIcon)) {
-    if (!extension_sidebar->GetString(keys::kSidebarDefaultIcon,
-                                      &default_icon) ||
-        default_icon.empty()) {
-      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultIconPath);
-      return NULL;
-    }
-    result->set_default_icon_path(default_icon);
-  }
-
-  // Read sidebar's |default_title| (optional).
-  base::string16 default_title;
-  if (extension_sidebar->HasKey(keys::kSidebarDefaultTitle)) {
-    if (!extension_sidebar->GetString(keys::kSidebarDefaultTitle,
-                                      &default_title)) {
-      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultTitle);
-      return NULL;
-    }
-  }
-  result->set_default_title(default_title);
-
   // Read sidebar's |default_scope|.
   base::string16 default_scope;
   if (extension_sidebar->HasKey(keys::kSidebarDefaultScope)) {
@@ -726,26 +703,6 @@ ExtensionSidebarDefaults* Extension::LoadExtensionSidebarDefaults(
     }
   }
   result->set_default_scope(default_scope);
-
-  // Read sidebar's |default_page| (optional).
-  // TODO(rdevlin.cronin): Continue removing std::string errors and replace
-  //  with string16
-  std::string default_page;
-  std::string utf8_error;
-  if (extension_sidebar->HasKey(keys::kSidebarDefaultPage)) {
-    if (!extension_sidebar->GetString(keys::kSidebarDefaultPage,
-                                      &default_page) ||
-        default_page.empty()) {
-      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultPage);
-      return NULL;
-    }
-    GURL url = extension_sidebar_utils::ResolveRelativePath(
-        default_page, this, &utf8_error);
-    *error = base::UTF8ToUTF16(utf8_error);
-    if (!url.is_valid())
-      return NULL;
-    result->set_default_page(url);
-  }
 
   return result.release();
 }

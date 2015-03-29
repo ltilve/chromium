@@ -10,6 +10,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
+#include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
 #include "extensions/common/extension_sidebar_defaults.h"
 #include "extensions/common/extension_sidebar_utils.h"
 #include "content/public/browser/web_contents.h"
@@ -26,9 +27,12 @@ SidebarContainer::SidebarContainer(content::WebContents* tab,
       delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {
   // Create WebContents for sidebar.
+
    sidebar_contents_.reset(
        content::WebContents::Create(
            content::WebContents::CreateParams(tab->GetBrowserContext())));
+  extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
+      sidebar_contents_.get());
 
    sidebar_contents_->SetDelegate(this);
 }
@@ -46,14 +50,16 @@ void SidebarContainer::Show() {
 
 bool SidebarContainer::HasGlobalScope() const {
   const extensions::Extension* extension = GetExtension();
-  if (!extension || extension->sidebar_defaults())
+  if (!extension || !extension->sidebar_defaults())
     return false;
-  return (std::string(base::UTF16ToUTF8(extension->sidebar_defaults()->default_scope())) == kGlobalScopeName);
+  base::string16 scope = extension->sidebar_defaults()->default_scope();
+  return !scope.empty() && (std::string(base::UTF16ToUTF8(scope)) == kGlobalScopeName);
 }
 
 void SidebarContainer::Expand() {
   if (navigate_to_default_page_on_expand_) {
     navigate_to_default_page_on_expand_ = false;
+    /*
     // Check whether a default page is specified for this sidebar.
     const extensions::Extension* extension = GetExtension();
     if (extension && extension->sidebar_defaults()) {  // Can be NULL in tests.
@@ -61,6 +67,7 @@ void SidebarContainer::Expand() {
       if (extension->sidebar_defaults()->default_page().is_valid())
         Navigate(extension->sidebar_defaults()->default_page());
     }
+    */
   }
 
   delegate_->UpdateSidebar(this);

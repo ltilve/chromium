@@ -404,10 +404,10 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
                   base::string16* error);
 
   bool LoadSharedFeatures(base::string16* error);
+  bool LoadSidebarFeatures(base::string16* error);
   bool LoadDescription(base::string16* error);
   bool LoadManifestVersion(base::string16* error);
   bool LoadShortName(base::string16* error);
-  bool LoadSidebarFeatures(base::string16* error);
   ExtensionSidebarDefaults* LoadExtensionSidebarDefaults(
     const base::DictionaryValue* extension_sidebar, base::string16* error);
   bool CheckMinimumChromeVersion(base::string16* error) const;
