@@ -97,7 +97,7 @@
     "contexts": ["blessed_extension"]
   },
   "bookmarks": {
-    "channel":"stable",
+    "dependencies": ["permission:bookmarks"],
     "contexts": ["blessed_extension"]
   },
   "bookmarks.export": {
