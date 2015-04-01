@@ -330,7 +330,6 @@ using content::WebContents;
     // Create a sub-controller for the docked sidebar and add its view to the
     // hierarchy.  This must happen before the previewable contents controller
     // is instantiated.
-    //TODO(me):here self should be another
     sidebarController_.reset([[SidebarController alloc] init]);
     [[sidebarController_ view] setFrame:[[devToolsController_ view] bounds]];
     [[devToolsController_ view] addSubview:[sidebarController_ view]];
