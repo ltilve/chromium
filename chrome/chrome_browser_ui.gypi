@@ -1201,6 +1201,8 @@
       'browser/ui/cocoa/restart_browser.mm',
       'browser/ui/cocoa/screen_capture_notification_ui_cocoa.h',
       'browser/ui/cocoa/screen_capture_notification_ui_cocoa.mm',
+      'browser/ui/cocoa/sidebar_controller.h',
+      'browser/ui/cocoa/sidebar_controller.mm',
       'browser/ui/cocoa/simple_message_box_mac.mm',
       'browser/ui/cocoa/spinner_view.h',
       'browser/ui/cocoa/spinner_view.mm',

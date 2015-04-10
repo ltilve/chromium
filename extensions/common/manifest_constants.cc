@@ -137,6 +137,11 @@ const char kSettingsOverrideAlternateUrls[] =
 const char kShiftKey[] = "shiftKey";
 const char kShortcutKey[] = "shortcutKey";
 const char kShortName[] = "short_name";
+const char kSidebar[] = "sidebar";
+const char kSidebarDefaultIcon[] = "default_icon";
+const char kSidebarDefaultPage[] = "default_page";
+const char kSidebarDefaultTitle[] = "default_title";
+const char kSidebarDefaultScope[] = "scope";
 const char kSignature[] = "signature";
 const char kSockets[] = "sockets";
 const char kSpellcheck[] = "spellcheck";
@@ -266,6 +271,14 @@ const char kCannotAccessExtensionUrl[] =
 const char kCannotAccessPage[] =
     "Cannot access contents of url \"*\". "
     "Extension manifest must request permission to access this host.";
+const char kInvalidSidebarDefaultIconPath[] =
+    "Invalid sidebar default icon path";
+const char kInvalidSidebar[] =
+    "kInvalidSidebar";
+const char kInvalidSidebarDefaultTitle[] =
+    "kInvalidSidebarDefaultTitle";
+const char kInvalidSidebarDefaultScope[] =
+    "kInvalidSidebarDefaultScope";
 const char kCannotChangeExtensionID[] =
     "Installed extensions cannot change their IDs.";
 const char kCannotClaimAllHostsInExtent[] =
@@ -691,6 +704,9 @@ const char kMultipleOverrides[] =
     "An extension cannot override more than one page.";
 const char kNoPermissionForMIMETypes[] =
     "The extension is not allowed to use mime_types key.";
+const char kInvalidSidebarDefaultPage[] = "Invalid sidebar default page.";
+const char kSidebarExperimental[] =
+  "Experimental sidebar error.";
 const char kNoWildCardsInPaths[] =
   "Wildcards are not allowed in extent URL pattern paths.";
 const char kOneUISurfaceOnly[] =

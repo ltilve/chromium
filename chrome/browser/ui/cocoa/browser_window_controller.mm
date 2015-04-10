@@ -61,6 +61,7 @@
 #import "chrome/browser/ui/cocoa/profiles/avatar_base_controller.h"
 #import "chrome/browser/ui/cocoa/profiles/avatar_button_controller.h"
 #import "chrome/browser/ui/cocoa/profiles/avatar_icon_controller.h"
+#import "chrome/browser/ui/cocoa/sidebar_controller.h"
 #import "chrome/browser/ui/cocoa/status_bubble_mac.h"
 #import "chrome/browser/ui/cocoa/tab_contents/overlayable_contents_controller.h"
 #import "chrome/browser/ui/cocoa/tab_contents/sad_tab_controller.h"
@@ -309,6 +310,12 @@ using content::WebContents;
     [[devToolsController_ view]
         addSubview:[overlayableContentsController_ view]];
 
+    // Create a sub-controller for the docked sidebar and add its view to the
+    // hierarchy.
+    sidebarController_.reset([[SidebarController alloc]
+                               initWithParentViewController: devToolsController_
+                                      andContentsController: overlayableContentsController_]);
+
     // Create a controller for the tab strip, giving it the model object for
     // this window's Browser and the tab strip view. The controller will handle
     // registering for the appropriate tab notifications from the back-end and
@@ -542,6 +549,11 @@ using content::WebContents;
                                             withProfile:browser_->profile()];
   if (layout_changed && [findBarCocoaController_ isFindBarVisible])
     [self layoutSubviews];
+}
+
+- (void)updateSidebarForContents:(content::WebContents*)contents {
+  [sidebarController_ updateSidebarForTabContents:contents];
+  [sidebarController_ ensureContentsVisible];
 }
 
 // Called when the user wants to close a window or from the shutdown process.
@@ -1643,6 +1655,8 @@ using content::WebContents;
   // Update all the UI bits.
   windowShim_->UpdateTitleBar();
 
+  [sidebarController_ updateSidebarForTabContents:
+      static_cast<content::WebContents*>(contents)];
   // Update the bookmark bar.
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?
@@ -1658,6 +1672,9 @@ using content::WebContents;
   // crbug.com/340720
   PermissionBubbleManager::FromWebContents(contents)->SetView(
       permissionBubbleCocoa_.get());
+
+  // Update devTools and sidebar contents after size for all views is set.
+  [sidebarController_ ensureContentsVisible];
 
   // Must do this after bookmark and infobar updates to avoid
   // unnecesary resize in contents.

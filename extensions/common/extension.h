@@ -401,7 +401,6 @@ class Extension : public base::RefCountedThreadSafe<Extension> {
   bool LoadDescription(base::string16* error);
   bool LoadManifestVersion(base::string16* error);
   bool LoadShortName(base::string16* error);
-
   bool CheckMinimumChromeVersion(base::string16* error) const;
 
   // The extension's human-readable name. Name is used for display purpose. It
