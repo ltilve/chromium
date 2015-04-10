@@ -32,11 +32,12 @@ class Extension;
 // the Cocoa NSWindow. Cross-platform code will interact with this object when
 // it needs to manipulate the window.
 
-class BrowserWindowCocoa
-    : public BrowserWindow,
-      public ExclusiveAccessContext,
-      public extensions::ExtensionKeybindingRegistry::Delegate,
-      public SearchModelObserver {
+class BrowserWindowCocoa :
+    public BrowserWindow,
+    public ExclusiveAccessContext,
+    public extensions::ExtensionKeybindingRegistry::Delegate,
+    public content::NotificationObserver,
+    public SearchModelObserver {
  public:
   BrowserWindowCocoa(Browser* browser,
                      BrowserWindowController* controller);
@@ -156,6 +157,11 @@ class BrowserWindowCocoa
   int GetRenderViewHeightInsetWithDetachedBookmarkBar() override;
   void ExecuteExtensionCommand(const extensions::Extension* extension,
                                const extensions::Command& command) override;
+  // content::NotificationObserver overrides:
+  void Observe(int type,
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
+
   ExclusiveAccessContext* GetExclusiveAccessContext() override;
 
   // ExclusiveAccessContext interface
@@ -183,7 +189,8 @@ class BrowserWindowCocoa
 
  private:
   NSWindow* window() const;  // Accessor for the (current) |NSWindow|.
-
+  void UpdateSidebarForContents(content::WebContents* tab_contents);
+  content::NotificationRegistrar registrar_;
   Browser* browser_;  // weak, owned by controller
   BrowserWindowController* controller_;  // weak, owns us
   base::scoped_nsobject<NSString> pending_window_title_;

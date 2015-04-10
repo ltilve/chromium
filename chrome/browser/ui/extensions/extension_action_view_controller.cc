@@ -5,6 +5,7 @@
 #include "chrome/browser/ui/extensions/extension_action_view_controller.h"
 
 #include "base/logging.h"
+#include "base/prefs/pref_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/api/commands/command_service.h"
 #include "chrome/browser/extensions/api/extension_action/extension_action_api.h"
@@ -13,11 +14,14 @@
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
+#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_delegate.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
+#include "chrome/common/pref_names.h"
 #include "chrome/common/extensions/api/extension_action/action_info.h"
 #include "extensions/browser/extension_host.h"
 #include "extensions/browser/extension_registry.h"
@@ -298,13 +302,31 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
   if (already_showing)
     return false;
 
-  popup_host_ = platform_delegate_->ShowPopupWithUrl(
-      show_action, popup_url, grant_tab_permissions);
-  if (popup_host_) {
-    popup_host_observer_.Add(popup_host_);
-    if (toolbar_actions_bar_)
-      toolbar_actions_bar_->SetPopupOwner(this);
+  bool use_sidebar =
+      browser()->profile()->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar);
+  SidebarContainer *sidebar_container = SidebarManager::GetInstance()->GetSidebarContainerFor(
+      view_delegate_->GetCurrentWebContents(), GetId());
+  SidebarManager::GetInstance()->HideSidebar(
+      view_delegate_->GetCurrentWebContents(), GetId());
+  if (use_sidebar) {
+    if (sidebar_container) {
+        view_delegate_->OnPopupClosed();
+        return false;
+    }
+    SidebarManager::GetInstance()->ShowSidebar(
+        view_delegate_->GetCurrentWebContents(), GetId());
+    SidebarManager::GetInstance()->NavigateSidebar(
+        view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
     view_delegate_->OnPopupShown(grant_tab_permissions);
+  } else {
+    popup_host_ = platform_delegate_->ShowPopupWithUrl(
+        show_action, popup_url, grant_tab_permissions);
+    if (popup_host_) {
+      popup_host_observer_.Add(popup_host_);
+      if (toolbar_actions_bar_)
+        toolbar_actions_bar_->SetPopupOwner(this);
+      view_delegate_->OnPopupShown(grant_tab_permissions);
+    }
   }
   return is_showing_popup();
 }

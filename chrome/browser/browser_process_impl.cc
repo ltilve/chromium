@@ -58,6 +58,7 @@
 #include "chrome/browser/renderer_host/chrome_resource_dispatcher_host_delegate.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/shell_integration.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/status_icons/status_tray.h"
 #include "chrome/browser/ui/browser_dialogs.h"
 #include "chrome/browser/ui/browser_finder.h"
@@ -173,6 +174,7 @@ BrowserProcessImpl::BrowserProcessImpl(
       created_profile_manager_(false),
       created_local_state_(false),
       created_icon_manager_(false),
+      created_sidebar_manager_(false),
       created_notification_ui_manager_(false),
       created_safe_browsing_service_(false),
       module_ref_count_(0),
@@ -562,6 +564,13 @@ PrefService* BrowserProcessImpl::local_state() {
   if (!created_local_state_)
     CreateLocalState();
   return local_state_.get();
+}
+
+SidebarManager* BrowserProcessImpl::sidebar_manager() {
+  DCHECK(CalledOnValidThread());
+  if (!created_sidebar_manager_)
+    CreateSidebarManager();
+  return sidebar_manager_.get();
 }
 
 net::URLRequestContextGetter* BrowserProcessImpl::system_request_context() {
@@ -1068,6 +1077,12 @@ void BrowserProcessImpl::CreateIconManager() {
   DCHECK(!created_icon_manager_ && icon_manager_.get() == NULL);
   created_icon_manager_ = true;
   icon_manager_.reset(new IconManager);
+}
+
+void BrowserProcessImpl::CreateSidebarManager() {
+  DCHECK(!created_sidebar_manager_ && sidebar_manager_.get() == NULL);
+  created_sidebar_manager_ = true;
+  sidebar_manager_ = new SidebarManager();
 }
 
 void BrowserProcessImpl::CreateIntranetRedirectDetector() {
