@@ -304,7 +304,6 @@ chrome.runtime.MessageSenderEvent.prototype.hasListener = function(callback) {};
  */
 chrome.runtime.MessageSenderEvent.prototype.hasListeners = function() {};
 
-
 /**
  * @const
  */

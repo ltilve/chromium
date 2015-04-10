@@ -170,6 +170,7 @@ class APIPermission {
     kSerial,
     kSessions,
     kSettingsPrivate,
+    kSidebar,
     kSignedInDevices,
     kSocket,
     kStartupPages,

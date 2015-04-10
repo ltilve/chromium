@@ -138,7 +138,8 @@ class Browser : public TabStripModelObserver,
     FEATURE_BOOKMARKBAR = 16,
     FEATURE_INFOBAR = 32,
     FEATURE_DOWNLOADSHELF = 64,
-    FEATURE_WEBAPPFRAME = 128
+    FEATURE_WEBAPPFRAME = 128,
+    FEATURE_SIDEBAR = 256
   };
 
   // The context for a download blocked notification from
