@@ -276,6 +276,7 @@ extern const char kCaptivePortalAuthenticationIgnoresProxy[];
 extern const char kForceMaximizeOnFirstRun[];
 #endif  // defined(OS_CHROMEOS)
 extern const char kShowHomeButton[];
+extern const char kShowPopupInSidebar[];
 extern const char kRecentlySelectedEncoding[];
 extern const char kDeleteBrowsingHistory[];
 extern const char kDeleteDownloadHistory[];
@@ -540,6 +541,7 @@ extern const char kRelaunchMode[];
 
 extern const char kDisableExtensions[];
 extern const char kDisablePluginFinder[];
+extern const char kExtensionSidebarWidth[];
 
 extern const char kNtpAppPageNames[];
 #if defined(OS_ANDROID)

@@ -149,6 +149,9 @@ ExtensionContextMenuModel::ExtensionContextMenuModel(const Extension* extension,
 }
 
 bool ExtensionContextMenuModel::IsCommandIdChecked(int command_id) const {
+  if (command_id == SIDEBAR) {
+    return profile_->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar);
+  }
   if (command_id >= IDC_EXTENSIONS_CONTEXT_CUSTOM_FIRST &&
       command_id <= IDC_EXTENSIONS_CONTEXT_CUSTOM_LAST)
     return extension_items_->IsCommandIdChecked(command_id);
@@ -163,6 +166,8 @@ bool ExtensionContextMenuModel::IsCommandIdEnabled(int command_id) const {
   if (command_id >= IDC_EXTENSIONS_CONTEXT_CUSTOM_FIRST &&
       command_id <= IDC_EXTENSIONS_CONTEXT_CUSTOM_LAST) {
     return extension_items_->IsCommandIdEnabled(command_id);
+  } else if (command_id == SIDEBAR) {
+    return true;
   } else if (command_id == CONFIGURE) {
     return extensions::OptionsPageInfo::HasOptionsPage(extension);
   } else if (command_id == NAME) {
@@ -222,6 +227,11 @@ void ExtensionContextMenuModel::ExecuteCommand(int command_id,
       }
       break;
     }
+    case SIDEBAR: {
+        bool current = profile_->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar);
+        profile_->GetPrefs()->SetBoolean(prefs::kShowPopupInSidebar, !current);
+      }
+      break;
     case CONFIGURE:
       DCHECK(extensions::OptionsPageInfo::HasOptionsPage(extension));
       extensions::ExtensionTabUtil::OpenOptionsPage(extension, browser_);
@@ -308,6 +318,7 @@ void ExtensionContextMenuModel::InitMenu(const Extension* extension,
           ->WantsToRun(extension)) {
     AddItemWithStringId(ALWAYS_RUN, IDS_EXTENSIONS_ALWAYS_RUN);
   }
+  AddCheckItem(SIDEBAR, l10n_util::GetStringUTF16(IDS_USE_SIDEBAR));
 
   if (!is_component_ || extensions::OptionsPageInfo::HasOptionsPage(extension))
     AddItemWithStringId(CONFIGURE, IDS_EXTENSIONS_OPTIONS_MENU_ITEM);

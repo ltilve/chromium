@@ -31,6 +31,7 @@
 #include "ui/base/models/simple_menu_model.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/views/controls/button/button.h"
+#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/webview/unhandled_keyboard_event_handler.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/widget_observer.h"
@@ -70,6 +71,7 @@ class Extension;
 namespace views {
 class AccessiblePaneView;
 class ExternalFocusTracker;
+class SingleSplitView;
 class WebView;
 }
 
@@ -83,11 +85,13 @@ class BrowserView : public BrowserWindow,
                     public TabStripModelObserver,
                     public ui::AcceleratorProvider,
                     public views::WidgetDelegate,
+                    public content::NotificationObserver,
                     public views::WidgetObserver,
                     public views::ClientView,
                     public InfoBarContainerDelegate,
                     public LoadCompleteListener::Delegate,
                     public OmniboxPopupModelObserver,
+                    public views::SingleSplitViewListener,
                     public ExclusiveAccessContext,
                     public ExclusiveAccessBubbleViewsContext {
  public:
@@ -102,7 +106,7 @@ class BrowserView : public BrowserWindow,
 
   void set_frame(BrowserFrame* frame) { frame_ = frame; }
   BrowserFrame* frame() const { return frame_; }
-
+  int GetSidebarWidth() const;
   // Returns a pointer to the BrowserView* interface implementation (an
   // instance of this object, typically) for a given native window, or null if
   // there is no such association.
@@ -118,6 +122,9 @@ class BrowserView : public BrowserWindow,
   Browser* browser() { return browser_.get(); }
   const Browser* browser() const { return browser_.get(); }
 
+  void Observe(int type,
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
   // Initializes (or re-initializes) the status bubble.  We try to only create
   // the bubble once and re-use it for the life of the browser, but certain
   // events (such as changing enabling/disabling Aero on Win) can force a need
@@ -515,7 +522,7 @@ class BrowserView : public BrowserWindow,
   // |contents|. |contents| can be null. In this case, all optional UI will be
   // removed.
   void UpdateUIForContents(content::WebContents* contents);
-
+  bool SplitHandleMoved(views::SingleSplitView* sender) override;
   // Invoked to update the necessary things when our fullscreen state changes
   // to |fullscreen|. On Windows this is invoked immediately when we toggle the
   // full screen state. On Linux changing the fullscreen state is async, so we
@@ -544,6 +551,7 @@ class BrowserView : public BrowserWindow,
 
   // Initialize the hung plugin detector.
   void InitHangMonitor();
+  void UpdateSidebarForContents(content::WebContents* new_contents);
 
   // Possibly records a user metrics action corresponding to the passed-in
   // accelerator.  Only implemented for Chrome OS, where we're interested in
@@ -631,6 +639,7 @@ class BrowserView : public BrowserWindow,
 
   // The view that contains the selected WebContents.
   ContentsWebView* contents_web_view_;
+  content::NotificationRegistrar registrar_;
 
   // The view that contains devtools window for the selected WebContents.
   views::WebView* devtools_web_view_;
@@ -689,6 +698,12 @@ class BrowserView : public BrowserWindow,
   base::RepeatingTimer<BrowserView> loading_animation_timer_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
+
+  views::WebView* sidebar_web_view_;
+
+  views::View* sidebar_container_;
+
+  views::SingleSplitView* sidebar_split_;
 
   // Used to measure the loading spinner animation rate.
   base::TimeTicks last_animation_time_;

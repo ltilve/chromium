@@ -821,6 +821,10 @@ const char kForceMaximizeOnFirstRun[] = "ui.force_maximize_on_first_run";
 // visible on the toolbar.
 const char kShowHomeButton[] = "browser.show_home_button";
 
+// A boolean pref set to true if an extension popup to open the pages should be
+// visible in the sidebar.
+const char kShowPopupInSidebar[] = "browser.show_home_popup_in_sidebar";
+
 // A string value which saves short list of recently user selected encodings
 // separated with comma punctuation mark.
 const char kRecentlySelectedEncoding[] = "profile.recently_selected_encodings";
@@ -1516,6 +1520,8 @@ const char kDisablePluginFinder[] = "plugins.disable_plugin_finder";
 
 // Customized app page names that appear on the New Tab Page.
 const char kNtpAppPageNames[] = "ntp.app_page_names";
+
+const char kExtensionSidebarWidth[] = "extensions.sidebar.width";
 
 #if defined(OS_ANDROID)
 // Keeps track of currently open tabs collapsed state in the Other Devices menu.

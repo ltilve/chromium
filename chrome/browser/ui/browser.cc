@@ -2435,7 +2435,7 @@ bool Browser::SupportsWindowFeatureImpl(WindowFeature feature,
                                         bool check_fullscreen) const {
   bool hide_ui_for_fullscreen = check_fullscreen && ShouldHideUIForFullscreen();
 
-  unsigned int features = FEATURE_INFOBAR | FEATURE_DOWNLOADSHELF;
+  unsigned int features = FEATURE_INFOBAR | FEATURE_DOWNLOADSHELF | FEATURE_SIDEBAR;
 
   if (is_type_tabbed())
     features |= FEATURE_BOOKMARKBAR;
