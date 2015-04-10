@@ -57,6 +57,10 @@ using ::testing::Return;
   return [findBarCocoaController_ view];
 }
 
+- (NSView*)sidebarView {
+  return [sidebarController_ view];
+}
+
 - (BOOL)bookmarkBarVisible {
   return [bookmarkBarController_ isVisible];
 }

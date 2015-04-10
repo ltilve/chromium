@@ -91,6 +91,7 @@ class BrowserProcessImpl : public BrowserProcess,
   BrowserProcessPlatformPart* platform_part() override;
   extensions::EventRouterForwarder* extension_event_router_forwarder() override;
   NotificationUIManager* notification_ui_manager() override;
+  SidebarManager* sidebar_manager() override;
   message_center::MessageCenter* message_center() override;
   policy::BrowserPolicyConnector* browser_policy_connector() override;
   policy::PolicyService* policy_service() override;
@@ -148,6 +149,7 @@ class BrowserProcessImpl : public BrowserProcess,
   void CreateLocalState();
   void CreateViewedPageTracker();
   void CreateIconManager();
+  void CreateSidebarManager();
   void CreateIntranetRedirectDetector();
   void CreateNotificationUIManager();
   void CreateStatusTrayManager();
@@ -206,6 +208,8 @@ class BrowserProcessImpl : public BrowserProcess,
 #if !defined(OS_ANDROID)
   scoped_ptr<RemoteDebuggingServer> remote_debugging_server_;
 #endif
+  bool created_sidebar_manager_;
+  scoped_refptr<SidebarManager> sidebar_manager_;
 
 #if defined(ENABLE_PRINT_PREVIEW)
   scoped_refptr<printing::PrintPreviewDialogController>

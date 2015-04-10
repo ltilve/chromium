@@ -340,6 +340,13 @@ enum NotificationType {
   // content::WebContents object, the details are None.
   NOTIFICATION_WEB_CONTENT_SETTINGS_CHANGED,
 
+  // Sidebar -----------------------------------------------------------------
+
+  // Sent when the sidebar state is changed.
+  // The source is a SidebarManager instance, the details are the changed
+  // SidebarContainer object.
+  NOTIFICATION_SIDEBAR_CHANGED,
+
   // Sync --------------------------------------------------------------------
 
   // The sync service has finished the datatype configuration process. The
