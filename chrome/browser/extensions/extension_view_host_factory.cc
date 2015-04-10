@@ -113,4 +113,13 @@ ExtensionViewHost* ExtensionViewHostFactory::CreateDialogHost(
   return CreateViewHost(url, profile, NULL, VIEW_TYPE_EXTENSION_DIALOG);
 }
 
+// static
+ExtensionViewHost* ExtensionViewHostFactory::CreateSidebarHost(
+    const GURL& url,
+    Browser* browser) {
+  DCHECK(browser);
+  return CreateViewHost(url, browser->profile(), browser,
+                        VIEW_TYPE_EXTENSION_SIDEBAR);
+}
+
 }  // namespace extensions

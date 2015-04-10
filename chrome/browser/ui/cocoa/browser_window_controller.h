@@ -44,6 +44,7 @@ class LocationBarViewMac;
 @class OverlayableContentsController;
 class PermissionBubbleCocoa;
 @class PresentationModeController;
+@class SidebarController;
 class StatusBubbleMac;
 @class TabStripController;
 @class TabStripView;
@@ -86,6 +87,8 @@ class Command;
       exclusiveAccessBubbleWindowController_;
   base::scoped_nsobject<BrowserWindowEnterFullscreenTransition>
       enterFullscreenTransition_;
+
+  base::scoped_nsobject<SidebarController> sidebarController_;
 
   // Strong. StatusBubble is a special case of a strong reference that
   // we don't wrap in a scoped_ptr because it is acting the same
@@ -344,6 +347,10 @@ class Command;
 
 // Shows or hides the docked web inspector depending on |contents|'s state.
 - (void)updateDevToolsForContents:(content::WebContents*)contents;
+
+// Displays the active sidebar linked to the |contents| or hides sidebar UI,
+// if there's no such sidebar.
+- (void)updateSidebarForContents:(content::WebContents*)contents;
 
 // Gets the current theme provider.
 - (ui::ThemeProvider*)themeProvider;

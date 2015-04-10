@@ -10,10 +10,13 @@
 #include "chrome/browser/devtools/devtools_window_testing.h"
 #include "chrome/browser/download/download_shelf.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/cocoa/view_id_util.h"
+#include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/view_ids.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/bookmarks/browser/bookmark_model.h"
@@ -24,6 +27,8 @@
 using bookmarks::BookmarkModel;
 using content::OpenURLParams;
 using content::Referrer;
+
+const char kSimplePage[] = "files/sidebar/simple_page.html";
 
 // Basic sanity check of ViewID use on the mac.
 class ViewIDTest : public InProcessBrowserTest {
@@ -46,6 +51,14 @@ class ViewIDTest : public InProcessBrowserTest {
     // Make sure FindBar is created to test VIEW_ID_FIND_IN_PAGE_TEXT_FIELD.
     chrome::ShowFindBar(browser());
 
+    // Make sure sidebar is created to test VIEW_ID_SIDE_BAR_CONTAINER.
+    const char sidebar_content_id[] = "test_content_id";
+    GURL test_page_url = test_server()->GetURL(kSimplePage);
+    SidebarManager::GetInstance()->ShowSidebar(
+        static_cast<content::WebContents*>(
+            browser()->tab_strip_model()->GetActiveWebContents()),
+        sidebar_content_id, test_page_url, browser());
+
     // Make sure docked devtools is created to test VIEW_ID_DEV_TOOLS_DOCKED
     DevToolsWindow* devtools_window =
         DevToolsWindowTesting::OpenDevToolsWindowSync(browser(), true);
@@ -67,13 +80,10 @@ class ViewIDTest : public InProcessBrowserTest {
 
     for (int i = VIEW_ID_TOOLBAR; i < VIEW_ID_PREDEFINED_COUNT; ++i) {
       // Mac implementation does not support following ids yet.
-      if (i == VIEW_ID_STAR_BUTTON ||
-          i == VIEW_ID_CONTENTS_SPLIT ||
-          i == VIEW_ID_BROWSER_ACTION ||
-          i == VIEW_ID_FEEDBACK_BUTTON ||
-          i == VIEW_ID_SCRIPT_BUBBLE ||
-          i == VIEW_ID_MIC_SEARCH_BUTTON ||
-          i == VIEW_ID_TRANSLATE_BUTTON) {
+      if (i == VIEW_ID_STAR_BUTTON || i == VIEW_ID_BROWSER_ACTION ||
+          i == VIEW_ID_SIDE_BAR_SPLIT || i == VIEW_ID_SIDE_BAR_VIEW ||
+          i == VIEW_ID_FEEDBACK_BUTTON || i == VIEW_ID_SCRIPT_BUBBLE ||
+          i == VIEW_ID_MIC_SEARCH_BUTTON || i == VIEW_ID_TRANSLATE_BUTTON) {
         continue;
       }
 

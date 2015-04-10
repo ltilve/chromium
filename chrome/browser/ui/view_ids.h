@@ -78,9 +78,6 @@ enum ViewID {
   // Docked dev tools.
   VIEW_ID_DEV_TOOLS_DOCKED,
 
-  // The contents split.
-  VIEW_ID_CONTENTS_SPLIT,
-
   // The Infobar container.
   VIEW_ID_INFO_BAR_CONTAINER,
 
@@ -89,6 +86,15 @@ enum ViewID {
 
   // The omnibox icon to do voice-based search.
   VIEW_ID_MIC_SEARCH_BUTTON,
+
+  // The sidebar container.
+  VIEW_ID_SIDE_BAR_CONTAINER,
+
+  // The sidebar split.
+  VIEW_ID_SIDE_BAR_SPLIT,
+
+  // The sidebar view.
+  VIEW_ID_SIDE_BAR_VIEW,
 
   // Used in chrome/browser/ui/cocoa/view_id_util_browsertest.mm.
   // If you add new ids, make sure the above test passes.

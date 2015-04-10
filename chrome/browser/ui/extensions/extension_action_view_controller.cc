@@ -5,6 +5,7 @@
 #include "chrome/browser/ui/extensions/extension_action_view_controller.h"
 
 #include "base/logging.h"
+#include "base/prefs/pref_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/api/commands/command_service.h"
 #include "chrome/browser/extensions/api/extension_action/extension_action_api.h"
@@ -14,13 +15,17 @@
 #include "chrome/browser/extensions/extension_view_host_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
+#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
+#include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_delegate.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
-#include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
 #include "chrome/common/extensions/api/extension_action/action_info.h"
+#include "chrome/common/pref_names.h"
 #include "extensions/browser/extension_host.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension.h"
@@ -58,6 +63,13 @@ ExtensionActionViewController::ExtensionActionViewController(
 
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
+
+  SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+  sidebar_manager->RemoveObserver(this);
+  for (std::set<content::WebContents*>::iterator it =
+           active_in_webcontents_.begin();
+       it != active_in_webcontents_.end(); ++it)
+    sidebar_manager->HideSidebar(*it, GetId());
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
@@ -304,16 +316,36 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     return false;
 
   bool already_showing = is_showing_popup();
+  bool use_sidebar = extension_action_->open_in_sidebar();
 
   // Always hide the current popup, even if it's not owned by this extension.
   // Only one popup should be visible at a time.
-  HideActivePopup();
+  if (!use_sidebar)
+    HideActivePopup();
 
   // If we were showing a popup already, then we treat the action to open the
   // same one as a desire to close it (like clicking a menu button that was
   // already open).
   if (already_showing)
     return false;
+
+  if (use_sidebar) {
+    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+    content::WebContents* web_contents =
+        view_delegate_->GetCurrentWebContents();
+
+    if (active_in_webcontents_.find(web_contents) !=
+        active_in_webcontents_.end()) {
+      sidebar_manager->HideSidebar(web_contents, GetId());
+      return false;
+    }
+
+    active_in_webcontents_.insert(web_contents);
+    sidebar_manager->AddObserver(this);
+
+    sidebar_manager->ShowSidebar(web_contents, GetId(), popup_url, browser_);
+    return true;
+  }
 
   scoped_ptr<extensions::ExtensionViewHost> host(
       extensions::ExtensionViewHostFactory::CreatePopupHost(popup_url,
@@ -367,4 +399,68 @@ void ExtensionActionViewController::OnPopupClosed() {
       toolbar_actions_bar_->UndoPopOut();
   }
   view_delegate_->OnPopupClosed();
+}
+
+void ExtensionActionViewController::OnPopupShown(bool grant_tab_permissions) {
+  view_delegate_->OnPopupShown(grant_tab_permissions);
+}
+
+void ExtensionActionViewController::OnSidebarHidden(
+    content::WebContents* tab,
+    const std::string& content_id) {
+  if (view_delegate_->GetCurrentWebContents() == tab && content_id == GetId()) {
+    view_delegate_->OnPopupClosed();
+    active_in_webcontents_.erase(
+        active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
+    if (active_in_webcontents_.size() == 0) {
+      SidebarManager::GetInstance()->RemoveObserver(this);
+      if (toolbar_actions_bar_) {
+        toolbar_actions_bar_->SetPopupOwner(nullptr);
+        if (toolbar_actions_bar_->popped_out_action() == this &&
+            !view_delegate_->IsMenuRunning())
+          toolbar_actions_bar_->UndoPopOut();
+      }
+    }
+  }
+}
+
+void ExtensionActionViewController::OnSidebarSwitched(
+    content::WebContents* old_tab,
+    const std::string& old_content_id,
+    content::WebContents* new_tab,
+    const std::string& new_content_id) {
+  if (browser_->tab_strip_model()->GetIndexOfWebContents(
+          new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
+    return;
+
+  if (old_content_id == GetId() && old_content_id != new_content_id) {
+    if (toolbar_actions_bar_) {
+      toolbar_actions_bar_->SetPopupOwner(nullptr);
+      if (toolbar_actions_bar_->popped_out_action() == this &&
+          !view_delegate_->IsMenuRunning())
+        toolbar_actions_bar_->UndoPopOut();
+    }
+    view_delegate_->OnPopupClosed();
+  }
+
+  if (view_delegate_->GetCurrentWebContents() == new_tab &&
+      new_content_id == GetId() && old_content_id != new_content_id) {
+    if (toolbar_actions_bar_)
+      toolbar_actions_bar_->SetPopupOwner(this);
+    if (toolbar_actions_bar_ && !toolbar_actions_bar_->IsActionVisible(this) &&
+        extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
+      platform_delegate_->CloseOverflowMenu();
+      toolbar_actions_bar_->PopOutAction(
+          this, base::Bind(&ExtensionActionViewController::OnPopupShown,
+                           weak_factory_.GetWeakPtr(), true));
+    } else {
+      // Without the popup corner arrow indicator, marking the browserAction
+      // icon
+      // is necessary for extension attribution
+      view_delegate_->OnPopupShown(true);
+    }
+  }
+
+  if (old_tab == new_tab && old_content_id == GetId())
+    OnSidebarHidden(old_tab, old_content_id);
 }

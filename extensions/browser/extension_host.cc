@@ -67,9 +67,10 @@ ExtensionHost::ExtensionHost(const Extension* extension,
   // Not used for panels, see PanelHost.
   DCHECK(host_type == VIEW_TYPE_EXTENSION_BACKGROUND_PAGE ||
          host_type == VIEW_TYPE_EXTENSION_DIALOG ||
-         host_type == VIEW_TYPE_EXTENSION_POPUP);
+         host_type == VIEW_TYPE_EXTENSION_POPUP ||
+         host_type == VIEW_TYPE_EXTENSION_SIDEBAR);
   host_contents_.reset(WebContents::Create(
-      WebContents::CreateParams(browser_context_, site_instance))),
+      WebContents::CreateParams(browser_context_, site_instance)));
   content::WebContentsObserver::Observe(host_contents_.get());
   host_contents_->SetDelegate(this);
   SetViewType(host_contents_.get(), host_type);
@@ -223,6 +224,11 @@ void ExtensionHost::LoadInitialURL() {
   host_contents_->GetController().LoadURL(
       initial_url_, content::Referrer(), ui::PAGE_TRANSITION_LINK,
       std::string());
+}
+
+void ExtensionHost::LoadURL(const GURL& url) {
+  initial_url_ = url;
+  LoadInitialURL();
 }
 
 bool ExtensionHost::IsBackgroundPage() const {
