@@ -889,6 +889,10 @@
     "platforms": ["chromeos", "mac", "win", "linux"],
     "whitelist": []
   },
+  "sidebar": {
+    "channel": "stable",
+    "extension_types": ["extension", "legacy_packaged_app", "platform_app"]
+  },
   "signedInDevices": {
     "channel": "dev",
     "extension_types": ["extension", "legacy_packaged_app", "platform_app"]

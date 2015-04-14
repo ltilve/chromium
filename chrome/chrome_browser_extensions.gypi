@@ -410,6 +410,8 @@
       'browser/extensions/api/settings_private/settings_private_event_router.h',
       'browser/extensions/api/settings_private/settings_private_event_router_factory.cc',
       'browser/extensions/api/settings_private/settings_private_event_router_factory.h',
+      'browser/extensions/api/sidebar/sidebar_api.cc',
+      'browser/extensions/api/sidebar/sidebar_api.h',
       'browser/extensions/api/signed_in_devices/id_mapping_helper.cc',
       'browser/extensions/api/signed_in_devices/id_mapping_helper.h',
       'browser/extensions/api/signed_in_devices/signed_in_devices_api.cc',
