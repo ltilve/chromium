@@ -57,11 +57,11 @@ protected:
   ~SidebarHideFunction() override {}
   bool RunSync() override;
 };
-    
+
 class SidebarShowFunction : public ChromeSyncExtensionFunction {
 public:
   DECLARE_EXTENSION_FUNCTION("sidebar.show", SIDEBAR_SHOW);
-  
+
 protected:
   ~SidebarShowFunction() override {} ;
   bool RunSync() override;

@@ -103,7 +103,7 @@ bool SidebarGetStateFunction::RunSync() {
     active_tab_id = *params->tab_id;
   }
   VLOG(1) << "getState of tab_id = " << active_tab_id;
-  
+
   SidebarManager* manager = SidebarManager::GetInstance();
   base::DictionaryValue* sidebar_state = new base::DictionaryValue;
   sidebar_state->SetBoolean(kShownFlag, false);
@@ -184,7 +184,6 @@ bool SidebarHideFunction::RunSync() {
 }
 
 bool SidebarShowFunction::RunSync() {
-  
   if (!extension()->sidebar_defaults()) {
     VLOG(1) << "No sidebar";
     error_ = kNoSidebarError;
@@ -232,7 +231,7 @@ bool SidebarShowFunction::RunSync() {
   }
 
 
-  /* 
+  /*
    * width ( optional integer )
    * The width in pixels for the sidebar display area. If not
    * specified, the sidebar can contain any HTML contents that you
@@ -249,13 +248,13 @@ bool SidebarShowFunction::RunSync() {
   VLOG(1) << "params->details->sidebar = " << params->details->sidebar;
   const GURL sidebarUrl = extension_sidebar_utils::ResolveRelativePath(
       params->details->sidebar, extension(), &error_);
-  
+
   if (!sidebarUrl.is_valid()) {
     VLOG(1) << "invalid URL (" << sidebarUrl << ") "
             << "passed to chrome.sidebar.show()";
     return false;
   }
-  
+
   VLOG(1) << "show tab with tab_id = " << active_tab_id
           << " width = " << width
           << " sidebar = " << sidebarUrl;

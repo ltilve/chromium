@@ -12,7 +12,7 @@ class SidebarApiTest : public ExtensionApiTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     ExtensionApiTest::SetUpCommandLine(command_line);
     command_line->AppendSwitch(
-	extensions::switches::kEnableExperimentalExtensionApis);
+      extensions::switches::kEnableExperimentalExtensionApis);
   }
 };
 
