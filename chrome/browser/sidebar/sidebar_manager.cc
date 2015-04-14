@@ -60,7 +60,7 @@ SidebarContainer* SidebarManager::MigrateSidebarTo(WebContents* tab) {
       GetActiveSidebarContainerFor(tab_to_sidebar_host_.begin()->first);
   if (container && !container->HasGlobalScope())
     return NULL;
-  
+
   return container;
 }
 

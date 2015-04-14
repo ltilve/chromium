@@ -22,7 +22,6 @@ class ExtensionSidebarDefaults {
   const base::string16& default_scope() const { return default_scope_; }
 
  private:
-  
   base::string16 default_scope_;
 };
 
