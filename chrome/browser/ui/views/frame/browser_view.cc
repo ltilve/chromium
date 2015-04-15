@@ -548,6 +548,14 @@ void BrowserView::InitStatusBubble() {
   contents_web_view_->SetStatusBubble(status_bubble_.get());
 }
 
+bool BrowserView::SplitHandleMoved(views::SingleSplitView* sender) {
+  for (int i = 0; i < sender->child_count(); ++i)
+    sender->child_at(i)->InvalidateLayout();
+  SchedulePaint();
+  Layout();
+  return false;
+}
+
 gfx::Rect BrowserView::GetToolbarBounds() const {
   gfx::Rect toolbar_bounds(toolbar_->bounds());
   if (toolbar_bounds.IsEmpty())
