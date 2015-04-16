@@ -11,14 +11,10 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
 #include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
-#include "extensions/common/extension_sidebar_defaults.h"
-#include "extensions/common/extension_sidebar_utils.h"
 #include "content/public/browser/web_contents.h"
 #include "components/app_modal/javascript_dialog_manager.h"
 #include "url/gurl.h"
-namespace {
-  const char kGlobalScopeName[] = "global";
-}
+
 SidebarContainer::SidebarContainer(content::WebContents* tab,
                                    const std::string& content_id,
                                    Delegate* delegate)
@@ -49,26 +45,12 @@ void SidebarContainer::Show() {
 }
 
 bool SidebarContainer::HasGlobalScope() const {
-  const extensions::Extension* extension = GetExtension();
-  if (!extension || !extension->sidebar_defaults())
-    return false;
-  base::string16 scope = extension->sidebar_defaults()->default_scope();
-  return !scope.empty() && (std::string(base::UTF16ToUTF8(scope)) == kGlobalScopeName);
+  return false;
 }
 
 void SidebarContainer::Expand() {
-  if (navigate_to_default_page_on_expand_) {
+  if (navigate_to_default_page_on_expand_)
     navigate_to_default_page_on_expand_ = false;
-    /*
-    // Check whether a default page is specified for this sidebar.
-    const extensions::Extension* extension = GetExtension();
-    if (extension && extension->sidebar_defaults()) {  // Can be NULL in tests.
-      LOG(INFO) << extension->sidebar_defaults()->default_page();
-      if (extension->sidebar_defaults()->default_page().is_valid())
-        Navigate(extension->sidebar_defaults()->default_page());
-    }
-    */
-  }
 
   delegate_->UpdateSidebar(this);
   sidebar_contents_->SetInitialFocus();
@@ -98,6 +80,5 @@ const extensions::Extension* SidebarContainer::GetExtension() const {
           extensions::ExtensionSystem::Get(profile)->extension_service();
   if (!service)
     return NULL;
-  return service->GetExtensionById(
-      extension_sidebar_utils::GetExtensionIdByContentId(content_id_), false);
+  return service->GetExtensionById(content_id_, false);
 }

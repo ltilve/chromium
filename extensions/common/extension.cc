@@ -32,7 +32,6 @@
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/permissions/permissions_info.h"
-#include "extensions/common/extension_sidebar_utils.h"
 #include "extensions/common/switches.h"
 #include "extensions/common/url_pattern.h"
 #include "net/base/filename_util.h"
@@ -537,9 +536,6 @@ bool Extension::InitFromValue(int flags, base::string16* error) {
                           &converted_from_user_script_);
   }
 
-  if (!LoadSidebarFeatures(error))
-    return false;
-
   if (!LoadSharedFeatures(error))
     return false;
 
@@ -689,47 +685,12 @@ bool Extension::LoadExtent(const char* key,
   return true;
 }
 
-ExtensionSidebarDefaults* Extension::LoadExtensionSidebarDefaults(
-    const base::DictionaryValue* extension_sidebar, base::string16* error) {
-  scoped_ptr<ExtensionSidebarDefaults> result(new ExtensionSidebarDefaults());
-
-  // Read sidebar's |default_scope|.
-  base::string16 default_scope;
-  if (extension_sidebar->HasKey(keys::kSidebarDefaultScope)) {
-    if (!extension_sidebar->GetString(keys::kSidebarDefaultScope,
-                                      &default_scope)) {
-      *error = base::ASCIIToUTF16(errors::kInvalidSidebarDefaultScope);
-      return NULL;
-    }
-  }
-  result->set_default_scope(default_scope);
-
-  return result.release();
-}
 bool Extension::LoadSharedFeatures(base::string16* error) {
   if (!LoadDescription(error) ||
       !ManifestHandler::ParseExtension(this, error) ||
       !LoadShortName(error))
     return false;
 
-  return true;
-}
-bool Extension::LoadSidebarFeatures(base::string16* error) {
-   // Initialize sidebar action (optional).
-  if (manifest_->HasKey(keys::kSidebar)) {
-    const base::DictionaryValue* sidebar_value = NULL;
-    if (!manifest_->GetDictionary(keys::kSidebar, &sidebar_value)) {
-      *error = base::ASCIIToUTF16(errors::kInvalidSidebar);
-      return false;
-    }
-/*    if (!api_permissions.count(ExtensionAPIPermission::kExperimental)) {
-      *error = ASCIIToUTF16(errors::kSidebarExperimental);
-      return false;
-    }*/
-    sidebar_defaults_.reset(LoadExtensionSidebarDefaults(sidebar_value, error));
-    if (!sidebar_defaults_.get())
-      return false;  // Failed to parse sidebar definition.
-  }
   return true;
 }
 
