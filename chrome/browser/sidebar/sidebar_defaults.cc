@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extensions/common/extension_sidebar_defaults.h"
+#include "chrome/browser/sidebar/sidebar_defaults.h"
 
 #include <string>
 #include "url/gurl.h"
