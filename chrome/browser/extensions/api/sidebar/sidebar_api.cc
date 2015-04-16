@@ -8,13 +8,14 @@
 #include "base/json/json_writer.h"
 #include "base/strings/string_number_conversions.h"
 #include "extensions/browser/event_router.h"
+#include "extensions/common/permissions/api_permission.h"
+#include "extensions/common/permissions/permissions_data.h"
 #include "chrome/browser/extensions/chrome_extension_function.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/sidebar/sidebar_manager.h"
 #include "extensions/common/error_utils.h"
-#include "extensions/common/extension_sidebar_utils.h"
 #include "content/public/browser/web_contents.h"
 
 
@@ -28,6 +29,7 @@ const char kNoSidebarError[] =
 const char kNoTabError[] = "No tab with id: *.";
 const char kNoCurrentWindowError[] = "No current browser window was found";
 const char kNoDefaultTabError[] = "No default tab was found";
+const char kInvalidPathError[] = "Invalid path: \"*\".";
 // Keys.
 const char kStateKey[] = "state";
 const char kTabIdKey[] = "tabId";
@@ -64,13 +66,12 @@ void ExtensionSidebarEventRouter::OnStateChanged(
       extensions::api::sidebar::OnStateChanged::kEventName, event_args.Pass()));
   event->restrict_to_browser_context = profile;
 
-  router->DispatchEventToExtension(
-      extension_sidebar_utils::GetExtensionIdByContentId(content_id),
-      event.Pass());
+  router->DispatchEventToExtension(content_id, event.Pass());
 }
 
 bool SidebarGetStateFunction::RunSync() {
-  if (!extension()->sidebar_defaults()) {
+  if (!extension()->permissions_data()->HasAPIPermission(
+                                        extensions::APIPermission::kSidebar)) {
     error_ = kNoSidebarError;
     return false;
   }
@@ -130,7 +131,8 @@ bool SidebarGetStateFunction::RunSync() {
 }
 
 bool SidebarHideFunction::RunSync() {
-  if (!extension()->sidebar_defaults()) {
+  if (!extension()->permissions_data()->HasAPIPermission(
+                                        extensions::APIPermission::kSidebar)) {
     error_ = kNoSidebarError;
     return false;
   }
@@ -184,7 +186,8 @@ bool SidebarHideFunction::RunSync() {
 }
 
 bool SidebarShowFunction::RunSync() {
-  if (!extension()->sidebar_defaults()) {
+  if (!extension()->permissions_data()->HasAPIPermission(
+                                        extensions::APIPermission::kSidebar)) {
     VLOG(1) << "No sidebar";
     error_ = kNoSidebarError;
     return false;
@@ -246,12 +249,12 @@ bool SidebarShowFunction::RunSync() {
    * URL to navigate sidebar content to.
    */
   VLOG(1) << "params->details->sidebar = " << params->details->sidebar;
-  const GURL sidebarUrl = extension_sidebar_utils::ResolveRelativePath(
-      params->details->sidebar, extension(), &error_);
-
+  const GURL sidebarUrl = extension()->GetResourceURL(params->details->sidebar);
   if (!sidebarUrl.is_valid()) {
     VLOG(1) << "invalid URL (" << sidebarUrl << ") "
             << "passed to chrome.sidebar.show()";
+    error_ = extensions::ErrorUtils::FormatErrorMessage(kInvalidPathError,
+                                                  params->details->sidebar);
     return false;
   }
 
