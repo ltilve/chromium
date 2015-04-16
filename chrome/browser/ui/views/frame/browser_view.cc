@@ -2064,7 +2064,6 @@ void BrowserView::InitViews() {
   contents_container_->AddChildView(contents_web_view_);
   contents_container_->SetLayoutManager(new ContentsLayoutManager(
       devtools_web_view_, contents_web_view_));
-  AddChildView(contents_container_);
 
   sidebar_web_view_ = new views::WebView(browser_->profile());
   sidebar_web_view_->set_id(VIEW_ID_SIDE_BAR_VIEW);
