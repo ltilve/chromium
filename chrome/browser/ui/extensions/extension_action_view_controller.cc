@@ -14,6 +14,7 @@
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
+#include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
@@ -279,9 +280,14 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
     return false;
   bool use_sidebar =
       browser()->profile()->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar);
+  SidebarContainer *sidebar_container = SidebarManager::GetInstance()->GetSidebarContainerFor(
+      view_delegate_->GetCurrentWebContents(), GetId());
   SidebarManager::GetInstance()->HideSidebar(
       view_delegate_->GetCurrentWebContents(), GetId());
   if (use_sidebar) {
+    if (sidebar_container) {
+        return false;
+    }
     SidebarManager::GetInstance()->ShowSidebar(
         view_delegate_->GetCurrentWebContents(), GetId());
     SidebarManager::GetInstance()->NavigateSidebar(
