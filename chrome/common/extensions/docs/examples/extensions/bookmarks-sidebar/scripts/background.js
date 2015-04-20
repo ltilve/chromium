@@ -12,8 +12,7 @@ function initialize(tab) {
   });
 }
 
-$(document).ready(
-  function() {
+document.addEventListener("DOMContentLoaded", function(event) {
     chrome.tabs.onUpdated.addListener(
       function(tabId, changeInfo, tab) {
         if (changeInfo.status === 'complete') {

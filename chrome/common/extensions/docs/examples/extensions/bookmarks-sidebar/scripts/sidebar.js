@@ -1,7 +1,7 @@
 function visit(b,d) {
   if (b) {
     if (b.url) {
-      d.append('<li><a href="' + b.url + '"><button>' + b.title + '</button></a></li>');
+      d.innerHTML += ('<li><a href="' + b.url + '"><button>' + b.title + '</button></a></li>');
     }
     if (b.children) {
       for(var ix = 0; ix < b.children.length; ++ix) {
@@ -12,31 +12,34 @@ function visit(b,d) {
 }
 
 function makeBookmarksList(bookmarks_tree) {
-  var root = $("#bookmarks");
+  var root = document.querySelector("#bookmarks");
   visit(bookmarks_tree[0],root);
-  $('body').on('click', 'a', function(){
-    chrome.runtime.sendMessage({type: "navigate", url: $(this).attr('href')});
+  document.querySelector('body').addEventListener('click',
+    function(event) {
+      if (event.target.tagName.toLowerCase() === 'a') {
+      chrome.runtime.sendMessage({type: "navigate", url: event.target.href});
+    }
   });
 
 }
 
 function refreshBookmarksList() {
-  $("#bookmarks").hide();
-  $("#bookmarks").empty();
+  document.querySelector("#bookmarks").hide();
+  document.querySelector("#bookmarks").empty();
   chrome.runtime.sendMessage({"type":"bookmarks"},
                              function(response) {
                                makeBookmarksList(response);
                              });
-  $("#bookmarks").show();
+  document.querySelector("#bookmarks").show();
 }
 
-$(document).ready(
-  function() {
+document.addEventListener("DOMContentLoaded", function(event) {
+
     chrome.runtime.sendMessage({"type":"bookmarks"},
                                function(response) {
                                  makeBookmarksList(response);
                                });
-    $("#hide-sidebar-button").click(
+    document.querySelector("#hide-sidebar-button").addEventListener('click',
       function(s) {
         chrome.runtime.sendMessage({"type":"hide"});
       });
