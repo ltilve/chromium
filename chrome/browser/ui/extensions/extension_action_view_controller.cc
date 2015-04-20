@@ -286,12 +286,14 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
       view_delegate_->GetCurrentWebContents(), GetId());
   if (use_sidebar) {
     if (sidebar_container) {
+        view_delegate_->OnPopupClosed();
         return false;
     }
     SidebarManager::GetInstance()->ShowSidebar(
         view_delegate_->GetCurrentWebContents(), GetId());
     SidebarManager::GetInstance()->NavigateSidebar(
         view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
+    view_delegate_->OnPopupShown(grant_tab_permissions);
   } else {
     popup_host_ = platform_delegate_->ShowPopupWithUrl(
         show_action, popup_url, grant_tab_permissions);
