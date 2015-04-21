@@ -32,12 +32,12 @@ class Extension;
 // the Cocoa NSWindow. Cross-platform code will interact with this object when
 // it needs to manipulate the window.
 
-class BrowserWindowCocoa :
-    public BrowserWindow,
-    public ExclusiveAccessContext,
-    public extensions::ExtensionKeybindingRegistry::Delegate,
-    public content::NotificationObserver,
-    public SearchModelObserver {
+class BrowserWindowCocoa
+    : public BrowserWindow,
+      public ExclusiveAccessContext,
+      public extensions::ExtensionKeybindingRegistry::Delegate,
+      public content::NotificationObserver,
+      public SearchModelObserver {
  public:
   BrowserWindowCocoa(Browser* browser,
                      BrowserWindowController* controller);
