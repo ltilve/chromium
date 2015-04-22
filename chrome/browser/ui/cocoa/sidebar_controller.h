@@ -31,6 +31,9 @@ class WebContents;
 - (id)initWithParentViewController: (id) parentController
              andContentsController: (id) contentsController;
 
+// This controller's view.
+- (NSSplitView*)view;
+
 // Depending on |contents|'s state, decides whether the sidebar
 // should be shown or hidden and adjusts its width (|delegate_| handles
 // the actual resize).
