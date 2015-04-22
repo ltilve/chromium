@@ -69,6 +69,10 @@ const int kMinWebWidth = 50;
   [super dealloc];
 }
 
+- (NSSplitView*)view {
+  return splitView_.get();
+}
+
 - (void)updateSidebarForTabContents:(content::WebContents*)contents {
   // Get the active sidebar content.
   if (SidebarManager::GetInstance() == NULL)  // Happens in tests.
