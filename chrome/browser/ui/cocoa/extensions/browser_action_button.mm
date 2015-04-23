@@ -62,7 +62,7 @@ class ToolbarActionViewDelegateBridge : public ToolbarActionViewDelegate {
   ToolbarActionViewController* GetPreferredPopupViewController() override;
   content::WebContents* GetCurrentWebContents() const override;
   void UpdateState() override;
-  void OnPopupShown(bool by_user) override;
+  void OnPopupShown() override;
   void OnPopupClosed() override;
 
   // A helper method to implement showing the context menu.
@@ -138,9 +138,8 @@ void ToolbarActionViewDelegateBridge::UpdateState() {
   [owner_ updateState];
 }
 
-void ToolbarActionViewDelegateBridge::OnPopupShown(bool by_user) {
-  if (by_user)
-    user_shown_popup_visible_ = true;
+void ToolbarActionViewDelegateBridge::OnPopupShown() {
+  user_shown_popup_visible_ = true;
   [owner_ updateHighlightedState];
 }
 
