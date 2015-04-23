@@ -297,7 +297,7 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
     sidebar_manager->NavigateSidebar(
         view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
     sidebar_manager->AddObserver(this);
-    view_delegate_->OnPopupShown(grant_tab_permissions);
+    view_delegate_->OnPopupShown();
     sidebar_is_shown_ = true;
     return true;
   }
@@ -306,7 +306,7 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
       show_action, popup_url, grant_tab_permissions);
   if (popup_host_) {
     popup_host_observer_.Add(popup_host_);
-    view_delegate_->OnPopupShown(grant_tab_permissions);
+    view_delegate_->OnPopupShown();
   }
 
   return is_showing_popup();

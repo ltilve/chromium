@@ -283,18 +283,17 @@ content::WebContents* ToolbarActionView::GetCurrentWebContents() const {
   return delegate_->GetCurrentWebContents();
 }
 
-void ToolbarActionView::OnPopupShown(bool by_user) {
+void ToolbarActionView::OnPopupShown() {
   delegate_->SetPopupOwner(this);
-  // If this was through direct user action, we press the menu button.
-  if (by_user) {
-    // We set the state of the menu button we're using as a reference view,
-    // which is either this or the overflow reference view.
-    // This cast is safe because GetReferenceViewForPopup returns either |this|
-    // or delegate_->GetOverflowReferenceView(), which returns a MenuButton.
-    views::MenuButton* reference_view =
-        static_cast<views::MenuButton*>(GetReferenceViewForPopup());
-    pressed_lock_.reset(new views::MenuButton::PressedLock(reference_view));
-  }
+  // If this was through direct user action, We press the menu button in any case
+  // for popup attribution.
+  // We set the state of the menu button we're using as a reference view,
+  // which is either this or the overflow reference view.
+  // This cast is safe because GetReferenceViewForPopup returns either |this|
+  // or delegate_->GetOverflowReferenceView(), which returns a MenuButton.
+  views::MenuButton* reference_view =
+	static_cast<views::MenuButton*>(GetReferenceViewForPopup());
+  pressed_lock_.reset(new views::MenuButton::PressedLock(reference_view));
 }
 
 void ToolbarActionView::OnPopupClosed() {

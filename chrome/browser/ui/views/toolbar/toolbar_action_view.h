@@ -131,7 +131,7 @@ class ToolbarActionView : public views::MenuButton,
   ToolbarActionViewController* GetPreferredPopupViewController() override;
   views::View* GetReferenceViewForPopup() override;
   views::MenuButton* GetContextMenuButton() override;
-  void OnPopupShown(bool by_user) override;
+  void OnPopupShown() override;
   void OnPopupClosed() override;
 
   // A lock to keep the MenuButton pressed when a menu or popup is visible.

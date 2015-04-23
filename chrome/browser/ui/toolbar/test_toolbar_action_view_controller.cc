@@ -88,7 +88,7 @@ bool TestToolbarActionViewController::CanDrag() const {
   return false;
 }
 
-bool TestToolbarActionViewController::ExecuteAction(bool by_user) {
+bool TestToolbarActionViewController::ExecuteAction() {
   ++execute_action_count_;
   return false;
 }
@@ -97,8 +97,8 @@ void TestToolbarActionViewController::UpdateState() {
   UpdateDelegate();
 }
 
-void TestToolbarActionViewController::ShowPopup(bool by_user) {
-  delegate_->OnPopupShown(by_user);
+void TestToolbarActionViewController::ShowPopup() {
+  delegate_->OnPopupShown();
 }
 
 void TestToolbarActionViewController::SetAccessibleName(
