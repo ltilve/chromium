@@ -8,6 +8,7 @@
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_action_icon_factory.h"
 #include "chrome/browser/extensions/extension_context_menu_model.h"
+#include "chrome/browser/sidebar/sidebar_manager_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_controller.h"
 #include "extensions/browser/extension_host_observer.h"
 #include "ui/gfx/image/image.h"
@@ -34,6 +35,7 @@ class ExtensionActionViewController
     : public ToolbarActionViewController,
       public ExtensionActionIconFactory::Observer,
       public ExtensionContextMenuModel::PopupDelegate,
+      public SidebarManagerObserver,
       public extensions::ExtensionHostObserver {
  public:
   // The different options for showing a popup.
@@ -126,6 +128,10 @@ class ExtensionActionViewController
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
 
+  // Handles sidebar events
+  void OnSidebarShown(const std::string& content_id);
+  void OnSidebarHidden(const std::string& content_id);
+
   // The extension associated with the action we're displaying.
   const extensions::Extension* extension_;
 
@@ -170,6 +176,8 @@ class ExtensionActionViewController
 
   ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
       popup_host_observer_;
+
+  bool sidebar_is_shown_;
 
   DISALLOW_COPY_AND_ASSIGN(ExtensionActionViewController);
 };
