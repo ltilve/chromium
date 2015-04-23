@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+
+  "name": "Sidebar tests",
+  "description": "Tests for sidebar browserAction/API",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "cpu.png",
+    "default_popup": "popup.html",
+    "default_title": "Sidebar tests"
+  },
+ "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "system.cpu"
+  ]
+}
