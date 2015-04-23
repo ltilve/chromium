@@ -46,7 +46,8 @@ ExtensionActionViewController::ExtensionActionViewController(
       icon_observer_(nullptr),
       extension_registry_(
           extensions::ExtensionRegistry::Get(browser_->profile())),
-      popup_host_observer_(this) {
+      popup_host_observer_(this),
+      sidebar_is_shown_(false) {
   DCHECK(extension_action);
   DCHECK(extension_action->action_type() == ActionInfo::TYPE_PAGE ||
          extension_action->action_type() == ActionInfo::TYPE_BROWSER);
@@ -278,30 +279,36 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
   // already open).
   if (already_showing)
     return false;
+
   bool use_sidebar =
       browser()->profile()->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar);
-  SidebarContainer *sidebar_container = SidebarManager::GetInstance()->GetSidebarContainerFor(
-      view_delegate_->GetCurrentWebContents(), GetId());
-  SidebarManager::GetInstance()->HideSidebar(
-      view_delegate_->GetCurrentWebContents(), GetId());
+
   if (use_sidebar) {
-    if (sidebar_container) {
-        view_delegate_->OnPopupClosed();
-        return false;
+    SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+
+    if (sidebar_is_shown_) {
+      sidebar_manager->HideSidebar(
+          view_delegate_->GetCurrentWebContents(), GetId());
+      return false;
     }
-    SidebarManager::GetInstance()->ShowSidebar(
+
+    sidebar_manager->ShowSidebar(
         view_delegate_->GetCurrentWebContents(), GetId());
-    SidebarManager::GetInstance()->NavigateSidebar(
+    sidebar_manager->NavigateSidebar(
         view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
+    sidebar_manager->AddObserver(this);
     view_delegate_->OnPopupShown(grant_tab_permissions);
-  } else {
-    popup_host_ = platform_delegate_->ShowPopupWithUrl(
-        show_action, popup_url, grant_tab_permissions);
-    if (popup_host_) {
-      popup_host_observer_.Add(popup_host_);
-      view_delegate_->OnPopupShown(grant_tab_permissions);
-    }
+    sidebar_is_shown_ = true;
+    return true;
   }
+
+  popup_host_ = platform_delegate_->ShowPopupWithUrl(
+      show_action, popup_url, grant_tab_permissions);
+  if (popup_host_) {
+    popup_host_observer_.Add(popup_host_);
+    view_delegate_->OnPopupShown(grant_tab_permissions);
+  }
+
   return is_showing_popup();
 }
 
@@ -309,4 +316,19 @@ void ExtensionActionViewController::OnPopupClosed() {
   popup_host_observer_.Remove(popup_host_);
   popup_host_ = nullptr;
   view_delegate_->OnPopupClosed();
+}
+
+void ExtensionActionViewController::OnSidebarShown(const std::string& content_id) {
+  if (content_id == GetId())
+    return;
+
+  view_delegate_->OnPopupClosed();
+  SidebarManager::GetInstance()->RemoveObserver(this);
+  sidebar_is_shown_ = false;
+}
+
+void ExtensionActionViewController::OnSidebarHidden(const std::string& content_id) {
+  view_delegate_->OnPopupClosed();
+  SidebarManager::GetInstance()->RemoveObserver(this);
+  sidebar_is_shown_ = false;
 }
