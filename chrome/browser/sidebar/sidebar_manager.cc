@@ -10,6 +10,7 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/sidebar/sidebar_manager_observer.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/notification_service.h"
@@ -98,6 +99,9 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
 
   host->Show();
   ExpandSidebar(tab, content_id);
+
+  FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
+                    OnSidebarShown(content_id));
 }
 
 void SidebarManager::ExpandSidebar(content::WebContents* tab,
@@ -151,6 +155,9 @@ void SidebarManager::HideSidebar(WebContents* tab,
   DCHECK(host);
   CollapseSidebar(tab, content_id);
   UnregisterSidebarContainerFor(tab, content_id);
+
+  FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
+                    OnSidebarHidden(content_id));
 }
 
 void SidebarManager::NavigateSidebar(content::WebContents* tab,
@@ -277,4 +284,12 @@ void SidebarManager::UnbindSidebarHost(WebContents* tab,
   if (tab_to_sidebar_host_[tab].content_id_to_sidebar_host.empty())
     tab_to_sidebar_host_.erase(tab);
   sidebar_host_to_tab_.erase(sidebar_host);
+}
+
+void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
+  observer_list_.AddObserver(observer);
+}
+
+void SidebarManager::RemoveObserver(SidebarManagerObserver* observer) {
+  observer_list_.RemoveObserver(observer);
 }
