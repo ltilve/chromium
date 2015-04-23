@@ -9,6 +9,7 @@
 #include <string>
 
 #include "base/memory/ref_counted.h"
+#include "base/observer_list.h"
 #include "base/strings/string16.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "content/public/browser/notification_observer.h"
@@ -16,6 +17,7 @@
 
 class GURL;
 class SidebarContainer;
+class SidebarManagerObserver;
 
 namespace content {
 class WebContents;
@@ -79,6 +81,9 @@ class SidebarManager : public content::NotificationObserver,
                        const std::string& content_id,
                        const GURL& url);
 
+  void AddObserver(SidebarManagerObserver* observer);
+  void RemoveObserver(SidebarManagerObserver* observer);
+
  private:
   friend class base::RefCounted<SidebarManager>;
 
@@ -134,6 +139,8 @@ class SidebarManager : public content::NotificationObserver,
   typedef std::map<SidebarContainer*, content::WebContents*>
       SidebarHostToTabMap;
   SidebarHostToTabMap sidebar_host_to_tab_;
+
+  ObserverList<SidebarManagerObserver> observer_list_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
 };

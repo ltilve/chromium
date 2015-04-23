@@ -680,6 +680,7 @@
       'browser/sidebar/sidebar_container.h',
       'browser/sidebar/sidebar_manager.cc',
       'browser/sidebar/sidebar_manager.h',
+      'browser/sidebar/sidebar_manager_observer.h',
       'browser/site_details.cc',
       'browser/site_details.h',
       'browser/speech/chrome_speech_recognition_manager_delegate.cc',
