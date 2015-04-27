@@ -689,20 +689,6 @@ TEST_F(BrowserWindowControllerTest, TestFindBarOnTop) {
   EXPECT_GT(findBar_index, bookmark_index);
 }
 
-// Tests that the sidebar view and devtools view are both non-opaque.
-TEST_F(BrowserWindowControllerTest, TestSplitViewsAreNotOpaque) {
-  // Add a subview to the sidebar view to mimic what happens when a tab is added
-  // to the window.  NSSplitView only marks itself as non-opaque when one of its
-  // subviews is non-opaque, so the test will not pass without this subview.
-  base::scoped_nsobject<NSView> view(
-      [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 10, 10)]);
-  [[controller_ sidebarView] addSubview:view];
-
-  EXPECT_FALSE([[controller_ tabContentArea] isOpaque]);
-  EXPECT_FALSE([[[controller_ devToolsController] view] isOpaque]);
-  EXPECT_FALSE([[controller_ sidebarView] isOpaque]);
-}
-
 // Verify that hit testing works correctly when the bookmark bar overlaps
 // web contents.
 TEST_F(BrowserWindowControllerTest, BookmarkBarHitTest) {
