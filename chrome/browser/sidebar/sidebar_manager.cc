@@ -102,13 +102,26 @@ void SidebarManager::NotifyStateChanges(
       active_sidebar_contents == NULL ? NULL :
           FindSidebarContainerFor(active_sidebar_contents);
 
+  content::WebContents* old_tab =
+      was_active_host == NULL ? NULL :
+          was_active_host->web_contents();
+  content::WebContents* new_tab =
+      active_host == NULL ? NULL :
+          active_host->web_contents();
+  const std::string& old_content_id =
+      was_active_host == NULL ? "" :
+          was_active_host->content_id();
+  const std::string& new_content_id =
+      active_host == NULL ? "" :
+          active_host->content_id();
+
   if (was_active_host != NULL) {
     Profile* profile = Profile::FromBrowserContext(
         was_active_sidebar_contents->GetBrowserContext());
     ExtensionSidebarEventRouter::OnStateChanged(
         profile,
-        was_active_host->web_contents(),
-        was_active_host->content_id(),
+        old_tab,
+        old_content_id,
         extension_sidebar_constants::kShownState);
   }
 
@@ -117,10 +130,14 @@ void SidebarManager::NotifyStateChanges(
         active_sidebar_contents->GetBrowserContext());
     ExtensionSidebarEventRouter::OnStateChanged(
         profile,
-        active_host->web_contents(),
-        active_host->content_id(),
+        new_tab,
+        new_content_id,
         extension_sidebar_constants::kActiveState);
   }
+
+  FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
+                    OnSidebarSwitched(old_tab, old_content_id,
+                                      new_tab, new_content_id));
 }
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
@@ -136,7 +153,7 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   ExpandSidebar(tab, content_id);
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarShown(content_id));
+                    OnSidebarShown(tab, content_id));
 
   Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
   ExtensionSidebarEventRouter::OnStateChanged(
@@ -197,7 +214,7 @@ void SidebarManager::HideSidebar(WebContents* tab,
   UnregisterSidebarContainerFor(tab, content_id);
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarHidden(content_id));
+                    OnSidebarHidden(tab, content_id));
 
   Profile* profile = Profile::FromBrowserContext(tab->GetBrowserContext());
   ExtensionSidebarEventRouter::OnStateChanged(
