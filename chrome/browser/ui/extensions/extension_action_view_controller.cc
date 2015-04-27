@@ -58,7 +58,12 @@ ExtensionActionViewController::ExtensionActionViewController(
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
 
-  SidebarManager::GetInstance()->RemoveObserver(this);
+  SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  sidebar_manager->RemoveObserver(this);
+  for (std::set<content::WebContents*>::iterator it = active_in_webcontents_.begin();
+       it != active_in_webcontents_.end();
+       ++it)
+      sidebar_manager->HideSidebar(*it, GetId());
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
