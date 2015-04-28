@@ -129,8 +129,8 @@ class ExtensionActionViewController
   void OnPopupClosed();
 
   // Handles sidebar events
-  void OnSidebarShown(const std::string& content_id);
-  void OnSidebarHidden(const std::string& content_id);
+  void OnSidebarShown(const std::string& content_id) override;
+  void OnSidebarHidden(const std::string& content_id) override;
 
   // The extension associated with the action we're displaying.
   const extensions::Extension* extension_;
