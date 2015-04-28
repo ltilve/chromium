@@ -320,23 +320,17 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
     sidebar_manager->NavigateSidebar(
         view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
     sidebar_manager->AddObserver(this);
-    // Without the popup corner arrow indicator, marking the browserAction icon
-    // is necessary for extension attribution
-    view_delegate_->OnPopupShown(true);
     view_delegate_->OnPopupShown(grant_tab_permissions);
-    sidebar_is_shown_ = true;
-    return true;
-  }
-
-  popup_host_ = platform_delegate_->ShowPopupWithUrl(
-      show_action, popup_url, grant_tab_permissions);
-  if (popup_host_) {
-    popup_host_observer_.Add(popup_host_);
+  } else {
+    popup_host_ = platform_delegate_->ShowPopupWithUrl(
+        show_action, popup_url, grant_tab_permissions);
+    if (popup_host_) {
+      popup_host_observer_.Add(popup_host_);
       if (toolbar_actions_bar_)
         toolbar_actions_bar_->SetPopupOwner(this);
-    view_delegate_->OnPopupShown(grant_tab_permissions);
+      view_delegate_->OnPopupShown(grant_tab_permissions);
+    }
   }
-
   return is_showing_popup();
 }
 
