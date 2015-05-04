@@ -821,10 +821,6 @@ const char kForceMaximizeOnFirstRun[] = "ui.force_maximize_on_first_run";
 // visible on the toolbar.
 const char kShowHomeButton[] = "browser.show_home_button";
 
-// A boolean pref set to true if an extension popup to open the pages should be
-// visible in the sidebar.
-const char kShowPopupInSidebar[] = "browser.show_home_popup_in_sidebar";
-
 // A string value which saves short list of recently user selected encodings
 // separated with comma punctuation mark.
 const char kRecentlySelectedEncoding[] = "profile.recently_selected_encodings";
