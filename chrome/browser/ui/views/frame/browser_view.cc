@@ -2176,6 +2176,9 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   bool should_show = visible && !sidebar_container_->visible();
   bool should_hide = !visible && sidebar_container_->visible();
 
+  // Update sidebar content.
+  sidebar_web_view_->SetWebContents(sidebar_contents);
+
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
