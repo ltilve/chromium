@@ -70,6 +70,10 @@ class ExtensionAction {
   std::string id() const { return id_; }
   void set_id(const std::string& id) { id_ = id; }
 
+  // Should open Popup in sidebar?
+  bool open_in_sidebar() { return open_in_sidebar_; }
+  void set_open_in_sidebar(bool open_in_sidebar) { open_in_sidebar_ = open_in_sidebar; }
+
   // Set the url which the popup will load when the user clicks this action's
   // icon.  Setting an empty URL will disable the popup for a given tab.
   void SetPopupUrl(int tab_id, const GURL& url);
@@ -298,6 +302,9 @@ class ExtensionAction {
   // The id for the ExtensionAction, for example: "RssPageAction". This is
   // needed for compat with an older version of the page actions API.
   std::string id_;
+
+  // Popup should be open sidebar
+  bool open_in_sidebar_;
 
   DISALLOW_COPY_AND_ASSIGN(ExtensionAction);
 };
