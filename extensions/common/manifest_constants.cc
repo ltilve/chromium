@@ -111,6 +111,7 @@ const char kPageActionDefaultPopup[] = "default_popup";
 const char kPageActionDefaultTitle[] = "default_title";
 const char kPageActionIcons[] = "icons";
 const char kPageActionId[] = "id";
+const char kPageActionOpenInSidebar[] = "open_in_sidebar";
 const char kPageActionPopup[] = "popup";
 const char kPageActionPopupPath[] = "path";
 const char kPermissions[] = "permissions";

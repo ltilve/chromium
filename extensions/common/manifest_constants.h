@@ -113,6 +113,7 @@ extern const char kPageActionDefaultPopup[];
 extern const char kPageActionDefaultTitle[];
 extern const char kPageActionIcons[];
 extern const char kPageActionId[];
+extern const char kPageActionOpenInSidebar[];
 extern const char kPageActionPopup[];
 extern const char kPageActionPopupPath[];
 extern const char kPermissions[];
