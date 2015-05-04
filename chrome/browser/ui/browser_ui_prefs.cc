@@ -32,7 +32,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
       prefs::kShowHomeButton,
       false,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(prefs::kShowPopupInSidebar, false);
 #if defined(OS_MACOSX)
   // This really belongs in platform code, but there's no good place to
   // initialize it between the time when the AppController is created

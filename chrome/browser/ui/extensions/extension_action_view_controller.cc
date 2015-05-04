@@ -319,9 +319,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (already_showing)
     return false;
 
-  bool use_sidebar =
-      browser()->profile()->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar) ||
-      extension_action_->open_in_sidebar();
+  bool use_sidebar = extension_action_->open_in_sidebar();
 
   if (use_sidebar) {
     SidebarManager *sidebar_manager = SidebarManager::GetInstance();

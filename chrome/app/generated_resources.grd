@@ -4998,9 +4998,6 @@ Even if you have downloaded files from this website before, the website might ha
           <message name="IDS_MANAGE_EXTENSION" desc="The 'Manage extensions' text in the context menu for when right-clicking on extension icons (sentence case).">
             Manage extensions
           </message>
-          <message name="IDS_USE_SIDEBAR" desc="The 'Manage extensions' text in the context menu for when right-clicking on extension icons (sentence case).">
-            Open in sidebar
-          </message>
           <message name="IDS_EXTENSION_ACTION_INSPECT_POPUP" desc="The text for the right-click menu of page and browser actions which shows the popup and opens the developer tools (sentence case).">
             Inspect popup
           </message>
@@ -5023,9 +5020,6 @@ Even if you have downloaded files from this website before, the website might ha
           </message>
           <message name="IDS_EXTENSIONS_SHOW_BUTTON_IN_TOOLBAR" desc="The text for the menu item to move a button to the toolbar (title case).">
             Show in Toolbar
-          </message>
-          <message name="IDS_USE_SIDEBAR" desc="The 'Manage extensions' text in the context menu for when right-clicking on extension icons (sentence case).">
-            Open in sidebar
           </message>
           <message name="IDS_MANAGE_EXTENSION" desc="The 'Manage Extensions' text in the context menu for when right-clicking on extension icons (title case).">
             Manage Extensions
