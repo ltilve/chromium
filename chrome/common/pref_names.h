@@ -275,7 +275,6 @@ extern const char kForceMaximizeOnFirstRun[];
 #endif  // defined(OS_CHROMEOS)
 extern const char kIpcDisabledMessages[];
 extern const char kShowHomeButton[];
-extern const char kShowPopupInSidebar[];
 extern const char kRecentlySelectedEncoding[];
 extern const char kDeleteBrowsingHistory[];
 extern const char kDeleteDownloadHistory[];
