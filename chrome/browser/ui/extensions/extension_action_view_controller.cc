@@ -320,7 +320,10 @@ bool ExtensionActionViewController::ShowPopupWithUrl(
     sidebar_manager->NavigateSidebar(
         view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
     sidebar_manager->AddObserver(this);
-    view_delegate_->OnPopupShown(grant_tab_permissions);
+    // Without the popup corner arrow indicator, marking the browserAction icon
+    // is necessary for extension attribution
+    view_delegate_->OnPopupShown(true);
+    sidebar_is_shown_ = true;
   } else {
     popup_host_ = platform_delegate_->ShowPopupWithUrl(
         show_action, popup_url, grant_tab_permissions);
