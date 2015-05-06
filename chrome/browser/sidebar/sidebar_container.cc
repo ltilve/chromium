@@ -8,6 +8,7 @@
 #include "extensions/browser/extension_system.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
 #include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
@@ -71,6 +72,11 @@ void SidebarContainer::Navigate(const GURL& url) {
 content::JavaScriptDialogManager*
 SidebarContainer::GetJavaScriptDialogManager(content::WebContents* source) {
   return app_modal::JavaScriptDialogManager::GetInstance();
+}
+
+void SidebarContainer::CloseContents(content::WebContents* source) {
+    // Invoke through SidebarManager, as we need to send a notification
+    SidebarManager::GetInstance()->HideSidebar(tab_, content_id_);
 }
 
 const extensions::Extension* SidebarContainer::GetExtension() const {
