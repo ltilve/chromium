@@ -4,7 +4,6 @@
 
 #ifndef CHROME_BROWSER_UI_COCOA_SIDEBAR_CONTROLLER_H_
 #define CHROME_BROWSER_UI_COCOA_SIDEBAR_CONTROLLER_H_
-#pragma once
 
 #import "base/mac/cocoa_protocols.h"
 #include "base/mac/scoped_nsobject.h"
