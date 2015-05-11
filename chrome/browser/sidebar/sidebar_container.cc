@@ -24,10 +24,9 @@ SidebarContainer::SidebarContainer(content::WebContents* tab,
       delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {
   // Create WebContents for sidebar.
-
-   sidebar_contents_.reset(
-       content::WebContents::Create(
-           content::WebContents::CreateParams(tab->GetBrowserContext())));
+  sidebar_contents_.reset(
+      content::WebContents::Create(
+      content::WebContents::CreateParams(tab->GetBrowserContext())));
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       sidebar_contents_.get());
 
