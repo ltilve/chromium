@@ -319,12 +319,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (already_showing)
     return false;
 
-  scoped_ptr<extensions::ExtensionViewHost> host(
-      extensions::ExtensionViewHostFactory::CreatePopupHost(popup_url,
-                                                            browser_));
-  if (!host)
-    return false;
-
   bool use_sidebar =
       browser()->profile()->GetPrefs()->GetBoolean(prefs::kShowPopupInSidebar) ||
       extension_action_->open_in_sidebar();
@@ -349,6 +343,12 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     sidebar_is_shown_ = true;
     return true;
   }
+
+  scoped_ptr<extensions::ExtensionViewHost> host(
+      extensions::ExtensionViewHostFactory::CreatePopupHost(popup_url,
+                                                            browser_));
+  if (!host)
+    return false;
 
   popup_host_ = host.get();
   popup_host_observer_.Add(popup_host_);
