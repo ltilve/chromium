@@ -30,8 +30,7 @@ const char kSimplePage[] = "files/sidebar/simple_page.html";
 
 class SidebarTest : public ExtensionBrowserTest {
  public:
-  SidebarTest() {
-  }
+  SidebarTest() {}
 
  protected:
   // InProcessBrowserTest overrides.
@@ -94,10 +93,9 @@ class SidebarTest : public ExtensionBrowserTest {
   // completes.
   void OpenNewTab() {
     ui_test_utils::NavigateToURLWithDisposition(
-        browser(), GURL("about:blank"),
-        NEW_FOREGROUND_TAB,
+        browser(), GURL("about:blank"), NEW_FOREGROUND_TAB,
         ui_test_utils::BROWSER_TEST_WAIT_FOR_TAB |
-        ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
+            ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
   }
 
   WebContents* web_contents(int i) {

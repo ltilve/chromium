@@ -132,7 +132,6 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
     controller_(controller),
     initial_show_state_(ui::SHOW_STATE_DEFAULT),
     attention_request_id_(0) {
-
   registrar_.Add(
       this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
       content::Source<SidebarManager>(SidebarManager::GetInstance()));
@@ -318,8 +317,7 @@ void BrowserWindowCocoa::BookmarkBarStateChanged(
 void BrowserWindowCocoa::UpdateDevTools() {
   [controller_ updateDevToolsForContents:
       browser_->tab_strip_model()->GetActiveWebContents()];
-  UpdateSidebarForContents(
-          browser_->tab_strip_model()->GetActiveWebContents());
+  UpdateSidebarForContents(browser_->tab_strip_model()->GetActiveWebContents());
 }
 
 void BrowserWindowCocoa::UpdateLoadingAnimations(bool should_animate) {
@@ -831,7 +829,8 @@ void BrowserWindowCocoa::CloseAvatarBubbleFromAvatarButton() {
   [[controller_ avatarButtonController] closeAvatarBubble];
 }
 
-void BrowserWindowCocoa::UpdateSidebarForContents(content::WebContents* tab_contents) {
+void BrowserWindowCocoa::UpdateSidebarForContents(
+    content::WebContents* tab_contents) {
   if (tab_contents == browser_->tab_strip_model()->GetActiveWebContents()) {
     [controller_ updateSidebarForContents:tab_contents];
   }

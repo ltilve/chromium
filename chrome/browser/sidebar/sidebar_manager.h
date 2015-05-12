@@ -52,7 +52,7 @@ class SidebarManager : public content::NotificationObserver,
 
   // Returns sidebar's TabContents registered for |tab| and |content_id|.
   content::WebContents* GetSidebarTabContents(content::WebContents* tab,
-                                     const std::string& content_id);
+                                              const std::string& content_id);
 
   // Functions supporting chrome.experimental.sidebar API.
 
@@ -88,8 +88,8 @@ class SidebarManager : public content::NotificationObserver,
 
   // Overridden from content::NotificationObserver.
   void Observe(int type,
-                       const content::NotificationSource& source,
-                       const content::NotificationDetails& details) override;
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
 
   // Overridden from SidebarContainer::Delegate.
   void UpdateSidebar(SidebarContainer* host) override;
@@ -99,7 +99,7 @@ class SidebarManager : public content::NotificationObserver,
 
   // Returns SidebarContainer corresponding to |sidebar_contents|.
   SidebarContainer* FindSidebarContainerFor(
-                      content::WebContents* sidebar_contents);
+      content::WebContents* sidebar_contents);
 
   // Registers new SidebarContainer for |tab|. There must be no
   // other SidebarContainers registered for the RenderViewHost at the moment.

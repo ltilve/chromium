@@ -322,18 +322,18 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   bool use_sidebar = extension_action_->open_in_sidebar();
 
   if (use_sidebar) {
-    SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
 
     if (sidebar_is_shown_) {
-      sidebar_manager->HideSidebar(
-          view_delegate_->GetCurrentWebContents(), GetId());
+      sidebar_manager->HideSidebar(view_delegate_->GetCurrentWebContents(),
+                                   GetId());
       return false;
     }
 
-    sidebar_manager->ShowSidebar(
-        view_delegate_->GetCurrentWebContents(), GetId());
-    sidebar_manager->NavigateSidebar(
-        view_delegate_->GetCurrentWebContents(), GetId(), popup_url);
+    sidebar_manager->ShowSidebar(view_delegate_->GetCurrentWebContents(),
+                                 GetId());
+    sidebar_manager->NavigateSidebar(view_delegate_->GetCurrentWebContents(),
+                                     GetId(), popup_url);
     sidebar_manager->AddObserver(this);
     // Without the popup corner arrow indicator, marking the browserAction icon
     // is necessary for extension attribution
@@ -396,7 +396,8 @@ void ExtensionActionViewController::OnPopupClosed() {
   view_delegate_->OnPopupClosed();
 }
 
-void ExtensionActionViewController::OnSidebarShown(const std::string& content_id) {
+void ExtensionActionViewController::OnSidebarShown(
+    const std::string& content_id) {
   if (content_id == GetId())
     return;
 
@@ -405,7 +406,8 @@ void ExtensionActionViewController::OnSidebarShown(const std::string& content_id
   sidebar_is_shown_ = false;
 }
 
-void ExtensionActionViewController::OnSidebarHidden(const std::string& content_id) {
+void ExtensionActionViewController::OnSidebarHidden(
+    const std::string& content_id) {
   view_delegate_->OnPopupClosed();
   SidebarManager::GetInstance()->RemoveObserver(this);
   sidebar_is_shown_ = false;

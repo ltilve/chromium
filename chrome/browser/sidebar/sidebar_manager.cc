@@ -66,7 +66,8 @@ SidebarContainer* SidebarManager::MigrateSidebarTo(WebContents* tab) {
 }
 
 SidebarContainer* SidebarManager::GetSidebarContainerFor(
-    WebContents* tab, const std::string& content_id) {
+    WebContents* tab,
+    const std::string& content_id) {
   DCHECK(!content_id.empty());
   TabToSidebarHostMap::iterator it = tab_to_sidebar_host_.find(tab);
   if (it == tab_to_sidebar_host_.end()) {
@@ -80,7 +81,8 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
 }
 
 content::WebContents* SidebarManager::GetSidebarTabContents(
-    content::WebContents* tab, const std::string& content_id) {
+    content::WebContents* tab,
+    const std::string& content_id) {
   DCHECK(!content_id.empty());
   SidebarContainer* sidebar_host = GetSidebarContainerFor(tab, content_id);
   if (!sidebar_host)
@@ -215,8 +217,7 @@ void SidebarManager::HideAllSidebars(WebContents* tab) {
 SidebarContainer* SidebarManager::FindSidebarContainerFor(
     content::WebContents* sidebar_contents) {
   for (SidebarHostToTabMap::iterator it = sidebar_host_to_tab_.begin();
-       it != sidebar_host_to_tab_.end();
-       ++it) {
+       it != sidebar_host_to_tab_.end(); ++it) {
     if (sidebar_contents == it->first->sidebar_contents())
       return it->first;
   }
@@ -224,13 +225,13 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
 }
 
 void SidebarManager::RegisterSidebarContainerFor(
-    WebContents* tab, SidebarContainer* sidebar_host) {
+    WebContents* tab,
+    SidebarContainer* sidebar_host) {
   DCHECK(!GetSidebarContainerFor(tab, sidebar_host->content_id()));
 
   // If it's a first sidebar for this tab, register destroy notification.
   if (tab_to_sidebar_host_.find(tab) == tab_to_sidebar_host_.end()) {
-    registrar_.Add(this,
-                   content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
+    registrar_.Add(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
                    content::Source<WebContents>(tab));
   }
 
@@ -238,7 +239,8 @@ void SidebarManager::RegisterSidebarContainerFor(
 }
 
 void SidebarManager::UnregisterSidebarContainerFor(
-      WebContents* tab, const std::string& content_id) {
+    WebContents* tab,
+    const std::string& content_id) {
   SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
   DCHECK(host);
   if (!host)
@@ -248,8 +250,7 @@ void SidebarManager::UnregisterSidebarContainerFor(
 
   // If there's no more sidebars linked to this tab, unsubscribe.
   if (tab_to_sidebar_host_.find(tab) == tab_to_sidebar_host_.end()) {
-    registrar_.Remove(this,
-                      content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
+    registrar_.Remove(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
                       content::Source<WebContents>(tab));
   }
 
@@ -264,8 +265,7 @@ void SidebarManager::BindSidebarHost(WebContents* tab,
   const std::string& content_id = sidebar_host->content_id();
 
   DCHECK(GetSidebarContainerFor(tab, content_id) == NULL);
-  DCHECK(sidebar_host_to_tab_.find(sidebar_host) ==
-         sidebar_host_to_tab_.end());
+  DCHECK(sidebar_host_to_tab_.find(sidebar_host) == sidebar_host_to_tab_.end());
 
   tab_to_sidebar_host_[tab].content_id_to_sidebar_host[content_id] =
       sidebar_host;

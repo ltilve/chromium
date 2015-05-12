@@ -313,8 +313,8 @@ using content::WebContents;
     // Create a sub-controller for the docked sidebar and add its view to the
     // hierarchy.
     sidebarController_.reset([[SidebarController alloc]
-                               initWithParentViewController: devToolsController_
-                                      andContentsController: overlayableContentsController_]);
+        initWithParentViewController:devToolsController_
+               andContentsController:overlayableContentsController_]);
 
     // Create a controller for the tab strip, giving it the model object for
     // this window's Browser and the tab strip view. The controller will handle
@@ -1673,8 +1673,8 @@ using content::WebContents;
   // Update all the UI bits.
   windowShim_->UpdateTitleBar();
 
-  [sidebarController_ updateSidebarForTabContents:
-      static_cast<content::WebContents*>(contents)];
+  [sidebarController_
+      updateSidebarForTabContents:static_cast<content::WebContents*>(contents)];
   // Update the bookmark bar.
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?

@@ -24,13 +24,12 @@ SidebarContainer::SidebarContainer(content::WebContents* tab,
       delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {
   // Create WebContents for sidebar.
-  sidebar_contents_.reset(
-      content::WebContents::Create(
+  sidebar_contents_.reset(content::WebContents::Create(
       content::WebContents::CreateParams(tab->GetBrowserContext())));
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       sidebar_contents_.get());
 
-   sidebar_contents_->SetDelegate(this);
+  sidebar_contents_->SetDelegate(this);
 }
 
 SidebarContainer::~SidebarContainer() {
@@ -64,25 +63,24 @@ void SidebarContainer::Navigate(const GURL& url) {
   // TODO(alekseys): add a progress UI.
   navigate_to_default_page_on_expand_ = false;
   sidebar_contents_->GetController().LoadURL(
-      url, content::Referrer(), ui::PAGE_TRANSITION_HOME_PAGE,
-      std::string());
+      url, content::Referrer(), ui::PAGE_TRANSITION_HOME_PAGE, std::string());
 }
 
-content::JavaScriptDialogManager*
-SidebarContainer::GetJavaScriptDialogManager(content::WebContents* source) {
+content::JavaScriptDialogManager* SidebarContainer::GetJavaScriptDialogManager(
+    content::WebContents* source) {
   return app_modal::JavaScriptDialogManager::GetInstance();
 }
 
 void SidebarContainer::CloseContents(content::WebContents* source) {
-    // Invoke through SidebarManager, as we need to send a notification
-    SidebarManager::GetInstance()->HideSidebar(tab_, content_id_);
+  // Invoke through SidebarManager, as we need to send a notification
+  SidebarManager::GetInstance()->HideSidebar(tab_, content_id_);
 }
 
 const extensions::Extension* SidebarContainer::GetExtension() const {
   Profile* profile =
       Profile::FromBrowserContext(sidebar_contents_->GetBrowserContext());
   ExtensionService* service =
-          extensions::ExtensionSystem::Get(profile)->extension_service();
+      extensions::ExtensionSystem::Get(profile)->extension_service();
   if (!service)
     return NULL;
   return service->GetExtensionById(content_id_, false);

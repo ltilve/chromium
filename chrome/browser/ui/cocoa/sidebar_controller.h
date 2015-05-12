@@ -27,8 +27,8 @@ class WebContents;
   base::scoped_nsobject<TabContentsController> contentsController_;
 }
 
-- (id)initWithParentViewController: (id) parentController
-             andContentsController: (id) contentsController;
+- (id)initWithParentViewController:(id)parentController
+             andContentsController:(id)contentsController;
 
 // This controller's view.
 - (NSSplitView*)view;
