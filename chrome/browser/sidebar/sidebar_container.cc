@@ -43,10 +43,6 @@ void SidebarContainer::Show() {
   delegate_->UpdateSidebar(this);
 }
 
-bool SidebarContainer::HasGlobalScope() const {
-  return false;
-}
-
 void SidebarContainer::Expand() {
   if (navigate_to_default_page_on_expand_)
     navigate_to_default_page_on_expand_ = false;
