@@ -72,7 +72,9 @@ class ExtensionAction {
 
   // Should open Popup in sidebar?
   bool open_in_sidebar() { return open_in_sidebar_; }
-  void set_open_in_sidebar(bool open_in_sidebar) { open_in_sidebar_ = open_in_sidebar; }
+  void set_open_in_sidebar(bool open_in_sidebar) {
+    open_in_sidebar_ = open_in_sidebar;
+  }
 
   // Set the url which the popup will load when the user clicks this action's
   // icon.  Setting an empty URL will disable the popup for a given tab.

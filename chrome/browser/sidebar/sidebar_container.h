@@ -54,7 +54,9 @@ class SidebarContainer : public content::WebContentsDelegate {
   content::WebContents* web_contents() const { return tab_; }
 
   // Returns sidebar's TabContents.
-  content::WebContents* sidebar_contents() const { return sidebar_contents_.get(); }
+  content::WebContents* sidebar_contents() const {
+    return sidebar_contents_.get();
+  }
 
   bool HasGlobalScope() const;
 

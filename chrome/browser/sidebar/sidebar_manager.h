@@ -65,7 +65,8 @@ class SidebarManager : public content::NotificationObserver,
 
   // Collapses sidebar identified by |tab| and |content_id| (has no effect
   // if sidebar is not expanded).
-  void CollapseSidebar(content::WebContents* tab, const std::string& content_id);
+  void CollapseSidebar(content::WebContents* tab,
+                       const std::string& content_id);
 
   SidebarContainer* MigrateSidebarTo(content::WebContents* tab);
   // Hides sidebar identified by |tab| and |content_id| (removes sidebar's
@@ -97,7 +98,8 @@ class SidebarManager : public content::NotificationObserver,
   void HideAllSidebars(content::WebContents* tab);
 
   // Returns SidebarContainer corresponding to |sidebar_contents|.
-  SidebarContainer* FindSidebarContainerFor(content::WebContents* sidebar_contents);
+  SidebarContainer* FindSidebarContainerFor(
+                      content::WebContents* sidebar_contents);
 
   // Registers new SidebarContainer for |tab|. There must be no
   // other SidebarContainers registered for the RenderViewHost at the moment.
