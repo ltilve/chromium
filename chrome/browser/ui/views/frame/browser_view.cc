@@ -469,8 +469,8 @@ BrowserView::BrowserView()
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
   registrar_.Add(
-    this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-    content::Source<SidebarManager>(SidebarManager::GetInstance()));
+      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
+      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -673,7 +673,8 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
 void BrowserView::Observe(int type,
                           const content::NotificationSource& source,
                           const content::NotificationDetails& details) {
- content::WebContents* target = content::Details<SidebarContainer>(details)->web_contents();
+  content::WebContents* target =
+      content::Details<SidebarContainer>(details)->web_contents();
   switch (type) {
     case chrome::NOTIFICATION_SIDEBAR_CHANGED:
       if (GetActiveWebContents() == target)
@@ -2092,16 +2093,13 @@ void BrowserView::InitViews() {
   sidebar_container_->SetVisible(false);
 
   sidebar_split_ = new views::SingleSplitView(
-      contents_container_,
-      sidebar_container_,
-      views::SingleSplitView::HORIZONTAL_SPLIT,
-      this);
+      contents_container_, sidebar_container_,
+      views::SingleSplitView::HORIZONTAL_SPLIT, this);
 
   sidebar_split_->set_id(VIEW_ID_SIDE_BAR_SPLIT);
-  sidebar_split_->set_background(
-      views::Background::CreateSolidBackground(
-          GetWidget()->GetThemeProvider()->GetColor(
-              ThemeProperties::COLOR_TOOLBAR)));
+  sidebar_split_->set_background(views::Background::CreateSolidBackground(
+      GetWidget()->GetThemeProvider()->GetColor(
+          ThemeProperties::COLOR_TOOLBAR)));
   sidebar_split_->set_resize_leading_on_bounds_change(false);
   AddChildView(sidebar_split_);
   set_contents_view(sidebar_split_);
@@ -2133,16 +2131,10 @@ void BrowserView::InitViews() {
   immersive_mode_controller_->Init(this);
 
   BrowserViewLayout* browser_view_layout = new BrowserViewLayout;
-  browser_view_layout->Init(new BrowserViewLayoutDelegateImpl(this),
-                            browser(),
-                            this,
-                            top_container_,
-                            tabstrip_,
-                            toolbar_,
-                            infobar_container_,
-                            sidebar_split_,
-                            GetContentsLayoutManager(),
-                            immersive_mode_controller_.get());
+  browser_view_layout->Init(
+      new BrowserViewLayoutDelegateImpl(this), browser(), this, top_container_,
+      tabstrip_, toolbar_, infobar_container_, sidebar_split_,
+      GetContentsLayoutManager(), immersive_mode_controller_.get());
   SetLayoutManager(browser_view_layout);
 
 #if defined(OS_WIN)
@@ -2156,7 +2148,6 @@ void BrowserView::InitViews() {
   GetLocationBar()->GetOmniboxView()->model()->popup_model()->AddObserver(this);
 }
 
-
 void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
@@ -2165,8 +2156,9 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   WebContents* sidebar_contents = NULL;
   if (new_contents && SidebarManager::IsSidebarAllowed()) {
-    SidebarContainer* client_host = SidebarManager::GetInstance()->
-        GetActiveSidebarContainerFor(new_contents);
+    SidebarContainer* client_host =
+        SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
+            new_contents);
     if (client_host)
       sidebar_contents = client_host->sidebar_contents();
   }
@@ -2182,8 +2174,8 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
-    int sidebar_width = 300;// g_browser_process->local_state()->GetInteger(
-        //prefs::kExtensionSidebarWidth);
+    int sidebar_width = 300;  // g_browser_process->local_state()->GetInteger(
+    // prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
       // Initial load, set to default value.verti
       sidebar_width = sidebar_split_->width() / 7;
@@ -2192,8 +2184,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
     int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
     sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
-    sidebar_split_->set_divider_offset(
-        sidebar_split_->width() - sidebar_width);
+    sidebar_split_->set_divider_offset(sidebar_split_->width() - sidebar_width);
 
     sidebar_container_->SetVisible(true);
     sidebar_web_view_->SetVisible(true);

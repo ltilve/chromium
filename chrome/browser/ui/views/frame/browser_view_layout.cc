@@ -369,11 +369,14 @@ void BrowserViewLayout::Layout(views::View* browser_view) {
     dialog_host_->NotifyPositionRequiresUpdate();
   }
 
-  views::SingleSplitView* ssplitview = (views::SingleSplitView*)contents_container_;
-  views::View* sidebar_web_view = browser_view_->GetViewByID(VIEW_ID_SIDE_BAR_VIEW);
+  views::SingleSplitView* ssplitview =
+      (views::SingleSplitView*)contents_container_;
+  views::View* sidebar_web_view =
+      browser_view_->GetViewByID(VIEW_ID_SIDE_BAR_VIEW);
   if (ssplitview && sidebar_web_view && sidebar_web_view->visible()) {
     int width = (contents_container_->width() - ssplitview->divider_offset());
-    sidebar_web_view->SetBoundsRect(gfx::Rect(0, 0, width, contents_container_->height()));
+    sidebar_web_view->SetBoundsRect(
+        gfx::Rect(0, 0, width, contents_container_->height()));
   }
 }
 

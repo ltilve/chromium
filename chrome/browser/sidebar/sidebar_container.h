@@ -34,6 +34,7 @@ class SidebarContainer : public content::WebContentsDelegate {
     Delegate() {}
     virtual ~Delegate() {}
     virtual void UpdateSidebar(SidebarContainer* host) = 0;
+
    private:
     DISALLOW_COPY_AND_ASSIGN(Delegate);
   };
@@ -77,7 +78,7 @@ class SidebarContainer : public content::WebContentsDelegate {
   content::JavaScriptDialogManager* GetJavaScriptDialogManager(
       content::WebContents* source) override;
 
-  void CloseContents(content::WebContents *contents) override;
+  void CloseContents(content::WebContents* contents) override;
 
   // Returns an extension this sidebar belongs to.
   const extensions::Extension* GetExtension() const;

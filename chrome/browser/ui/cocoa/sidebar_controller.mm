@@ -25,7 +25,6 @@ const int kMinWebWidth = 50;
 
 }  // end namespace
 
-
 @interface SidebarController (Private)
 - (void)showSidebarContents:(content::WebContents*)sidebarContents;
 - (void)resizeSidebarToNewWidth:(CGFloat)width;
@@ -35,30 +34,27 @@ const int kMinWebWidth = 50;
 @end
 
 @implementation SidebarSplitView
-- (NSColor*)dividerColor
-{
+- (NSColor*)dividerColor {
   return [NSColor controlColor];
 }
 @end
 
-
 @implementation SidebarController
 
-- (id)initWithParentViewController: (id) parentController
-             andContentsController: (id) contentsController
-{
+- (id)initWithParentViewController:(id)parentController
+             andContentsController:(id)contentsController {
   DCHECK(parentController);
 
   if (self = [super init]) {
     splitView_.reset([[SidebarSplitView alloc]
-                       initWithFrame: [[parentController view] bounds]]);
+        initWithFrame:[[parentController view] bounds]]);
     [splitView_ setDelegate:self];
     [splitView_ setVertical:YES];
     [splitView_ setDividerStyle:NSSplitViewDividerStyleThin];
-    [splitView_ setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
-    [[parentController view] addSubview: splitView_];
+    [splitView_ setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    [[parentController view] addSubview:splitView_];
 
-    [splitView_ addSubview: [contentsController view]];
+    [splitView_ addSubview:[contentsController view]];
     [splitView_ adjustSubviews];
   }
   return self;
@@ -92,8 +88,8 @@ const int kMinWebWidth = 50;
     contentsController_.reset(
         [[TabContentsController alloc] initWithContents:contents]);
 
-  content::WebContents* oldSidebarContents = static_cast<content::WebContents*>(
-      [contentsController_ webContents]);
+  content::WebContents* oldSidebarContents =
+      static_cast<content::WebContents*>([contentsController_ webContents]);
   if (oldSidebarContents == sidebarContents)
     return;
 
@@ -115,8 +111,8 @@ const int kMinWebWidth = 50;
     // Native view is a TabContentsViewCocoa object, whose ViewID was
     // set to VIEW_ID_TAB_CONTAINER initially, so change it to
     // VIEW_ID_SIDE_BAR_CONTAINER here.
-    view_id_util::SetID(
-        sidebarContents->GetNativeView(), VIEW_ID_SIDE_BAR_CONTAINER);
+    view_id_util::SetID(sidebarContents->GetNativeView(),
+                        VIEW_ID_SIDE_BAR_CONTAINER);
 
     CGFloat sidebarWidth = 0;
     if ([subviews count] == 1) {
@@ -125,8 +121,7 @@ const int kMinWebWidth = 50;
           prefs::kExtensionSidebarWidth);
       if (sidebarWidth < 0) {
         // Initial load, set to default value.
-        sidebarWidth =
-            NSWidth([splitView_ frame]) * kDefaultSidebarWidthRatio;
+        sidebarWidth = NSWidth([splitView_ frame]) * kDefaultSidebarWidthRatio;
       }
 
       [splitView_ addSubview:[contentsController_ view]];
@@ -136,8 +131,8 @@ const int kMinWebWidth = 50;
     }
 
     // Make sure |sidebarWidth| isn't too large or too small.
-    sidebarWidth = std::min(sidebarWidth,
-                            NSWidth([splitView_ frame]) - kMinWebWidth);
+    sidebarWidth =
+        std::min(sidebarWidth, NSWidth([splitView_ frame]) - kMinWebWidth);
     DCHECK_GE(sidebarWidth, 0) << "kMinWebWidth needs to be smaller than "
                                << "smallest available tab contents space.";
     sidebarWidth = std::max(static_cast<CGFloat>(0), sidebarWidth);
@@ -190,46 +185,39 @@ const int kMinWebWidth = 50;
  *
  */
 
-- (BOOL)splitView:(NSSplitView *)splitView
-shouldAdjustSizeOfSubview:(NSView *)subview
-{
+- (BOOL)splitView:(NSSplitView*)splitView
+    shouldAdjustSizeOfSubview:(NSView*)subview {
   if ([[splitView_ subviews] indexOfObject:subview] == 1) {
     return NSWidth([subview bounds]) > kMinWebWidth;
   }
   return YES;
 }
 
-- (BOOL)splitView:(NSSplitView *)splitView
-shouldHideDividerAtIndex:(NSInteger)dividerIndex
-{
+- (BOOL)splitView:(NSSplitView*)splitView
+    shouldHideDividerAtIndex:(NSInteger)dividerIndex {
   return NO;
 }
 
-- (BOOL)splitView:(NSSplitView *)splitView
-canCollapseSubview:(NSView *)subview
-{
+- (BOOL)splitView:(NSSplitView*)splitView canCollapseSubview:(NSView*)subview {
   return NO;
 }
 
-- (BOOL)splitView:(NSSplitView *)splitView
-shouldCollapseSubview:(NSView *)subview
-forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
-{
+- (BOOL)splitView:(NSSplitView*)splitView
+             shouldCollapseSubview:(NSView*)subview
+    forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex {
   return NO;
 }
 
-- (CGFloat)splitView:(NSSplitView *)splitView
-constrainMinCoordinate:(CGFloat)proposedMinimumPosition
-         ofSubviewAt:(NSInteger)dividerIndex
-{
-  return  std::max(proposedMinimumPosition,
-                   kMaximumSidebarWidthRatio * NSWidth([splitView_ frame]));
+- (CGFloat)splitView:(NSSplitView*)splitView
+    constrainMinCoordinate:(CGFloat)proposedMinimumPosition
+               ofSubviewAt:(NSInteger)dividerIndex {
+  return std::max(proposedMinimumPosition,
+                  kMaximumSidebarWidthRatio * NSWidth([splitView_ frame]));
 }
 
-- (CGFloat)splitView:(NSSplitView *)splitView
-constrainMaxCoordinate:(CGFloat)proposedMaximumPosition
-         ofSubviewAt:(NSInteger)dividerIndex
-{
+- (CGFloat)splitView:(NSSplitView*)splitView
+    constrainMaxCoordinate:(CGFloat)proposedMaximumPosition
+               ofSubviewAt:(NSInteger)dividerIndex {
   return std::min(proposedMaximumPosition,
                   NSWidth([splitView_ frame]) - kMinWebWidth);
 }
