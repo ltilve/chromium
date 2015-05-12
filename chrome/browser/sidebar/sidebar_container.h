@@ -59,8 +59,6 @@ class SidebarContainer : public content::WebContentsDelegate {
     return sidebar_contents_.get();
   }
 
-  bool HasGlobalScope() const;
-
   // Notifies hosting window that this sidebar was expanded.
   void Show();
 
