@@ -2174,15 +2174,15 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   // Update sidebar UI width.
   if (should_show) {
     // Restore split offset.
-    int sidebar_width = 300;  // g_browser_process->local_state()->GetInteger(
-    // prefs::kExtensionSidebarWidth);
+    int sidebar_width = g_browser_process->local_state()->GetInteger(
+        prefs::kExtensionSidebarWidth);
     if (sidebar_width < 0) {
-      // Initial load, set to default value.verti
+      // By default sidebar width is 1/7th of the current page content width.
       sidebar_width = sidebar_split_->width() / 7;
     }
-    // Make sure user can see both panes.
     int min_sidebar_width = sidebar_split_->GetMinimumSize().width();
-    sidebar_width = std::min(sidebar_split_->width() - min_sidebar_width,
+    // Not allowed to be wider than 50% of the split-view's frame
+    sidebar_width = std::min(sidebar_split_->width() / 2 - min_sidebar_width,
                              std::max(min_sidebar_width, sidebar_width));
     sidebar_split_->set_divider_offset(sidebar_split_->width() - sidebar_width);
 
