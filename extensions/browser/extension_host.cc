@@ -10,6 +10,8 @@
 #include "base/profiler/scoped_tracker.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/extensions/extension_service.h"
+#include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/native_web_keyboard_event.h"
@@ -69,7 +71,7 @@ ExtensionHost::ExtensionHost(const Extension* extension,
          host_type == VIEW_TYPE_EXTENSION_DIALOG ||
          host_type == VIEW_TYPE_EXTENSION_POPUP);
   host_contents_.reset(WebContents::Create(
-      WebContents::CreateParams(browser_context_, site_instance))),
+      WebContents::CreateParams(browser_context_, site_instance)));
   content::WebContentsObserver::Observe(host_contents_.get());
   host_contents_->SetDelegate(this);
   SetViewType(host_contents_.get(), host_type);
@@ -83,6 +85,30 @@ ExtensionHost::ExtensionHost(const Extension* extension,
   // Set up web contents observers and pref observers.
   delegate_->OnExtensionHostCreated(host_contents());
 }
+
+ExtensionHost::ExtensionHost(content::WebContents* tab,
+                             const std::string& extension_id)
+    : delegate_(ExtensionsBrowserClient::Get()->CreateExtensionHostDelegate()),
+      extension_id_(extension_id),
+      browser_context_(tab->GetBrowserContext()),
+      render_view_host_(nullptr),
+      has_loaded_once_(false),
+      document_element_available_(false),
+      extension_function_dispatcher_(browser_context_, this),
+      extension_host_type_(VIEW_TYPE_EXTENSION_SIDEBAR) {
+
+  host_contents_.reset(WebContents::Create(
+      WebContents::CreateParams(browser_context_)));
+  content::WebContentsObserver::Observe(host_contents_.get());
+  host_contents_->SetDelegate(this);
+  SetViewType(host_contents(), VIEW_TYPE_EXTENSION_SIDEBAR);
+  render_view_host_ = host_contents_->GetRenderViewHost();
+  ExtensionRegistry::Get(browser_context_)->AddObserver(this);
+  delegate_->OnExtensionHostCreated(host_contents());
+
+  extension_ = GetExtension();
+}
+
 
 ExtensionHost::~ExtensionHost() {
   ExtensionRegistry::Get(browser_context_)->RemoveObserver(this);
@@ -223,6 +249,11 @@ void ExtensionHost::LoadInitialURL() {
   host_contents_->GetController().LoadURL(
       initial_url_, content::Referrer(), ui::PAGE_TRANSITION_LINK,
       std::string());
+}
+
+void ExtensionHost::LoadURL(const GURL& url) {
+  initial_url_ = url;
+  LoadInitialURL();
 }
 
 bool ExtensionHost::IsBackgroundPage() const {
@@ -477,6 +508,16 @@ void ExtensionHost::RecordStopLoadingUMA() {
     UMA_HISTOGRAM_MEDIUM_TIMES("Extensions.PopupCreateTime",
                                create_start_.Elapsed());
   }
+}
+
+const extensions::Extension* ExtensionHost::GetExtension() const {
+  Profile* profile =
+      Profile::FromBrowserContext(host_contents_->GetBrowserContext());
+  ExtensionService* service =
+      extensions::ExtensionSystem::Get(profile)->extension_service();
+  if (!service)
+    return NULL;
+  return service->GetExtensionById(extension_id_, false);
 }
 
 }  // namespace extensions

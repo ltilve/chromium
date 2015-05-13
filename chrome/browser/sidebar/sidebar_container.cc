@@ -19,17 +19,12 @@
 SidebarContainer::SidebarContainer(content::WebContents* tab,
                                    const std::string& content_id,
                                    Delegate* delegate)
-    : tab_(tab),
-      content_id_(content_id),
+    : ExtensionHost(tab, content_id),
+      tab_(tab),
       delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {
-  // Create WebContents for sidebar.
-  sidebar_contents_.reset(content::WebContents::Create(
-      content::WebContents::CreateParams(tab->GetBrowserContext())));
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
-      sidebar_contents_.get());
-
-  sidebar_contents_->SetDelegate(this);
+      host_contents());
 }
 
 SidebarContainer::~SidebarContainer() {
@@ -48,7 +43,7 @@ void SidebarContainer::Expand() {
     navigate_to_default_page_on_expand_ = false;
 
   delegate_->UpdateSidebar(this);
-  sidebar_contents_->SetInitialFocus();
+  host_contents()->SetInitialFocus();
 }
 
 void SidebarContainer::Collapse() {
@@ -58,8 +53,7 @@ void SidebarContainer::Collapse() {
 void SidebarContainer::Navigate(const GURL& url) {
   // TODO(alekseys): add a progress UI.
   navigate_to_default_page_on_expand_ = false;
-  sidebar_contents_->GetController().LoadURL(
-      url, content::Referrer(), ui::PAGE_TRANSITION_HOME_PAGE, std::string());
+  LoadURL(url);
 }
 
 content::JavaScriptDialogManager* SidebarContainer::GetJavaScriptDialogManager(
@@ -69,15 +63,6 @@ content::JavaScriptDialogManager* SidebarContainer::GetJavaScriptDialogManager(
 
 void SidebarContainer::CloseContents(content::WebContents* source) {
   // Invoke through SidebarManager, as we need to send a notification
-  SidebarManager::GetInstance()->HideSidebar(tab_, content_id_);
+  SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
 }
 
-const extensions::Extension* SidebarContainer::GetExtension() const {
-  Profile* profile =
-      Profile::FromBrowserContext(sidebar_contents_->GetBrowserContext());
-  ExtensionService* service =
-      extensions::ExtensionSystem::Get(profile)->extension_service();
-  if (!service)
-    return NULL;
-  return service->GetExtensionById(content_id_, false);
-}
