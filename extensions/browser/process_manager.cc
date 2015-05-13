@@ -167,6 +167,7 @@ struct ProcessManager::ExtensionRenderFrameData {
       case VIEW_TYPE_BACKGROUND_CONTENTS:
       case VIEW_TYPE_EXTENSION_DIALOG:
       case VIEW_TYPE_EXTENSION_POPUP:
+      case VIEW_TYPE_EXTENSION_SIDEBAR:
       case VIEW_TYPE_LAUNCHER_PAGE:
       case VIEW_TYPE_PANEL:
       case VIEW_TYPE_TAB_CONTENTS:

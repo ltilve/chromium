@@ -87,7 +87,7 @@ content::WebContents* SidebarManager::GetSidebarTabContents(
   SidebarContainer* sidebar_host = GetSidebarContainerFor(tab, content_id);
   if (!sidebar_host)
     return NULL;
-  return sidebar_host->sidebar_contents();
+  return sidebar_host->host_contents();
 }
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
@@ -218,7 +218,7 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
     content::WebContents* sidebar_contents) {
   for (SidebarHostToTabMap::iterator it = sidebar_host_to_tab_.begin();
        it != sidebar_host_to_tab_.end(); ++it) {
-    if (sidebar_contents == it->first->sidebar_contents())
+    if (sidebar_contents == it->first->host_contents())
       return it->first;
   }
   return NULL;
@@ -227,7 +227,7 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
 void SidebarManager::RegisterSidebarContainerFor(
     WebContents* tab,
     SidebarContainer* sidebar_host) {
-  DCHECK(!GetSidebarContainerFor(tab, sidebar_host->content_id()));
+  DCHECK(!GetSidebarContainerFor(tab, sidebar_host->extension_id()));
 
   // If it's a first sidebar for this tab, register destroy notification.
   if (tab_to_sidebar_host_.find(tab) == tab_to_sidebar_host_.end()) {
@@ -262,7 +262,7 @@ void SidebarManager::UnregisterSidebarContainerFor(
 
 void SidebarManager::BindSidebarHost(WebContents* tab,
                                      SidebarContainer* sidebar_host) {
-  const std::string& content_id = sidebar_host->content_id();
+  const std::string& content_id = sidebar_host->extension_id();
 
   DCHECK(GetSidebarContainerFor(tab, content_id) == NULL);
   DCHECK(sidebar_host_to_tab_.find(sidebar_host) == sidebar_host_to_tab_.end());
@@ -274,7 +274,7 @@ void SidebarManager::BindSidebarHost(WebContents* tab,
 
 void SidebarManager::UnbindSidebarHost(WebContents* tab,
                                        SidebarContainer* sidebar_host) {
-  const std::string& content_id = sidebar_host->content_id();
+  const std::string& content_id = sidebar_host->extension_id();
 
   DCHECK(GetSidebarContainerFor(tab, content_id) == sidebar_host);
   DCHECK(sidebar_host_to_tab_.find(sidebar_host)->second == tab);

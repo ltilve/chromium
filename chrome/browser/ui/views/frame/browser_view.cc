@@ -2160,7 +2160,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
         SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
             new_contents);
     if (client_host)
-      sidebar_contents = client_host->sidebar_contents();
+      sidebar_contents = client_host->host_contents();
   }
 
   bool visible = NULL != sidebar_contents;
