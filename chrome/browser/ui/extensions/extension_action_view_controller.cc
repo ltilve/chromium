@@ -52,7 +52,6 @@ ExtensionActionViewController::ExtensionActionViewController(
       extension_registry_(
           extensions::ExtensionRegistry::Get(browser_->profile())),
       popup_host_observer_(this),
-      sidebar_is_shown_(false),
       weak_factory_(this) {
   DCHECK(extension_action);
   DCHECK(extension_action->action_type() == ActionInfo::TYPE_PAGE ||
@@ -62,6 +61,8 @@ ExtensionActionViewController::ExtensionActionViewController(
 
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
+
+  SidebarManager::GetInstance()->RemoveObserver(this);
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
@@ -323,22 +324,18 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
   if (use_sidebar) {
     SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+    content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
 
-    if (sidebar_is_shown_) {
-      sidebar_manager->HideSidebar(view_delegate_->GetCurrentWebContents(),
-                                   GetId());
+    if (active_in_webcontents_.find(web_contents) != active_in_webcontents_.end()) {
+      sidebar_manager->HideSidebar(web_contents, GetId());
       return false;
     }
 
-    sidebar_manager->ShowSidebar(view_delegate_->GetCurrentWebContents(),
-                                 GetId());
-    sidebar_manager->NavigateSidebar(view_delegate_->GetCurrentWebContents(),
-                                     GetId(), popup_url);
+    active_in_webcontents_.insert(web_contents);
     sidebar_manager->AddObserver(this);
-    // Without the popup corner arrow indicator, marking the browserAction icon
-    // is necessary for extension attribution
-    view_delegate_->OnPopupShown(true);
-    sidebar_is_shown_ = true;
+
+    sidebar_manager->ShowSidebar(web_contents, GetId());
+    sidebar_manager->NavigateSidebar(web_contents, GetId(), popup_url);
     return true;
   }
 
@@ -396,19 +393,37 @@ void ExtensionActionViewController::OnPopupClosed() {
   view_delegate_->OnPopupClosed();
 }
 
-void ExtensionActionViewController::OnSidebarShown(
-    const std::string& content_id) {
-  if (content_id == GetId())
-    return;
-
-  view_delegate_->OnPopupClosed();
-  SidebarManager::GetInstance()->RemoveObserver(this);
-  sidebar_is_shown_ = false;
+void ExtensionActionViewController::OnSidebarShown(content::WebContents* tab,
+                                                   const std::string& content_id) {
+  if (view_delegate_->GetCurrentWebContents() == tab &&
+    content_id == GetId())
+    // Without the popup corner arrow indicator, marking the browserAction icon
+    // is necessary for extension attribution
+    view_delegate_->OnPopupShown(true);
 }
 
-void ExtensionActionViewController::OnSidebarHidden(
-    const std::string& content_id) {
-  view_delegate_->OnPopupClosed();
-  SidebarManager::GetInstance()->RemoveObserver(this);
-  sidebar_is_shown_ = false;
+void ExtensionActionViewController::OnSidebarHidden(content::WebContents* tab,
+                                                    const std::string& content_id) {
+  if (view_delegate_->GetCurrentWebContents() == tab &&
+    content_id == GetId()) {
+    view_delegate_->OnPopupClosed();
+    active_in_webcontents_.erase(active_in_webcontents_.find(
+                                 view_delegate_->GetCurrentWebContents()));
+    if (active_in_webcontents_.size() == 0)
+        SidebarManager::GetInstance()->RemoveObserver(this);
+  }
+}
+
+void ExtensionActionViewController::OnSidebarSwitched(content::WebContents* old_tab,
+                                                      const std::string& old_content_id,
+                                                      content::WebContents* new_tab,
+                                                      const std::string& new_content_id) {
+
+    if (view_delegate_->GetCurrentWebContents() == new_tab &&
+        new_content_id == GetId())
+        // Without the popup corner arrow indicator, marking the browserAction icon
+        // is necessary for extension attribution
+        view_delegate_->OnPopupShown(true);
+    else
+        view_delegate_->OnPopupClosed();
 }
