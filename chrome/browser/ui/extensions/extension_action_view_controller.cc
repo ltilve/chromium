@@ -20,6 +20,8 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
+#include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_delegate.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
 #include "chrome/common/extensions/api/extension_action/action_info.h"
@@ -418,6 +420,9 @@ void ExtensionActionViewController::OnSidebarSwitched(content::WebContents* old_
                                                       const std::string& old_content_id,
                                                       content::WebContents* new_tab,
                                                       const std::string& new_content_id) {
+	if (browser_->tab_strip_model()->GetIndexOfWebContents(
+			new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
+	    return;
 
     if (view_delegate_->GetCurrentWebContents() == new_tab &&
         new_content_id == GetId())
