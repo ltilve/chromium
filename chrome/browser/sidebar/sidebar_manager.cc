@@ -103,7 +103,7 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   ExpandSidebar(tab, content_id);
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarShown(content_id));
+                    OnSidebarShown(tab, content_id));
 }
 
 void SidebarManager::ExpandSidebar(content::WebContents* tab,
@@ -159,7 +159,7 @@ void SidebarManager::HideSidebar(WebContents* tab,
   UnregisterSidebarContainerFor(tab, content_id);
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarHidden(content_id));
+                    OnSidebarHidden(tab, content_id));
 }
 
 void SidebarManager::NavigateSidebar(content::WebContents* tab,

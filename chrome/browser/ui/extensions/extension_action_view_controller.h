@@ -138,8 +138,16 @@ class ExtensionActionViewController
   void OnPopupClosed();
 
   // Handles sidebar events
-  void OnSidebarShown(const std::string& content_id) override;
-  void OnSidebarHidden(const std::string& content_id) override;
+  void OnSidebarShown(content::WebContents* tab,
+                      const std::string& content_id);
+
+  void OnSidebarHidden(content::WebContents* tab,
+                       const std::string& content_id);
+
+  void OnSidebarSwitched(content::WebContents* old_tab,
+                         const std::string& old_content_id,
+                         content::WebContents* new_tab,
+                         const std::string& new_content_id);
 
   // The extension associated with the action we're displaying.
   scoped_refptr<const extensions::Extension> extension_;
@@ -186,7 +194,7 @@ class ExtensionActionViewController
   ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
       popup_host_observer_;
 
-  bool sidebar_is_shown_;
+  std::set<content::WebContents*> active_in_webcontents_;
 
   base::WeakPtrFactory<ExtensionActionViewController> weak_factory_;
 
