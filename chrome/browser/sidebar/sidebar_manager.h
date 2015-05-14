@@ -54,7 +54,9 @@ class SidebarManager : public content::NotificationObserver,
   content::WebContents* GetSidebarTabContents(content::WebContents* tab,
                                               const std::string& content_id);
 
-  // Functions supporting chrome.experimental.sidebar API.
+  // Sends sidebar state change notification to extensions.
+  void NotifyStateChanges(content::WebContents* was_active_sidebar_contents,
+                          content::WebContents* active_sidebar_contents);
 
   // Shows sidebar identified by |tab| and |content_id| (only sidebar's
   // mini tab is visible).

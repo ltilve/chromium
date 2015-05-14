@@ -2169,7 +2169,13 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   bool should_hide = !visible && sidebar_container_->visible();
 
   // Update sidebar content.
+  WebContents* old_contents =
+      static_cast<WebContents*>(sidebar_web_view_->web_contents());
+
   sidebar_web_view_->SetWebContents(sidebar_contents);
+
+  SidebarManager::GetInstance()->
+      NotifyStateChanges(old_contents, sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {
