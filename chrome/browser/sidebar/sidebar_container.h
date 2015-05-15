@@ -43,7 +43,7 @@ class SidebarContainer : public extensions::ExtensionHost {
   SidebarContainer(content::WebContents* tab,
                    const std::string& content_id,
                    Delegate* delegate);
-  ~SidebarContainer();
+  ~SidebarContainer() override;
 
   // Called right before destroying this sidebar.
   // Does all the necessary cleanup.

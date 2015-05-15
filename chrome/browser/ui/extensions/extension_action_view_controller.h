@@ -139,15 +139,15 @@ class ExtensionActionViewController
 
   // Handles sidebar events
   void OnSidebarShown(content::WebContents* tab,
-                      const std::string& content_id);
+                      const std::string& content_id) override;
 
   void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id);
+                       const std::string& content_id) override;
 
   void OnSidebarSwitched(content::WebContents* old_tab,
                          const std::string& old_content_id,
                          content::WebContents* new_tab,
-                         const std::string& new_content_id);
+                         const std::string& new_content_id) override;
 
   // The extension associated with the action we're displaying.
   scoped_refptr<const extensions::Extension> extension_;
