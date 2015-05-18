@@ -412,12 +412,12 @@ void ExtensionActionViewController::OnSidebarShown(content::WebContents* tab,
 void ExtensionActionViewController::OnSidebarHidden(content::WebContents* tab,
                                                     const std::string& content_id) {
   if (view_delegate_->GetCurrentWebContents() == tab &&
-    content_id == GetId()) {
+      content_id == GetId()) {
     view_delegate_->OnPopupClosed();
     active_in_webcontents_.erase(active_in_webcontents_.find(
-                                 view_delegate_->GetCurrentWebContents()));
+        view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0)
-        SidebarManager::GetInstance()->RemoveObserver(this);
+      SidebarManager::GetInstance()->RemoveObserver(this);
   }
 }
 
@@ -425,15 +425,18 @@ void ExtensionActionViewController::OnSidebarSwitched(content::WebContents* old_
                                                       const std::string& old_content_id,
                                                       content::WebContents* new_tab,
                                                       const std::string& new_content_id) {
-	if (browser_->tab_strip_model()->GetIndexOfWebContents(
-			new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
-	    return;
+  if (browser_->tab_strip_model()->GetIndexOfWebContents(
+          new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
+    return;
 
-    if (view_delegate_->GetCurrentWebContents() == new_tab &&
-        new_content_id == GetId())
-        // Without the popup corner arrow indicator, marking the browserAction icon
-        // is necessary for extension attribution
-        view_delegate_->OnPopupShown(true);
-    else
-        view_delegate_->OnPopupClosed();
+  if (view_delegate_->GetCurrentWebContents() == new_tab &&
+      new_content_id == GetId())
+    // Without the popup corner arrow indicator, marking the browserAction icon
+    // is necessary for extension attribution
+    view_delegate_->OnPopupShown(true);
+  else
+    view_delegate_->OnPopupClosed();
+
+  if (old_tab == new_tab && old_content_id == GetId())
+    OnSidebarHidden(old_tab, old_content_id);
 }
