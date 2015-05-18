@@ -36,9 +36,6 @@ class SidebarManager : public content::NotificationObserver,
   // Returns s singleton instance.
   static SidebarManager* GetInstance();
 
-  // Returns true if sidebar is allowed to be displayed in the browser.
-  static bool IsSidebarAllowed();
-
   SidebarManager();
 
   // Returns SidebarContainer registered for |tab| and active or NULL if
