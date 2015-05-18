@@ -38,6 +38,8 @@ class ExtensionViewHost
                     content::SiteInstance* site_instance,
                     const GURL& url,
                     ViewType host_type);
+  ExtensionViewHost(content::WebContents* tab,
+                    const std::string& extension_id);
   ~ExtensionViewHost() override;
 
   ExtensionView* view() { return view_.get(); }
