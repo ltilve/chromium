@@ -4776,9 +4776,6 @@ Even if you have downloaded files from this website before, the website might ha
       <message name="IDS_EXTENSION_LOAD_ICON_FOR_BROWSER_ACTION_FAILED" desc="">
         Could not load icon '<ph name="ICON">$1<ex>icon.png</ex></ph>' for browser action.
       </message>
-      <message name="IDS_EXTENSION_LOAD_SIDEBAR_PAGE_FAILED" desc="">
-         Could not load sidebar page '<ph name="SIDEBAR_PAGE">$1<ex>page.html</ex></ph>'.
-      </message>
 
       <!-- Extension installed bubble -->
       <message name="IDS_EXTENSION_BUNDLE_INSTALLED_HEADING_EXTENSIONS" desc="First line in the content area of the extension bundle installed bubble. Instructs which extensions were installed.">
@@ -7661,9 +7658,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
           Voice Search
         </message>
       </if>
-      <message name="IDS_ACCNAME_SIDE_BAR" desc="The accessible name for the side bar.">
-         Sidebar
-      </message>
 
       <!-- Browser Hung Plugin Detector -->
       <if expr="is_win">
