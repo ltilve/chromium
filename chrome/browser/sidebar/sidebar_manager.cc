@@ -124,11 +124,13 @@ void SidebarManager::NotifyStateChanges(
 
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
-                                 const std::string& content_id) {
+                                 const std::string& content_id,
+                                 Browser* browser) {
   DCHECK(!content_id.empty());
   SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
   if (!host) {
     host = new SidebarContainer(tab, content_id, this);
+    host->CreateView(browser);
     RegisterSidebarContainerFor(tab, host);
   }
 

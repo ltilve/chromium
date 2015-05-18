@@ -19,7 +19,7 @@
 SidebarContainer::SidebarContainer(content::WebContents* tab,
                                    const std::string& content_id,
                                    Delegate* delegate)
-    : ExtensionHost(tab, content_id),
+    : ExtensionViewHost(tab, content_id),
       tab_(tab),
       delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {

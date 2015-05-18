@@ -10,8 +10,8 @@
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
+#include "chrome/browser/extensions/extension_view_host.h"
 #include "content/public/browser/web_contents_delegate.h"
-#include "extensions/browser/extension_host.h"
 
 namespace content {
 class WebContents;
@@ -27,7 +27,7 @@ class Extension;
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer : public extensions::ExtensionHost {
+class SidebarContainer : public extensions::ExtensionViewHost {
  public:
   // Interface to implement to listen for sidebar update notification.
   class Delegate {
