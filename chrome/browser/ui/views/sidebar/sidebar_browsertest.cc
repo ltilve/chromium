@@ -65,7 +65,7 @@ class SidebarTest : public ExtensionBrowserTest {
     SidebarManager* sidebar_manager = SidebarManager::GetInstance();
     SidebarContainer* sidebar_container =
         sidebar_manager->GetSidebarContainerFor(tab, content_id_);
-    WebContents* client_contents = sidebar_container->sidebar_contents();
+    WebContents* client_contents = sidebar_container->host_contents();
 
     content::WindowedNotificationObserver observer(
         content::NOTIFICATION_LOAD_STOP,
@@ -78,7 +78,7 @@ class SidebarTest : public ExtensionBrowserTest {
   void ShowSidebar(WebContents* temp) {
     WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager = SidebarManager::GetInstance();
-    sidebar_manager->ShowSidebar(tab, content_id_);
+    sidebar_manager->ShowSidebar(tab, content_id_, browser());
   }
 
   void HideSidebar(WebContents* temp) {
