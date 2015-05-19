@@ -2174,8 +2174,8 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   sidebar_web_view_->SetWebContents(sidebar_contents);
 
-  SidebarManager::GetInstance()->
-      NotifyStateChanges(old_contents, sidebar_contents);
+  SidebarManager::GetInstance()->NotifyStateChanges(old_contents,
+                                                    sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {

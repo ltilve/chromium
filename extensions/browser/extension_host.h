@@ -52,8 +52,7 @@ class ExtensionHost : public DeferredStartRenderHost,
   ExtensionHost(const Extension* extension,
                 content::SiteInstance* site_instance,
                 const GURL& url, ViewType host_type);
-  ExtensionHost(content::WebContents* tab,
-                const std::string& extension_id);
+  ExtensionHost(content::WebContents* tab, const std::string& extension_id);
   ~ExtensionHost() override;
 
   const Extension* extension() const { return extension_; }

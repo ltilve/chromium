@@ -64,12 +64,12 @@ ExtensionActionViewController::ExtensionActionViewController(
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
 
-  SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  SidebarManager* sidebar_manager = SidebarManager::GetInstance();
   sidebar_manager->RemoveObserver(this);
-  for (std::set<content::WebContents*>::iterator it = active_in_webcontents_.begin();
-       it != active_in_webcontents_.end();
-       ++it)
-      sidebar_manager->HideSidebar(*it, GetId());
+  for (std::set<content::WebContents*>::iterator it =
+           active_in_webcontents_.begin();
+       it != active_in_webcontents_.end(); ++it)
+    sidebar_manager->HideSidebar(*it, GetId());
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
@@ -331,9 +331,11 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
   if (use_sidebar) {
     SidebarManager* sidebar_manager = SidebarManager::GetInstance();
-    content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
+    content::WebContents* web_contents =
+        view_delegate_->GetCurrentWebContents();
 
-    if (active_in_webcontents_.find(web_contents) != active_in_webcontents_.end()) {
+    if (active_in_webcontents_.find(web_contents) !=
+        active_in_webcontents_.end()) {
       sidebar_manager->HideSidebar(web_contents, GetId());
       return false;
     }
@@ -400,31 +402,32 @@ void ExtensionActionViewController::OnPopupClosed() {
   view_delegate_->OnPopupClosed();
 }
 
-void ExtensionActionViewController::OnSidebarShown(content::WebContents* tab,
-                                                   const std::string& content_id) {
-  if (view_delegate_->GetCurrentWebContents() == tab &&
-    content_id == GetId())
+void ExtensionActionViewController::OnSidebarShown(
+    content::WebContents* tab,
+    const std::string& content_id) {
+  if (view_delegate_->GetCurrentWebContents() == tab && content_id == GetId())
     // Without the popup corner arrow indicator, marking the browserAction icon
     // is necessary for extension attribution
     view_delegate_->OnPopupShown(true);
 }
 
-void ExtensionActionViewController::OnSidebarHidden(content::WebContents* tab,
-                                                    const std::string& content_id) {
-  if (view_delegate_->GetCurrentWebContents() == tab &&
-      content_id == GetId()) {
+void ExtensionActionViewController::OnSidebarHidden(
+    content::WebContents* tab,
+    const std::string& content_id) {
+  if (view_delegate_->GetCurrentWebContents() == tab && content_id == GetId()) {
     view_delegate_->OnPopupClosed();
-    active_in_webcontents_.erase(active_in_webcontents_.find(
-        view_delegate_->GetCurrentWebContents()));
+    active_in_webcontents_.erase(
+        active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0)
       SidebarManager::GetInstance()->RemoveObserver(this);
   }
 }
 
-void ExtensionActionViewController::OnSidebarSwitched(content::WebContents* old_tab,
-                                                      const std::string& old_content_id,
-                                                      content::WebContents* new_tab,
-                                                      const std::string& new_content_id) {
+void ExtensionActionViewController::OnSidebarSwitched(
+    content::WebContents* old_tab,
+    const std::string& old_content_id,
+    content::WebContents* new_tab,
+    const std::string& new_content_id) {
   if (browser_->tab_strip_model()->GetIndexOfWebContents(
           new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
     return;

@@ -84,7 +84,6 @@ content::WebContents* SidebarManager::GetSidebarTabContents(
   return sidebar_host->host_contents();
 }
 
-
 void SidebarManager::NotifyStateChanges(
     content::WebContents* was_active_sidebar_contents,
     content::WebContents* active_sidebar_contents) {
@@ -92,30 +91,27 @@ void SidebarManager::NotifyStateChanges(
     return;
 
   SidebarContainer* was_active_host =
-      was_active_sidebar_contents == NULL ? NULL :
-          FindSidebarContainerFor(was_active_sidebar_contents);
+      was_active_sidebar_contents == NULL
+          ? NULL
+          : FindSidebarContainerFor(was_active_sidebar_contents);
   SidebarContainer* active_host =
-      active_sidebar_contents == NULL ? NULL :
-          FindSidebarContainerFor(active_sidebar_contents);
+      active_sidebar_contents == NULL
+          ? NULL
+          : FindSidebarContainerFor(active_sidebar_contents);
 
   content::WebContents* old_tab =
-      was_active_host == NULL ? NULL :
-          was_active_host->web_contents();
+      was_active_host == NULL ? NULL : was_active_host->web_contents();
   content::WebContents* new_tab =
-      active_host == NULL ? NULL :
-          active_host->web_contents();
+      active_host == NULL ? NULL : active_host->web_contents();
   const std::string& old_content_id =
-      was_active_host == NULL ? "" :
-          was_active_host->extension_id();
+      was_active_host == NULL ? "" : was_active_host->extension_id();
   const std::string& new_content_id =
-      active_host == NULL ? "" :
-          active_host->extension_id();
+      active_host == NULL ? "" : active_host->extension_id();
 
-  FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarSwitched(old_tab, old_content_id,
-                                      new_tab, new_content_id));
+  FOR_EACH_OBSERVER(
+      SidebarManagerObserver, observer_list_,
+      OnSidebarSwitched(old_tab, old_content_id, new_tab, new_content_id));
 }
-
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
                                  const std::string& content_id,

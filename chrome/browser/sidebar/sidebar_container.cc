@@ -65,4 +65,3 @@ void SidebarContainer::CloseContents(content::WebContents* source) {
   // Invoke through SidebarManager, as we need to send a notification
   SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
 }
-

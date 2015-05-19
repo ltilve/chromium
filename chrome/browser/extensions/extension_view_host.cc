@@ -67,11 +67,9 @@ ExtensionViewHost::ExtensionViewHost(
          host_type == VIEW_TYPE_EXTENSION_SIDEBAR);
 }
 
-ExtensionViewHost::ExtensionViewHost(
-    content::WebContents *tab,
-    const std::string& extension_id)
-    : ExtensionHost(tab, extension_id),
-      associated_web_contents_(NULL) {
+ExtensionViewHost::ExtensionViewHost(content::WebContents* tab,
+                                     const std::string& extension_id)
+    : ExtensionHost(tab, extension_id), associated_web_contents_(NULL) {
 }
 
 ExtensionViewHost::~ExtensionViewHost() {

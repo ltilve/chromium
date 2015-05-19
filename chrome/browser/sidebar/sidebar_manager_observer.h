@@ -22,4 +22,4 @@ class SidebarManagerObserver {
                                  const std::string& new_content_id) {}
 };
 
-#endif // CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_OBSERVER_H_
+#endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_OBSERVER_H_

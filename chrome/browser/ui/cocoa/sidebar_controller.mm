@@ -97,8 +97,8 @@ const int kMinWebWidth = 50;
   [self showSidebarContents:sidebarContents];
 
   // Notify extensions.
-  SidebarManager::GetInstance()->NotifyStateChanges(
-      oldSidebarContents, sidebarContents);
+  SidebarManager::GetInstance()->NotifyStateChanges(oldSidebarContents,
+                                                    sidebarContents);
 }
 
 - (void)ensureContentsVisible {

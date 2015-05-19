@@ -57,7 +57,9 @@ class SidebarManager : public content::NotificationObserver,
 
   // Shows sidebar identified by |tab| and |content_id| (only sidebar's
   // mini tab is visible).
-  void ShowSidebar(content::WebContents* tab, const std::string& content_id, Browser* browser);
+  void ShowSidebar(content::WebContents* tab,
+                   const std::string& content_id,
+                   Browser* browser);
 
   // Expands sidebar identified by |tab| and |content_id|.
   void ExpandSidebar(content::WebContents* tab, const std::string& content_id);
