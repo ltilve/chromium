@@ -19,10 +19,6 @@ namespace {
 const CGFloat kDefaultSidebarWidthRatio = 1.0f / 7.0f;
 const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
-// Never make the web part of the tab contents smaller than this (needed if the
-// window is only a few pixels wide).
-const int kMinWebWidth = 50;
-
 }  // end namespace
 
 @interface SidebarController (Private)
@@ -134,11 +130,6 @@ const int kMinWebWidth = 50;
       sidebarWidth = NSWidth([[subviews objectAtIndex:1] frame]);
     }
 
-    // Make sure |sidebarWidth| isn't too large or too small.
-    sidebarWidth =
-        std::min(sidebarWidth, NSWidth([splitView_ frame]) - kMinWebWidth);
-    DCHECK_GE(sidebarWidth, 0) << "kMinWebWidth needs to be smaller than "
-                               << "smallest available tab contents space.";
     sidebarWidth = std::max(static_cast<CGFloat>(0), sidebarWidth);
 
     [self resizeSidebarToNewWidth:sidebarWidth];
@@ -177,8 +168,8 @@ const int kMinWebWidth = 50;
 /* NSSplitViewDelegate Support
  *
  * Sidebar behavior:
- * - initial sidebar is the greater of kMinWebWidth and
- *   kDefaultSidebarWidthRatio * width of the split-view's frame
+ * - initial sidebar is kDefaultSidebarWidthRatio * width
+ *   of the split-view's frame
  * - sidebar width is not allowed to be greater than 50% of width of the
  *   the split-view's frame
  *
