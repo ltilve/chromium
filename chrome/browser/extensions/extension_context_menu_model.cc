@@ -308,6 +308,7 @@ void ExtensionContextMenuModel::InitMenu(const Extension* extension,
           ->WantsToRun(extension)) {
     AddItemWithStringId(ALWAYS_RUN, IDS_EXTENSIONS_ALWAYS_RUN);
   }
+
   if (!is_component_ || extensions::OptionsPageInfo::HasOptionsPage(extension))
     AddItemWithStringId(CONFIGURE, IDS_EXTENSIONS_OPTIONS_MENU_ITEM);
 

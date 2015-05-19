@@ -1,4 +1,4 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
+// Copyright (c) 2015 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -51,7 +51,6 @@ void SidebarContainer::Collapse() {
 }
 
 void SidebarContainer::Navigate(const GURL& url) {
-  // TODO(alekseys): add a progress UI.
   navigate_to_default_page_on_expand_ = false;
   LoadURL(url);
 }

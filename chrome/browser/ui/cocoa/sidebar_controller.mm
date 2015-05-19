@@ -1,4 +1,4 @@
-// Copyright (c) 2010 The Chromium Authors. All rights reserved.
+// Copyright (c) 2015 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -160,10 +160,6 @@ const int kMinWebWidth = 50;
 - (void)resizeSidebarToNewWidth:(CGFloat)width {
   NSArray* subviews = [splitView_ subviews];
 
-  // It seems as if |-setPosition:ofDividerAtIndex:| should do what's needed,
-  // but I can't figure out how to use it. Manually resize web and sidebar.
-  // TODO(alekseys): either make setPosition:ofDividerAtIndex: work or to add a
-  // category on NSSplitView to handle manual resizing.
   NSView* sidebarView = [subviews objectAtIndex:1];
   NSRect sidebarFrame = [sidebarView frame];
   sidebarFrame.size.width = width;

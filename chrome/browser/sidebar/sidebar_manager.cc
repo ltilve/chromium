@@ -1,4 +1,4 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
+// Copyright (c) 2015 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -37,9 +37,8 @@ SidebarManager::SidebarManager() {
 SidebarContainer* SidebarManager::GetActiveSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarHostMap::iterator it = tab_to_sidebar_host_.find(tab);
-  if (it == tab_to_sidebar_host_.end()) {
+  if (it == tab_to_sidebar_host_.end())
     return NULL;
-  }
   if (it->second.active_content_id.empty())
     return NULL;
   ContentIdToSidebarHostMap::iterator host_it =
@@ -64,9 +63,8 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
     const std::string& content_id) {
   DCHECK(!content_id.empty());
   TabToSidebarHostMap::iterator it = tab_to_sidebar_host_.find(tab);
-  if (it == tab_to_sidebar_host_.end()) {
+  if (it == tab_to_sidebar_host_.end())
     return NULL;
-  }
   ContentIdToSidebarHostMap::iterator host_it =
       it->second.content_id_to_sidebar_host.find(content_id);
   if (host_it == it->second.content_id_to_sidebar_host.end())
