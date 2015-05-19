@@ -183,19 +183,10 @@ const int kMinWebWidth = 50;
  * Sidebar behavior:
  * - initial sidebar is the greater of kMinWebWidth and
  *   kDefaultSidebarWidthRatio * width of the split-view's frame
- * - sidebar width is not allowed to be smaller than kMinWebWidth
  * - sidebar width is not allowed to be greater than 50% of width of the
  *   the split-view's frame
  *
  */
-
-- (BOOL)splitView:(NSSplitView*)splitView
-    shouldAdjustSizeOfSubview:(NSView*)subview {
-  if ([[splitView_ subviews] indexOfObject:subview] == 1) {
-    return NSWidth([subview bounds]) > kMinWebWidth;
-  }
-  return YES;
-}
 
 - (BOOL)splitView:(NSSplitView*)splitView
     shouldHideDividerAtIndex:(NSInteger)dividerIndex {
@@ -223,7 +214,7 @@ const int kMinWebWidth = 50;
     constrainMaxCoordinate:(CGFloat)proposedMaximumPosition
                ofSubviewAt:(NSInteger)dividerIndex {
   return std::min(proposedMaximumPosition,
-                  NSWidth([splitView_ frame]) - kMinWebWidth);
+                  NSWidth([splitView_ frame]) - [splitView_ dividerThickness]);
 }
 
 @end
