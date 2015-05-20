@@ -40,6 +40,7 @@ void SidebarContainer::SidebarClosing() {
 }
 
 void SidebarContainer::Show() {
+  host_->CreateRenderViewSoon();
   delegate_->UpdateSidebar(this);
 }
 
