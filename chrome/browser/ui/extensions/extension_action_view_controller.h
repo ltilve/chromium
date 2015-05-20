@@ -137,10 +137,9 @@ class ExtensionActionViewController
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
 
-  // Handles sidebar events
-  void OnSidebarShown(content::WebContents* tab,
-                      const std::string& content_id) override;
+  void OnPopupShown(bool grant_tab_permissions);
 
+  // Handles sidebar events
   void OnSidebarHidden(content::WebContents* tab,
                        const std::string& content_id) override;
 

@@ -402,13 +402,9 @@ void ExtensionActionViewController::OnPopupClosed() {
   view_delegate_->OnPopupClosed();
 }
 
-void ExtensionActionViewController::OnSidebarShown(
-    content::WebContents* tab,
-    const std::string& content_id) {
-  if (view_delegate_->GetCurrentWebContents() == tab && content_id == GetId())
-    // Without the popup corner arrow indicator, marking the browserAction icon
-    // is necessary for extension attribution
-    view_delegate_->OnPopupShown(true);
+void ExtensionActionViewController::OnPopupShown(
+    bool grant_tab_permissions) {
+  view_delegate_->OnPopupShown(grant_tab_permissions);
 }
 
 void ExtensionActionViewController::OnSidebarHidden(
@@ -418,8 +414,15 @@ void ExtensionActionViewController::OnSidebarHidden(
     view_delegate_->OnPopupClosed();
     active_in_webcontents_.erase(
         active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
-    if (active_in_webcontents_.size() == 0)
+    if (active_in_webcontents_.size() == 0) {
       SidebarManager::GetInstance()->RemoveObserver(this);
+      if (toolbar_actions_bar_) {
+        toolbar_actions_bar_->SetPopupOwner(nullptr);
+        if (toolbar_actions_bar_->popped_out_action() == this &&
+            !view_delegate_->IsMenuRunning())
+          toolbar_actions_bar_->UndoPopOut();
+      }
+    }
   }
 }
 
@@ -432,13 +435,37 @@ void ExtensionActionViewController::OnSidebarSwitched(
           new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
     return;
 
-  if (view_delegate_->GetCurrentWebContents() == new_tab &&
-      new_content_id == GetId())
-    // Without the popup corner arrow indicator, marking the browserAction icon
-    // is necessary for extension attribution
-    view_delegate_->OnPopupShown(true);
-  else
+  if (old_content_id == GetId() &&
+      old_content_id != new_content_id) {
+    if (toolbar_actions_bar_) {
+      toolbar_actions_bar_->SetPopupOwner(nullptr);
+      if (toolbar_actions_bar_->popped_out_action() == this &&
+          !view_delegate_->IsMenuRunning())
+        toolbar_actions_bar_->UndoPopOut();
+    }
     view_delegate_->OnPopupClosed();
+  }
+
+  if (view_delegate_->GetCurrentWebContents() == new_tab &&
+      new_content_id == GetId() &&
+      old_content_id != new_content_id) {
+    if (toolbar_actions_bar_)
+      toolbar_actions_bar_->SetPopupOwner(this);
+    if (toolbar_actions_bar_ &&
+        !toolbar_actions_bar_->IsActionVisible(this) &&
+        extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
+      platform_delegate_->CloseOverflowMenu();
+      toolbar_actions_bar_->PopOutAction(
+          this,
+          base::Bind(&ExtensionActionViewController::OnPopupShown,
+                     weak_factory_.GetWeakPtr(),
+                     true));
+    } else {
+      // Without the popup corner arrow indicator, marking the browserAction icon
+      // is necessary for extension attribution
+      view_delegate_->OnPopupShown(true);
+    }
+  }
 
   if (old_tab == new_tab && old_content_id == GetId())
     OnSidebarHidden(old_tab, old_content_id);
