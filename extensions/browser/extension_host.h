@@ -52,7 +52,6 @@ class ExtensionHost : public DeferredStartRenderHost,
   ExtensionHost(const Extension* extension,
                 content::SiteInstance* site_instance,
                 const GURL& url, ViewType host_type);
-  ExtensionHost(content::WebContents* tab, const std::string& extension_id);
   ~ExtensionHost() override;
 
   const Extension* extension() const { return extension_; }
@@ -162,9 +161,6 @@ class ExtensionHost : public DeferredStartRenderHost,
 
   // Records UMA for load events.
   void RecordStopLoadingUMA();
-
-  // Returns an extension this sidebar belongs to.
-  const extensions::Extension* GetExtension() const;
 
   // Delegate for functionality that cannot exist in the extensions module.
   scoped_ptr<ExtensionHostDelegate> delegate_;

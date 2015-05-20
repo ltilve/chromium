@@ -10,8 +10,10 @@
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
+#include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "content/public/browser/web_contents_delegate.h"
+#include "extensions/browser/extension_host_observer.h"
 
 namespace content {
 class WebContents;
@@ -27,7 +29,7 @@ class Extension;
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer : public extensions::ExtensionViewHost {
+class SidebarContainer : public extensions::ExtensionHostObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
   class Delegate {
@@ -40,15 +42,16 @@ class SidebarContainer : public extensions::ExtensionViewHost {
     DISALLOW_COPY_AND_ASSIGN(Delegate);
   };
 
-  SidebarContainer(content::WebContents* tab,
-                   const std::string& content_id,
-                   Delegate* delegate);
+  SidebarContainer(Browser* browser, content::WebContents* tab,
+                   const GURL& url, Delegate* delegate);
   ~SidebarContainer() override;
 
   // Called right before destroying this sidebar.
   // Does all the necessary cleanup.
   void SidebarClosing();
 
+  // Retruns HostContents sidebar is linked to.
+  content::WebContents* host_contents() const { return host_->host_contents(); }
   // Returns TabContents sidebar is linked to.
   content::WebContents* web_contents() const { return tab_; }
 
@@ -61,15 +64,14 @@ class SidebarContainer : public extensions::ExtensionViewHost {
   // Notifies hosting window that this sidebar was collapsed.
   void Collapse();
 
-  // Navigates sidebar contents to the |url|.
-  void Navigate(const GURL& url);
+  const std::string& extension_id() { return host_->extension_id(); }
 
  private:
-  // Overridden from content::WebContentsDelegate:
-  content::JavaScriptDialogManager* GetJavaScriptDialogManager(
-      content::WebContents* source) override;
 
-  void CloseContents(content::WebContents* contents) override;
+  scoped_ptr<extensions::ExtensionViewHost> host_;
+
+  ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
+      host_observer_;
 
   // Contents of the tab this sidebar is linked to.
   content::WebContents* tab_;

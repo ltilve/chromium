@@ -59,6 +59,7 @@ class SidebarManager : public content::NotificationObserver,
   // mini tab is visible).
   void ShowSidebar(content::WebContents* tab,
                    const std::string& content_id,
+                   const GURL& url,
                    Browser* browser);
 
   // Expands sidebar identified by |tab| and |content_id|.
@@ -73,11 +74,6 @@ class SidebarManager : public content::NotificationObserver,
   // Hides sidebar identified by |tab| and |content_id| (removes sidebar's
   // mini tab).
   void HideSidebar(content::WebContents* tab, const std::string& content_id);
-
-  // Navigates sidebar identified by |tab| and |content_id| to |url|.
-  void NavigateSidebar(content::WebContents* tab,
-                       const std::string& content_id,
-                       const GURL& url);
 
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);

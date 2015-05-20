@@ -343,8 +343,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     active_in_webcontents_.insert(web_contents);
     sidebar_manager->AddObserver(this);
 
-    sidebar_manager->ShowSidebar(web_contents, GetId(), browser_);
-    sidebar_manager->NavigateSidebar(web_contents, GetId(), popup_url);
+    sidebar_manager->ShowSidebar(web_contents, GetId(), popup_url, browser_);
     return true;
   }
 

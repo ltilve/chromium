@@ -9,11 +9,13 @@
 #include "base/command_line.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
+#include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/sidebar/sidebar_manager_observer.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/browser/web_contents.h"
+#include "extensions/browser/extension_system.h"
 #include "extensions/common/switches.h"
 #include "url/gurl.h"
 
@@ -113,12 +115,11 @@ void SidebarManager::NotifyStateChanges(
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
                                  const std::string& content_id,
-                                 Browser* browser) {
+                                 const GURL& url, Browser* browser) {
   DCHECK(!content_id.empty());
   SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
   if (!host) {
-    host = new SidebarContainer(tab, content_id, this);
-    host->CreateView(browser);
+    host = new SidebarContainer(browser, tab, url, this);
     RegisterSidebarContainerFor(tab, host);
   }
 
@@ -183,17 +184,6 @@ void SidebarManager::HideSidebar(WebContents* tab,
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
                     OnSidebarHidden(tab, content_id));
-}
-
-void SidebarManager::NavigateSidebar(content::WebContents* tab,
-                                     const std::string& content_id,
-                                     const GURL& url) {
-  DCHECK(!content_id.empty());
-  SidebarContainer* host = GetSidebarContainerFor(tab, content_id);
-  if (!host)
-    return;
-
-  host->Navigate(url);
 }
 
 SidebarManager::~SidebarManager() {
