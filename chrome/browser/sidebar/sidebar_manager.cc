@@ -186,6 +186,17 @@ void SidebarManager::HideSidebar(WebContents* tab,
                     OnSidebarHidden(tab, content_id));
 }
 
+void SidebarManager::NavigateSidebar(content::WebContents* tab,
+                                     const std::string& content_id,
+                                     const GURL& url) {
+  DCHECK(!content_id.empty());
+  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
+  if (!container)
+    return;
+
+  container->Navigate(url);
+}
+
 SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_container_.empty());
   DCHECK(sidebar_container_to_tab_.empty());

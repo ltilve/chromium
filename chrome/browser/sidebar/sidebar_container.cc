@@ -52,6 +52,14 @@ void SidebarContainer::Expand() {
   host_contents()->SetInitialFocus();
 }
 
+void SidebarContainer::Navigate(const GURL& url) {
+  navigate_to_default_page_on_expand_ = false;
+
+  host_contents()->GetController().LoadURL(
+      url, content::Referrer(), ui::PAGE_TRANSITION_LINK,
+      std::string());
+}
+
 void SidebarContainer::Collapse() {
   delegate_->UpdateSidebar(this);
 }

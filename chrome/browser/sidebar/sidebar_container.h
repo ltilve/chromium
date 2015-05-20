@@ -52,6 +52,7 @@ class SidebarContainer : public extensions::ExtensionHostObserver {
 
   // Retruns HostContents sidebar is linked to.
   content::WebContents* host_contents() const { return host_->host_contents(); }
+
   // Returns TabContents sidebar is linked to.
   content::WebContents* web_contents() const { return tab_; }
 
@@ -63,6 +64,9 @@ class SidebarContainer : public extensions::ExtensionHostObserver {
 
   // Notifies hosting window that this sidebar was collapsed.
   void Collapse();
+
+  // Navigates sidebar contents to the |url|.
+  void Navigate(const GURL& url);
 
   const std::string& extension_id() { return host_->extension_id(); }
 
