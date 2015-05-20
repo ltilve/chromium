@@ -12,6 +12,8 @@
 #include "base/memory/scoped_ptr.h"
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_view_host.h"
+#include "content/public/browser/notification_observer.h"
+#include "content/public/browser/notification_registrar.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "extensions/browser/extension_host_observer.h"
 
@@ -29,7 +31,8 @@ class Extension;
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer : public extensions::ExtensionHostObserver {
+class SidebarContainer : public extensions::ExtensionHostObserver,
+                         public content::NotificationObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
   class Delegate {
@@ -70,12 +73,19 @@ class SidebarContainer : public extensions::ExtensionHostObserver {
 
   const std::string& extension_id() { return host_->extension_id(); }
 
+  // content::NotificationObserver overrides.
+  void Observe(int type,
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
+
  private:
 
   scoped_ptr<extensions::ExtensionViewHost> host_;
 
   ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
       host_observer_;
+
+  content::NotificationRegistrar registrar_;
 
   // Contents of the tab this sidebar is linked to.
   content::WebContents* tab_;

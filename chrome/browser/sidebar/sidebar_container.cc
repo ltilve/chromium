@@ -5,12 +5,15 @@
 #include "chrome/browser/sidebar/sidebar_container.h"
 
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_manager.h"
 #include "components/app_modal/javascript_dialog_manager.h"
+#include "content/public/browser/notification_details.h"
+#include "content/public/browser/notification_source.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
@@ -30,6 +33,12 @@ SidebarContainer::SidebarContainer(Browser* browser,
       host_contents());
   host_->CreateView(browser);
   host_observer_.Add(host_.get());
+
+  // Listen for the containing view calling window.close();
+  registrar_.Add(
+      this,
+      extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE,
+      content::Source<content::BrowserContext>(host_->browser_context()));
 }
 
 SidebarContainer::~SidebarContainer() {
@@ -62,4 +71,17 @@ void SidebarContainer::Navigate(const GURL& url) {
 
 void SidebarContainer::Collapse() {
   delegate_->UpdateSidebar(this);
+}
+
+void SidebarContainer::Observe(int type,
+                             const content::NotificationSource& source,
+                             const content::NotificationDetails& details) {
+  if (type != extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE) {
+      NOTREACHED() << L"Received unexpected notification";
+      return;
+  }
+
+  // If we aren't the host of the popup, then disregard the notification.
+  if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
+    SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
 }
