@@ -89,7 +89,7 @@ class SidebarManager : public content::NotificationObserver,
                const content::NotificationDetails& details) override;
 
   // Overridden from SidebarContainer::Delegate.
-  void UpdateSidebar(SidebarContainer* host) override;
+  void UpdateSidebar(SidebarContainer* container) override;
 
   // Hides all sidebars registered for |tab|.
   void HideAllSidebars(content::WebContents* tab);
@@ -107,19 +107,19 @@ class SidebarManager : public content::NotificationObserver,
   void UnregisterSidebarContainerFor(content::WebContents* tab,
                                      const std::string& content_id);
 
-  // Records the link between |tab| and |sidebar_host|.
-  void BindSidebarHost(content::WebContents* tab,
-                       SidebarContainer* sidebar_host);
+  // Records the link between |tab| and |container|.
+  void BindSidebarContainer(content::WebContents* tab,
+                       SidebarContainer* container);
 
-  // Forgets the link between |tab| and |sidebar_host|.
-  void UnbindSidebarHost(content::WebContents* tab,
-                         SidebarContainer* sidebar_host);
+  // Forgets the link between |tab| and |container|.
+  void UnbindSidebarContainer(content::WebContents* tab,
+                         SidebarContainer* container);
 
   content::NotificationRegistrar registrar_;
 
   // This map stores sidebars linked to a particular tab. Sidebars are
   // identified by their unique content id (string).
-  typedef std::map<std::string, SidebarContainer*> ContentIdToSidebarHostMap;
+  typedef std::map<std::string, SidebarContainer*> ContentIdToSidebarContainerMap;
 
   // These two maps are for tracking dependencies between tabs and
   // their SidebarContainers.
@@ -128,12 +128,12 @@ class SidebarManager : public content::NotificationObserver,
   // into these maps and removes them when they are closing.
   struct SidebarStateForTab;
   typedef std::map<content::WebContents*, SidebarStateForTab>
-      TabToSidebarHostMap;
-  TabToSidebarHostMap tab_to_sidebar_host_;
+      TabToSidebarContainerMap;
+  TabToSidebarContainerMap tab_to_sidebar_container_;
 
   typedef std::map<SidebarContainer*, content::WebContents*>
-      SidebarHostToTabMap;
-  SidebarHostToTabMap sidebar_host_to_tab_;
+      SidebarContainerToTabMap;
+  SidebarContainerToTabMap sidebar_container_to_tab_;
 
   ObserverList<SidebarManagerObserver> observer_list_;
 
