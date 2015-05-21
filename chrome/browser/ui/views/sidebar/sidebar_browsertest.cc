@@ -48,8 +48,8 @@ class SidebarTest : public ExtensionBrowserTest {
     content_id_ = last_loaded_extension_id();
   }
 
-  void ShowSidebarForCurrentTab() {
-    ShowSidebar(browser()->tab_strip_model()->GetActiveWebContents());
+  void ShowSidebarForCurrentTab(const std::string& test_page) {
+    ShowSidebar(browser()->tab_strip_model()->GetActiveWebContents(), test_page);
   }
 
   void HideSidebarForCurrentTab() {
@@ -75,10 +75,11 @@ class SidebarTest : public ExtensionBrowserTest {
     observer.Wait();
   }
 
-  void ShowSidebar(WebContents* temp) {
+  void ShowSidebar(WebContents* temp, const std::string& test_page) {
     WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager = SidebarManager::GetInstance();
-    sidebar_manager->ShowSidebar(tab, content_id_, browser());
+    GURL url = test_server()->GetURL(test_page);
+    sidebar_manager->ShowSidebar(tab, content_id_, url, browser());
   }
 
   void HideSidebar(WebContents* temp) {
@@ -112,17 +113,17 @@ class SidebarTest : public ExtensionBrowserTest {
 };
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, OpenClose) {
-  ShowSidebarForCurrentTab();
+  ShowSidebarForCurrentTab(kSimplePage);
 
   HideSidebarForCurrentTab();
 
-  ShowSidebarForCurrentTab();
+  ShowSidebarForCurrentTab(kSimplePage);
 
   HideSidebarForCurrentTab();
 }
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
-  ShowSidebarForCurrentTab();
+  ShowSidebarForCurrentTab(kSimplePage);
 
   OpenNewTab();
 
@@ -140,7 +141,7 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
 }
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
-  ShowSidebarForCurrentTab();
+  ShowSidebarForCurrentTab(kSimplePage);
 
   OpenNewTab();
 
@@ -155,7 +156,7 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
   EXPECT_EQ(0, browser_view()->GetSidebarWidth());
 
   // Show sidebar on inactive (second) tab.
-  ShowSidebar(web_contents(1));
+  ShowSidebar(web_contents(1), kSimplePage);
   // Make sure sidebar is not visible yet.
   EXPECT_EQ(0, browser_view()->GetSidebarWidth());
 
@@ -170,7 +171,7 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
 IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarNavigate) {
   ASSERT_TRUE(test_server()->Start());
 
-  ShowSidebarForCurrentTab();
+  ShowSidebarForCurrentTab(kSimplePage);
 
   NavigateSidebarForCurrentTabTo(kSimplePage);
 
