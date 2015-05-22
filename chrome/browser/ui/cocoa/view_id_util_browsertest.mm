@@ -28,6 +28,8 @@ using bookmarks::BookmarkModel;
 using content::OpenURLParams;
 using content::Referrer;
 
+const char kSimplePage[] = "files/sidebar/simple_page.html";
+
 // Basic sanity check of ViewID use on the mac.
 class ViewIDTest : public InProcessBrowserTest {
  public:
@@ -51,10 +53,11 @@ class ViewIDTest : public InProcessBrowserTest {
 
     // Make sure sidebar is created to test VIEW_ID_SIDE_BAR_CONTAINER.
     const char sidebar_content_id[] = "test_content_id";
+    GURL test_page_url = test_server()->GetURL(kSimplePage);
     SidebarManager::GetInstance()->ShowSidebar(
         static_cast<content::WebContents*>(
             browser()->tab_strip_model()->GetActiveWebContents()),
-        sidebar_content_id, browser());
+        sidebar_content_id, test_page_url, browser());
 
     // Make sure docked devtools is created to test VIEW_ID_DEV_TOOLS_DOCKED
     DevToolsWindow* devtools_window =
