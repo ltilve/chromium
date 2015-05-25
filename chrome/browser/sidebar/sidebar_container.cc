@@ -31,7 +31,6 @@ SidebarContainer::SidebarContainer(Browser* browser,
       navigate_to_default_page_on_expand_(true) {
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       host_contents());
-  host_->CreateView(browser);
   host_observer_.Add(host_.get());
 
   // Listen for the containing view calling window.close();
