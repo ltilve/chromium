@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_container.h"
 
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "components/app_modal/javascript_dialog_manager.h"
 #include "content/public/browser/notification_details.h"
 #include "content/public/browser/notification_source.h"
@@ -70,5 +70,6 @@ void SidebarContainer::Observe(int type,
 
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
-    SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
+    extensions::SidebarManager::GetFromContext(
+        host_->browser_context())->HideSidebar(tab_, extension_id());
 }

@@ -8,7 +8,7 @@
 #include "base/mac/scoped_nsobject.h"
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/extensions/extension_keybinding_registry.h"
-#include "chrome/browser/sidebar/sidebar_manager_observer.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"

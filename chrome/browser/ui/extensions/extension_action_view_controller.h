@@ -9,7 +9,7 @@
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_action_icon_factory.h"
 #include "chrome/browser/extensions/extension_context_menu_model.h"
-#include "chrome/browser/sidebar/sidebar_manager_observer.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_controller.h"
 #include "extensions/browser/extension_host_observer.h"
 #include "ui/gfx/image/image.h"

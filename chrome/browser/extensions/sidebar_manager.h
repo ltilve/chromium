@@ -11,7 +11,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/observer_list.h"
 #include "base/strings/string16.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_container.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
 
@@ -20,9 +20,11 @@ class SidebarContainer;
 class SidebarManagerObserver;
 
 namespace content {
+class BrowserContext;
 class WebContents;
 }
 
+namespace extensions {
 ///////////////////////////////////////////////////////////////////////////////
 // SidebarManager
 //
@@ -32,8 +34,8 @@ class WebContents;
 class SidebarManager : public content::NotificationObserver,
                        public base::RefCounted<SidebarManager> {
  public:
-  // Returns s singleton instance.
-  static SidebarManager* GetInstance();
+  // Returns SidebarManager instance registered with BrowserContext.
+  static SidebarManager* GetFromContext(content::BrowserContext* context);
 
   SidebarManager();
 
@@ -140,5 +142,6 @@ class SidebarManager : public content::NotificationObserver,
 
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
 };
+}
 
 #endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_H_

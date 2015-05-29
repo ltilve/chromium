@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/sidebar/sidebar_manager.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 
 #include <vector>
 
@@ -10,17 +10,18 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/extension_service.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
-#include "chrome/browser/sidebar/sidebar_manager_observer.h"
+#include "chrome/browser/extensions/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/common/switches.h"
 #include "url/gurl.h"
 
+using content::BrowserContext;
 using content::WebContents;
 
+namespace extensions {
 struct SidebarManager::SidebarStateForTab {
   // Sidebars linked to this tab.
   ContentIdToSidebarContainerMap content_id_to_sidebar_container;
@@ -28,9 +29,10 @@ struct SidebarManager::SidebarStateForTab {
   std::string active_content_id;
 };
 
+
 // static
-SidebarManager* SidebarManager::GetInstance() {
-  return g_browser_process->sidebar_manager();
+SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
+  return ExtensionSystem::Get(context)->sidebar_manager();
 }
 
 SidebarManager::SidebarManager() {
@@ -305,4 +307,5 @@ void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
 
 void SidebarManager::RemoveObserver(SidebarManagerObserver* observer) {
   observer_list_.RemoveObserver(observer);
+}
 }
