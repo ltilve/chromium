@@ -30,6 +30,7 @@
 #include "chrome/browser/extensions/unpacked_installer.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
+#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/webui/extensions/extension_icon_source.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/chrome_version_info.h"
@@ -556,5 +557,18 @@ void ExtensionSystemImpl::UnregisterExtensionWithRequestContexts(
       FROM_HERE,
       base::Bind(&InfoMap::RemoveExtension, info_map(), extension_id, reason));
 }
+
+SidebarManager* ExtensionSystemImpl::sidebar_manager() {
+   if (!created_sidebar_manager_)
+     CreateSidebarManager();
+   return sidebar_manager_.get();
+}
+
+void ExtensionSystemImpl::CreateSidebarManager() {
+   DCHECK(!created_sidebar_manager_ && sidebar_manager_.get() == NULL);
+   created_sidebar_manager_ = true;
+   // sidebar_manager_ = new SidebarManager();
+}
+
 
 }  // namespace extensions
