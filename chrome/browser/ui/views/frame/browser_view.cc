@@ -468,9 +468,8 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-  registrar_.Add(
-      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(SidebarManager::GetInstance()));
+  SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  sidebar_manager->AddObserver(this);
 }
 
 BrowserView::~BrowserView() {
@@ -670,20 +669,14 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
   return *GetThemeProvider()->GetImageSkiaNamed(IDR_OTR_ICON);
 }
 
-void BrowserView::Observe(int type,
-                          const content::NotificationSource& source,
-                          const content::NotificationDetails& details) {
-  content::WebContents* target =
-      content::Details<SidebarContainer>(details)->web_contents();
-  switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      if (GetActiveWebContents() == target)
-        UpdateSidebarForContents(target);
-      break;
-    default:
-      NOTREACHED();  // we don't ask for anything else!
-      break;
-  }
+void BrowserView::OnSidebarShown(content::WebContents* tab,
+                                 const std::string& content_id) {
+  UpdateSidebarForContents(tab);
+}
+
+void BrowserView::OnSidebarHidden(content::WebContents* tab,
+                                  const std::string& content_id) {
+  UpdateSidebarForContents(tab);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
