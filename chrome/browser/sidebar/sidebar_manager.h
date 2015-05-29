@@ -30,8 +30,7 @@ class WebContents;
 //  maintains a connection between tabs and sidebars.
 //
 class SidebarManager : public content::NotificationObserver,
-                       public base::RefCounted<SidebarManager>,
-                       private SidebarContainer::Delegate {
+                       public base::RefCounted<SidebarManager> {
  public:
   // Returns s singleton instance.
   static SidebarManager* GetInstance();
@@ -92,9 +91,6 @@ class SidebarManager : public content::NotificationObserver,
   void Observe(int type,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
-
-  // Overridden from SidebarContainer::Delegate.
-  void UpdateSidebar(SidebarContainer* container) override;
 
   // Hides all sidebars registered for |tab|.
   void HideAllSidebars(content::WebContents* tab);

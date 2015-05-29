@@ -21,13 +21,11 @@
 
 SidebarContainer::SidebarContainer(Browser* browser,
                                    content::WebContents* tab,
-                                   const GURL& url,
-                                   Delegate* delegate)
+                                   const GURL& url)
     : host_(extensions::ExtensionViewHostFactory::CreateSidebarHost(url,
             browser)),
       host_observer_(this),
       tab_(tab),
-      delegate_(delegate),
       navigate_to_default_page_on_expand_(true) {
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       host_contents());
@@ -44,20 +42,14 @@ SidebarContainer::SidebarContainer(Browser* browser,
 SidebarContainer::~SidebarContainer() {
 }
 
-void SidebarContainer::SidebarClosing() {
-  delegate_->UpdateSidebar(this);
-}
-
 void SidebarContainer::Show() {
   host_->CreateRenderViewSoon();
-  delegate_->UpdateSidebar(this);
 }
 
 void SidebarContainer::Expand() {
   if (navigate_to_default_page_on_expand_)
     navigate_to_default_page_on_expand_ = false;
 
-  delegate_->UpdateSidebar(this);
   host_contents()->SetInitialFocus();
 }
 
@@ -67,10 +59,6 @@ void SidebarContainer::Navigate(const GURL& url) {
   host_contents()->GetController().LoadURL(
       url, content::Referrer(), ui::PAGE_TRANSITION_LINK,
       std::string());
-}
-
-void SidebarContainer::Collapse() {
-  delegate_->UpdateSidebar(this);
 }
 
 void SidebarContainer::Observe(int type,

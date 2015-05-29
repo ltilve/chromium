@@ -119,7 +119,7 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   DCHECK(!content_id.empty());
   SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
   if (!container) {
-    container = new SidebarContainer(browser, tab, url, this);
+    container = new SidebarContainer(browser, tab, url);
     RegisterSidebarContainerFor(tab, container);
   }
 
@@ -164,8 +164,6 @@ void SidebarManager::CollapseSidebar(content::WebContents* tab,
   if (!container)
     return;
   it->second.active_content_id.clear();
-
-  container->Collapse();
 }
 
 void SidebarManager::HideSidebar(WebContents* tab,
@@ -210,13 +208,6 @@ void SidebarManager::Observe(int type,
   } else {
     NOTREACHED() << "Got a notification we didn't register for!";
   }
-}
-
-void SidebarManager::UpdateSidebar(SidebarContainer* container) {
-  content::NotificationService::current()->Notify(
-      chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(this),
-      content::Details<SidebarContainer>(container));
 }
 
 void SidebarManager::HideAllSidebars(WebContents* tab) {
@@ -278,8 +269,6 @@ void SidebarManager::UnregisterSidebarContainerFor(
                       content::Source<WebContents>(tab));
   }
 
-  // Issue tab closing event post unbound.
-  container->SidebarClosing();
   // Destroy sidebar container.
   delete container;
 }
