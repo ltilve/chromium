@@ -12,6 +12,7 @@
 @class NSSplitView;
 @class NSView;
 namespace content {
+class BrowserContext;
 class WebContents;
 }
 
@@ -36,7 +37,8 @@ class WebContents;
 // Depending on |contents|'s state, decides whether the sidebar
 // should be shown or hidden and adjusts its width (|delegate_| handles
 // the actual resize).
-- (void)updateSidebarForTabContents:(content::WebContents*)contents;
+- (void)updateSidebarForTabContents:(content::WebContents*)contents
+                        withContext:(content::BrowserContext*)context;
 
 // Call when the sidebar view is properly sized and the render widget host view
 // should be put into the view hierarchy.

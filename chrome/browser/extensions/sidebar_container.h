@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
-#define CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
+#ifndef CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
+#define CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
 
 #include <string>
 
@@ -35,25 +35,11 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
                          public content::NotificationObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
-  class Delegate {
-   public:
-    Delegate() {}
-    virtual ~Delegate() {}
-    virtual void UpdateSidebar(SidebarContainer* host) = 0;
-
-   private:
-    DISALLOW_COPY_AND_ASSIGN(Delegate);
-  };
 
   SidebarContainer(Browser* browser,
                    content::WebContents* tab,
-                   const GURL& url,
-                   Delegate* delegate);
+                   const GURL& url);
   ~SidebarContainer() override;
-
-  // Called right before destroying this sidebar.
-  // Does all the necessary cleanup.
-  void SidebarClosing();
 
   // Retruns HostContents sidebar is linked to.
   content::WebContents* host_contents() const { return host_->host_contents(); }
@@ -66,9 +52,6 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
 
   // Notifies hosting window that this sidebar was expanded.
   void Expand();
-
-  // Notifies hosting window that this sidebar was collapsed.
-  void Collapse();
 
   // Navigates sidebar contents to the |url|.
   void Navigate(const GURL& url);
@@ -91,9 +74,6 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   // Contents of the tab this sidebar is linked to.
   content::WebContents* tab_;
 
-  // Sidebar update notification listener.
-  Delegate* delegate_;
-
   // On the first expand sidebar will be automatically navigated to the default
   // page (specified in the extension manifest), but only if the extension has
   // not explicitly navigated it yet. This variable is set to false on the first
@@ -103,4 +83,4 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
 
-#endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
+#endif  // CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_

@@ -39,6 +39,7 @@ class OneShotEvent;
 class QuotaService;
 class RuntimeData;
 class SharedUserScriptMaster;
+class SidebarManager;
 class StateStore;
 
 // ExtensionSystem manages the lifetime of many of the services used by the
@@ -115,6 +116,8 @@ class ExtensionSystem : public KeyedService {
   // so it can be retrieved from ExtensionSystem directly.
   virtual scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) = 0;
+
+  virtual SidebarManager* sidebar_manager();
 };
 
 }  // namespace extensions

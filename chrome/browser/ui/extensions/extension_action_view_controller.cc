@@ -13,10 +13,10 @@
 #include "chrome/browser/extensions/extension_view.h"
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
+#include "chrome/browser/extensions/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
@@ -64,7 +64,9 @@ ExtensionActionViewController::ExtensionActionViewController(
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
 
-  SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+
   sidebar_manager->RemoveObserver(this);
   for (std::set<content::WebContents*>::iterator it =
            active_in_webcontents_.begin();
@@ -330,7 +332,9 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     return false;
 
   if (use_sidebar) {
-    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+    extensions::SidebarManager* sidebar_manager =
+        extensions::SidebarManager::GetFromContext(browser_->profile());
+
     content::WebContents* web_contents =
         view_delegate_->GetCurrentWebContents();
 
@@ -413,7 +417,9 @@ void ExtensionActionViewController::OnSidebarHidden(
     active_in_webcontents_.erase(
         active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0) {
-      SidebarManager::GetInstance()->RemoveObserver(this);
+      extensions::SidebarManager::GetFromContext(browser_->profile())
+          ->RemoveObserver(this);
+
       if (toolbar_actions_bar_) {
         toolbar_actions_bar_->SetPopupOwner(nullptr);
         if (toolbar_actions_bar_->popped_out_action() == this &&

@@ -8,8 +8,8 @@
 #include "base/path_service.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_service.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -23,6 +23,7 @@
 
 using content::NavigationController;
 using content::WebContents;
+using extensions::SidebarManager;
 
 namespace {
 
@@ -62,7 +63,9 @@ class SidebarTest : public ExtensionBrowserTest {
     WebContents* tab = static_cast<WebContents*>(
         browser()->tab_strip_model()->GetActiveWebContents());
 
-    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+    SidebarManager* sidebar_manager =
+        SidebarManager::GetFromContext(browser()->profile());
+
     SidebarContainer* sidebar_container =
         sidebar_manager->GetSidebarContainerFor(tab, content_id_);
     WebContents* client_contents = sidebar_container->host_contents();
@@ -77,14 +80,17 @@ class SidebarTest : public ExtensionBrowserTest {
 
   void ShowSidebar(WebContents* temp) {
     WebContents* tab = static_cast<WebContents*>(temp);
-    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+
+    SidebarManager* sidebar_manager =
+        SidebarManager::GetFromContext(browser()->profile());
     GURL url("chrome-extension://" + content_id_ + kSimplePage);
     sidebar_manager->ShowSidebar(tab, content_id_, url, browser());
   }
 
   void HideSidebar(WebContents* temp) {
     WebContents* tab = static_cast<WebContents*>(temp);
-    SidebarManager* sidebar_manager = SidebarManager::GetInstance();
+    SidebarManager* sidebar_manager =
+        SidebarManager::GetFromContext(browser()->profile());
     sidebar_manager->HideSidebar(tab, content_id_);
     if (browser()->tab_strip_model()->GetActiveWebContents() == tab)
       EXPECT_EQ(0, browser_view()->GetSidebarWidth());

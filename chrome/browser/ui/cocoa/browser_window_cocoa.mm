@@ -15,12 +15,12 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/download/download_shelf.h"
+#include "chrome/browser/extensions/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/fullscreen.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/shell_integration.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/browser.h"
@@ -132,9 +132,6 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
     controller_(controller),
     initial_show_state_(ui::SHOW_STATE_DEFAULT),
     attention_request_id_(0) {
-  registrar_.Add(
-      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 
   gfx::Rect bounds;
   chrome::GetSavedWindowBoundsAndShowState(browser_,
@@ -142,6 +139,10 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
                                            &initial_show_state_);
 
   browser_->search_model()->AddObserver(this);
+
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  sidebar_manager->AddObserver(this);
 }
 
 BrowserWindowCocoa::~BrowserWindowCocoa() {
@@ -788,20 +789,6 @@ void BrowserWindowCocoa::ModelChanged(const SearchModel::State& old_state,
                                       const SearchModel::State& new_state) {
 }
 
-void BrowserWindowCocoa::Observe(int type,
-                                 const content::NotificationSource& source,
-                                 const content::NotificationDetails& details) {
-  switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      UpdateSidebarForContents(
-          content::Details<SidebarContainer>(details)->web_contents());
-      break;
-    default:
-      NOTREACHED();  // we don't ask for anything else!
-      break;
-  }
-}
-
 void BrowserWindowCocoa::DestroyBrowser() {
   [controller_ destroyBrowser];
 
@@ -870,4 +857,14 @@ void BrowserWindowCocoa::HideDownloadShelf() {
   StatusBubble* statusBubble = GetStatusBubble();
   if (statusBubble)
     statusBubble->Hide();
+}
+
+void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
+                                        const std::string& content_id) {
+  UpdateSidebarForContents(tab);
+}
+
+void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
+                                         const std::string& content_id) {
+  UpdateSidebarForContents(tab);
 }

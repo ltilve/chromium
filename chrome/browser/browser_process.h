@@ -36,7 +36,6 @@ class Profile;
 class ProfileManager;
 class PromoResourceService;
 class SafeBrowsingService;
-class SidebarManager;
 class StatusTray;
 class WatchDogThread;
 #if defined(ENABLE_WEBRTC)
@@ -121,7 +120,6 @@ class BrowserProcess {
   virtual rappor::RapporService* rappor_service() = 0;
   virtual ProfileManager* profile_manager() = 0;
   virtual PrefService* local_state() = 0;
-  virtual SidebarManager* sidebar_manager() = 0;
   virtual net::URLRequestContextGetter* system_request_context() = 0;
   virtual chrome_variations::VariationsService* variations_service() = 0;
   virtual PromoResourceService* promo_resource_service() = 0;

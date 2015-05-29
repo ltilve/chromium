@@ -21,6 +21,8 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/extension_util.h"
+#include "chrome/browser/extensions/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/infobars/infobar_service.h"
 #include "chrome/browser/native_window_notification_source.h"
@@ -34,8 +36,6 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
-#include "chrome/browser/sidebar/sidebar_manager.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/themes/theme_service_factory.h"
@@ -468,9 +468,6 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-  registrar_.Add(
-      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 }
 
 BrowserView::~BrowserView() {
@@ -527,6 +524,10 @@ void BrowserView::Init(Browser* browser) {
   browser_->tab_strip_model()->AddObserver(this);
   immersive_mode_controller_.reset(
       chrome::CreateImmersiveModeController(browser_->host_desktop_type()));
+
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  sidebar_manager->AddObserver(this);
 }
 
 // static
@@ -670,20 +671,14 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
   return *GetThemeProvider()->GetImageSkiaNamed(IDR_OTR_ICON);
 }
 
-void BrowserView::Observe(int type,
-                          const content::NotificationSource& source,
-                          const content::NotificationDetails& details) {
-  content::WebContents* target =
-      content::Details<SidebarContainer>(details)->web_contents();
-  switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      if (GetActiveWebContents() == target)
-        UpdateSidebarForContents(target);
-      break;
-    default:
-      NOTREACHED();  // we don't ask for anything else!
-      break;
-  }
+void BrowserView::OnSidebarShown(content::WebContents* tab,
+                                 const std::string& content_id) {
+  UpdateSidebarForContents(tab);
+}
+
+void BrowserView::OnSidebarHidden(content::WebContents* tab,
+                                  const std::string& content_id) {
+  UpdateSidebarForContents(tab);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2151,14 +2146,15 @@ void BrowserView::InitViews() {
 void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
-  if (!SidebarManager::GetInstance())
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  if (!sidebar_manager)
     return;  // Happens only in tests.s
 
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host =
-        SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
-            new_contents);
+        sidebar_manager->GetActiveSidebarContainerFor(new_contents);
     if (client_host)
       sidebar_contents = client_host->host_contents();
   }
@@ -2174,8 +2170,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   sidebar_web_view_->SetWebContents(sidebar_contents);
 
-  SidebarManager::GetInstance()->NotifyStateChanges(old_contents,
-                                                    sidebar_contents);
+  sidebar_manager->NotifyStateChanges(old_contents, sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {

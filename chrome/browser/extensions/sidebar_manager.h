@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_H_
-#define CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_H_
+#ifndef CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_
+#define CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_
 
 #include <map>
 #include <string>
@@ -11,7 +11,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/observer_list.h"
 #include "base/strings/string16.h"
-#include "chrome/browser/sidebar/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_container.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
 
@@ -20,9 +20,11 @@ class SidebarContainer;
 class SidebarManagerObserver;
 
 namespace content {
+class BrowserContext;
 class WebContents;
 }
 
+namespace extensions {
 ///////////////////////////////////////////////////////////////////////////////
 // SidebarManager
 //
@@ -30,11 +32,10 @@ class WebContents;
 //  maintains a connection between tabs and sidebars.
 //
 class SidebarManager : public content::NotificationObserver,
-                       public base::RefCounted<SidebarManager>,
-                       private SidebarContainer::Delegate {
+                       public base::RefCounted<SidebarManager> {
  public:
-  // Returns s singleton instance.
-  static SidebarManager* GetInstance();
+  // Returns SidebarManager instance registered with BrowserContext.
+  static SidebarManager* GetFromContext(content::BrowserContext* context);
 
   SidebarManager();
 
@@ -93,9 +94,6 @@ class SidebarManager : public content::NotificationObserver,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
 
-  // Overridden from SidebarContainer::Delegate.
-  void UpdateSidebar(SidebarContainer* container) override;
-
   // Hides all sidebars registered for |tab|.
   void HideAllSidebars(content::WebContents* tab);
 
@@ -146,4 +144,6 @@ class SidebarManager : public content::NotificationObserver,
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
 };
 
-#endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_H_
+} // namespace extensions
+
+#endif  // CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_

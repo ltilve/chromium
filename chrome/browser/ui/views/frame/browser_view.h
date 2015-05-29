@@ -14,6 +14,7 @@
 #include "base/timer/timer.h"
 #include "build/build_config.h"
 #include "chrome/browser/devtools/devtools_window.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -85,7 +86,6 @@ class BrowserView : public BrowserWindow,
                     public TabStripModelObserver,
                     public ui::AcceleratorProvider,
                     public views::WidgetDelegate,
-                    public content::NotificationObserver,
                     public views::WidgetObserver,
                     public views::ClientView,
                     public InfoBarContainerDelegate,
@@ -93,6 +93,7 @@ class BrowserView : public BrowserWindow,
                     public OmniboxPopupModelObserver,
                     public views::SingleSplitViewListener,
                     public ExclusiveAccessContext,
+                    public SidebarManagerObserver,
                     public ExclusiveAccessBubbleViewsContext {
  public:
   // The browser view's class name.
@@ -122,9 +123,6 @@ class BrowserView : public BrowserWindow,
   Browser* browser() { return browser_.get(); }
   const Browser* browser() const { return browser_.get(); }
 
-  void Observe(int type,
-               const content::NotificationSource& source,
-               const content::NotificationDetails& details) override;
   // Initializes (or re-initializes) the status bubble.  We try to only create
   // the bubble once and re-use it for the life of the browser, but certain
   // events (such as changing enabling/disabling Aero on Win) can force a need
@@ -458,6 +456,12 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetContentsWebViewForTest() { return contents_web_view_; }
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
+  // Handle SidebarManager events
+  void OnSidebarShown(content::WebContents* tab,
+                      const std::string& content_id) override;
+  void OnSidebarHidden(content::WebContents* tab,
+                       const std::string& content_id) override;
+
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate
   // interface to keep these two classes decoupled and testable.
@@ -639,7 +643,6 @@ class BrowserView : public BrowserWindow,
 
   // The view that contains the selected WebContents.
   ContentsWebView* contents_web_view_;
-  content::NotificationRegistrar registrar_;
 
   // The view that contains devtools window for the selected WebContents.
   views::WebView* devtools_web_view_;
