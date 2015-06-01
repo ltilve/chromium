@@ -67,15 +67,15 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
 - (void)updateSidebarForTabContents:(content::WebContents*)contents {
   // Get the active sidebar content.
-  if (SidebarManager::GetInstance() == NULL)  // Happens in tests.
+  if (extensions::SidebarManager::GetInstance() == NULL)  // Happens in tests.
     return;
 
   content::WebContents* sidebarContents = NULL;
   if (contents) {
     SidebarContainer* activeSidebar =
-        SidebarManager::GetInstance()->GetActiveSidebarContainerFor(contents);
+        extensions::SidebarManager::GetInstance()->GetActiveSidebarContainerFor(contents);
     if (!activeSidebar)
-      activeSidebar = SidebarManager::GetInstance()->MigrateSidebarTo(contents);
+      activeSidebar = extensions::SidebarManager::GetInstance()->MigrateSidebarTo(contents);
     if (activeSidebar)
       sidebarContents = activeSidebar->host_contents();
   }
@@ -93,7 +93,7 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
   [self showSidebarContents:sidebarContents];
 
   // Notify extensions.
-  SidebarManager::GetInstance()->NotifyStateChanges(oldSidebarContents,
+  extensions::SidebarManager::GetInstance()->NotifyStateChanges(oldSidebarContents,
                                                     sidebarContents);
 }
 

@@ -43,8 +43,6 @@ class MockExtensionSystem : public ExtensionSystem {
   scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) override;
 
-  SidebarManager* sidebar_manager() { return NULL; }
-
  private:
   content::BrowserContext* browser_context_;
   OneShotEvent ready_;
