@@ -132,9 +132,6 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
     controller_(controller),
     initial_show_state_(ui::SHOW_STATE_DEFAULT),
     attention_request_id_(0) {
-  registrar_.Add(
-      this, chrome::NOTIFICATION_SIDEBAR_CHANGED,
-      content::Source<SidebarManager>(SidebarManager::GetInstance()));
 
   gfx::Rect bounds;
   chrome::GetSavedWindowBoundsAndShowState(browser_,
@@ -142,6 +139,9 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
                                            &initial_show_state_);
 
   browser_->search_model()->AddObserver(this);
+
+  SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  sidebar_manager->AddObserver(this);
 }
 
 BrowserWindowCocoa::~BrowserWindowCocoa() {
@@ -788,20 +788,6 @@ void BrowserWindowCocoa::ModelChanged(const SearchModel::State& old_state,
                                       const SearchModel::State& new_state) {
 }
 
-void BrowserWindowCocoa::Observe(int type,
-                                 const content::NotificationSource& source,
-                                 const content::NotificationDetails& details) {
-  switch (type) {
-    case chrome::NOTIFICATION_SIDEBAR_CHANGED:
-      UpdateSidebarForContents(
-          content::Details<SidebarContainer>(details)->web_contents());
-      break;
-    default:
-      NOTREACHED();  // we don't ask for anything else!
-      break;
-  }
-}
-
 void BrowserWindowCocoa::DestroyBrowser() {
   [controller_ destroyBrowser];
 
@@ -870,4 +856,14 @@ void BrowserWindowCocoa::HideDownloadShelf() {
   StatusBubble* statusBubble = GetStatusBubble();
   if (statusBubble)
     statusBubble->Hide();
+}
+
+void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
+                                 const std::string& content_id) {
+  UpdateSidebarForContents(tab);
+}
+
+void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
+                                  const std::string& content_id) {
+  UpdateSidebarForContents(tab);
 }

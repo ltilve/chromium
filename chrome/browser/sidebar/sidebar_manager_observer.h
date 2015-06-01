@@ -5,6 +5,10 @@
 #ifndef CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_OBSERVER_H_
 #define CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_OBSERVER_H_
 
+namespace content {
+class WebContents;
+};
+
 class SidebarManagerObserver {
  public:
   // Called when sidebar is shown
