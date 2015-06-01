@@ -30,12 +30,6 @@ struct SidebarManager::SidebarStateForTab {
 };
 
 
-// static
-SidebarManager* SidebarManager::GetInstance() {
-//  return g_browser_process->sidebar_manager(); */
-  return NULL;
-}
-
 SidebarManager::SidebarManager() {
 }
 

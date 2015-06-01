@@ -33,8 +33,6 @@ namespace extensions {
 class SidebarManager : public content::NotificationObserver,
                        public base::RefCounted<SidebarManager> {
  public:
-  // Returns s singleton instance.
-  static SidebarManager* GetInstance();
 
   SidebarManager();
 
