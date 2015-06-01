@@ -118,6 +118,7 @@
 #include "content/public/browser/user_metrics.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
+#include "extensions/browser/extension_system.h"
 #include "grit/theme_resources.h"
 #include "ui/accessibility/ax_view_state.h"
 #include "ui/base/accelerators/accelerator.h"
@@ -468,7 +469,7 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-  extensions::SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  extensions::SidebarManager *sidebar_manager = extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
   sidebar_manager->AddObserver(this);
 }
 
@@ -2144,13 +2145,16 @@ void BrowserView::InitViews() {
 void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
-  if (!extensions::SidebarManager::GetInstance())
+  extensions::ExtensionSystem* extension_system =
+      extensions::ExtensionSystem::Get(browser_->profile());
+  extensions::SidebarManager* sidebar_manager = extension_system->sidebar_manager();
+  if (!sidebar_manager)
     return;  // Happens only in tests.s
 
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host =
-        extensions::SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
+        sidebar_manager->GetActiveSidebarContainerFor(
             new_contents);
     if (client_host)
       sidebar_contents = client_host->host_contents();
@@ -2167,8 +2171,8 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   sidebar_web_view_->SetWebContents(sidebar_contents);
 
-  extensions::SidebarManager::GetInstance()->NotifyStateChanges(old_contents,
-                                                    sidebar_contents);
+  sidebar_manager->NotifyStateChanges(old_contents,
+                                      sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {
