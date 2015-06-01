@@ -117,7 +117,7 @@ class ExtensionSystem : public KeyedService {
   virtual scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) = 0;
 
-  virtual SidebarManager* sidebar_manager() = 0;
+  virtual SidebarManager* sidebar_manager() { return 0; };
 
 };
 

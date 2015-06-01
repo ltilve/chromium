@@ -23,6 +23,7 @@
 
 using content::NavigationController;
 using content::WebContents;
+using extensions::SidebarManager;
 
 namespace {
 

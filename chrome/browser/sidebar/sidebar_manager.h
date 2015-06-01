@@ -23,6 +23,7 @@ namespace content {
 class WebContents;
 }
 
+namespace extensions {
 ///////////////////////////////////////////////////////////////////////////////
 // SidebarManager
 //
@@ -140,5 +141,6 @@ class SidebarManager : public content::NotificationObserver,
 
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
 };
+}
 
 #endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_MANAGER_H_

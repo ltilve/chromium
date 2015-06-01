@@ -468,7 +468,7 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-  SidebarManager *sidebar_manager = SidebarManager::GetInstance();
+  extensions::SidebarManager *sidebar_manager = SidebarManager::GetInstance();
   sidebar_manager->AddObserver(this);
 }
 
@@ -2144,13 +2144,13 @@ void BrowserView::InitViews() {
 void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
-  if (!SidebarManager::GetInstance())
+  if (!extensions::SidebarManager::GetInstance())
     return;  // Happens only in tests.s
 
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host =
-        SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
+        extensions::SidebarManager::GetInstance()->GetActiveSidebarContainerFor(
             new_contents);
     if (client_host)
       sidebar_contents = client_host->host_contents();
@@ -2167,7 +2167,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   sidebar_web_view_->SetWebContents(sidebar_contents);
 
-  SidebarManager::GetInstance()->NotifyStateChanges(old_contents,
+  extensions::SidebarManager::GetInstance()->NotifyStateChanges(old_contents,
                                                     sidebar_contents);
 
   // Update sidebar UI width.

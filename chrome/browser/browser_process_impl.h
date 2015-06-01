@@ -91,7 +91,7 @@ class BrowserProcessImpl : public BrowserProcess,
   BrowserProcessPlatformPart* platform_part() override;
   extensions::EventRouterForwarder* extension_event_router_forwarder() override;
   NotificationUIManager* notification_ui_manager() override;
-  SidebarManager* sidebar_manager() override;
+  extensions::SidebarManager* sidebar_manager() override;
   message_center::MessageCenter* message_center() override;
   policy::BrowserPolicyConnector* browser_policy_connector() override;
   policy::PolicyService* policy_service() override;
@@ -209,7 +209,7 @@ class BrowserProcessImpl : public BrowserProcess,
   scoped_ptr<RemoteDebuggingServer> remote_debugging_server_;
 #endif
   bool created_sidebar_manager_;
-  scoped_refptr<SidebarManager> sidebar_manager_;
+  scoped_refptr<extensions::SidebarManager> sidebar_manager_;
 
 #if defined(ENABLE_PRINT_PREVIEW)
   scoped_refptr<printing::PrintPreviewDialogController>

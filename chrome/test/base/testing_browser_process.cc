@@ -189,7 +189,7 @@ GLStringManager* TestingBrowserProcess::gl_string_manager() {
   return nullptr;
 }
 
-SidebarManager* TestingBrowserProcess::sidebar_manager() {
+extensions::SidebarManager* TestingBrowserProcess::sidebar_manager() {
   return NULL;
 }
 

@@ -569,7 +569,7 @@ PrefService* BrowserProcessImpl::local_state() {
   return local_state_.get();
 }
 
-SidebarManager* BrowserProcessImpl::sidebar_manager() {
+extensions::SidebarManager* BrowserProcessImpl::sidebar_manager() {
   DCHECK(CalledOnValidThread());
   if (!created_sidebar_manager_)
     CreateSidebarManager();
@@ -1087,7 +1087,7 @@ void BrowserProcessImpl::CreateIconManager() {
 void BrowserProcessImpl::CreateSidebarManager() {
   DCHECK(!created_sidebar_manager_ && sidebar_manager_.get() == NULL);
   created_sidebar_manager_ = true;
-  sidebar_manager_ = new SidebarManager();
+  sidebar_manager_ = new extensions::SidebarManager();
 }
 
 void BrowserProcessImpl::CreateIntranetRedirectDetector() {

@@ -71,5 +71,5 @@ void SidebarContainer::Observe(int type,
 
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
-    SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
+    extensions::SidebarManager::GetInstance()->HideSidebar(tab_, extension_id());
 }

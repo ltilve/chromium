@@ -21,6 +21,7 @@
 
 using content::WebContents;
 
+namespace extensions {
 struct SidebarManager::SidebarStateForTab {
   // Sidebars linked to this tab.
   ContentIdToSidebarContainerMap content_id_to_sidebar_container;
@@ -28,9 +29,10 @@ struct SidebarManager::SidebarStateForTab {
   std::string active_content_id;
 };
 
+
 // static
 SidebarManager* SidebarManager::GetInstance() {
-/*  return g_browser_process->sidebar_manager(); */
+//  return g_browser_process->sidebar_manager(); */
   return NULL;
 }
 
@@ -306,4 +308,5 @@ void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
 
 void SidebarManager::RemoveObserver(SidebarManagerObserver* observer) {
   observer_list_.RemoveObserver(observer);
+}
 }
