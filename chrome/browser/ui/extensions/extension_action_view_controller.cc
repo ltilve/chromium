@@ -66,7 +66,10 @@ ExtensionActionViewController::ExtensionActionViewController(
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
 
-  extensions::SidebarManager* sidebar_manager = extensions::SidebarManager::GetInstance();
+  // extensions::SidebarManager* sidebar_manager = extensions::SidebarManager::GetInstance();
+  extensions::SidebarManager* sidebar_manager =
+      extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
+
   sidebar_manager->RemoveObserver(this);
   for (std::set<content::WebContents*>::iterator it =
            active_in_webcontents_.begin();
@@ -334,10 +337,8 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (use_sidebar) {
 
     // extensions::SidebarManager* sidebar_manager = extensions::SidebarManager::GetInstance();
-    extensions::ExtensionSystem* extension_system
-        = extensions::ExtensionSystem::Get(browser_->profile());
-
-    extensions::SidebarManager* sidebar_manager = extension_system->sidebar_manager();
+    extensions::SidebarManager* sidebar_manager =
+    		extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
 
     content::WebContents* web_contents =
         view_delegate_->GetCurrentWebContents();
@@ -422,7 +423,9 @@ void ExtensionActionViewController::OnSidebarHidden(
     active_in_webcontents_.erase(
         active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0) {
-      extensions::SidebarManager::GetInstance()->RemoveObserver(this);
+      // extensions::SidebarManager::GetInstance()->RemoveObserver(this);
+      extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager()->RemoveObserver(this);
+
       if (toolbar_actions_bar_) {
         toolbar_actions_bar_->SetPopupOwner(nullptr);
         if (toolbar_actions_bar_->popped_out_action() == this &&
