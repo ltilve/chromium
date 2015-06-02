@@ -31,9 +31,11 @@ struct SidebarManager::SidebarStateForTab {
 
 
 // static
-SidebarManager* SidebarManager::GetInstance() {
-//  return g_browser_process->sidebar_manager(); */
-  return NULL;
+SidebarManager* SidebarManager::GetInstanceFromProfile(Profile* profile) {
+  SidebarManager* sidebar_manager =
+      ExtensionSystem::Get(profile)->sidebar_manager();
+  DCHECK(sidebar_manager);
+  return sidebar_manager;
 }
 
 SidebarManager::SidebarManager() {
