@@ -549,7 +549,8 @@ using content::WebContents;
 }
 
 - (void)updateSidebarForContents:(content::WebContents*)contents {
-  [sidebarController_ updateSidebarForTabContents:contents];
+  [sidebarController_ updateSidebarForTabContents:contents
+                                      withProfile:browser_->profile()];
   [sidebarController_ ensureContentsVisible];
 }
 
@@ -1674,7 +1675,8 @@ using content::WebContents;
   windowShim_->UpdateTitleBar();
 
   [sidebarController_
-      updateSidebarForTabContents:static_cast<content::WebContents*>(contents)];
+      updateSidebarForTabContents:static_cast<content::WebContents*>(contents)
+                      withProfile:browser_->profile()];
   // Update the bookmark bar.
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?

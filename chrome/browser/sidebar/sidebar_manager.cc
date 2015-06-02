@@ -30,6 +30,14 @@ struct SidebarManager::SidebarStateForTab {
 };
 
 
+// static
+SidebarManager* SidebarManager::GetInstanceFromProfile(Profile* profile) {
+  SidebarManager* sidebar_manager =
+      ExtensionSystem::Get(profile)->sidebar_manager();
+  DCHECK(sidebar_manager);
+  return sidebar_manager;
+}
+
 SidebarManager::SidebarManager() {
 }
 
