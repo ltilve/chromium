@@ -141,7 +141,7 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
   browser_->search_model()->AddObserver(this);
 
   extensions::SidebarManager *sidebar_manager =
-    extensions::SidebarManager::GetInstanceFromProfile(browser_->profile());
+    extensions::SidebarManager::GetFromContext(browser_->profile());
   sidebar_manager->AddObserver(this);
 }
 

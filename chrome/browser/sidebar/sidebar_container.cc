@@ -17,7 +17,6 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
-#include "extensions/browser/extension_system.h"
 #include "url/gurl.h"
 
 SidebarContainer::SidebarContainer(Browser* browser,
@@ -72,5 +71,6 @@ void SidebarContainer::Observe(int type,
 
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
-    extensions::ExtensionSystem::Get(host_->browser_context())->sidebar_manager()->HideSidebar(tab_, extension_id());
+    extensions::SidebarManager::GetFromContext(
+        host_->browser_context())->HideSidebar(tab_, extension_id());
 }

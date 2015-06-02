@@ -28,7 +28,6 @@
 #include "chrome/common/pref_names.h"
 #include "extensions/browser/extension_host.h"
 #include "extensions/browser/extension_registry.h"
-#include "extensions/browser/extension_system.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/feature_switch.h"
 #include "extensions/common/manifest_constants.h"
@@ -66,9 +65,8 @@ ExtensionActionViewController::ExtensionActionViewController(
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
 
-  // extensions::SidebarManager* sidebar_manager = extensions::SidebarManager::GetInstance();
   extensions::SidebarManager* sidebar_manager =
-      extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
+      extensions::SidebarManager::GetFromContext(browser_->profile());
 
   sidebar_manager->RemoveObserver(this);
   for (std::set<content::WebContents*>::iterator it =
@@ -335,10 +333,8 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     return false;
 
   if (use_sidebar) {
-
-    // extensions::SidebarManager* sidebar_manager = extensions::SidebarManager::GetInstance();
     extensions::SidebarManager* sidebar_manager =
-    		extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
+        extensions::SidebarManager::GetFromContext(browser_->profile());
 
     content::WebContents* web_contents =
         view_delegate_->GetCurrentWebContents();
@@ -423,8 +419,8 @@ void ExtensionActionViewController::OnSidebarHidden(
     active_in_webcontents_.erase(
         active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0) {
-      // extensions::SidebarManager::GetInstance()->RemoveObserver(this);
-      extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager()->RemoveObserver(this);
+      extensions::SidebarManager::GetFromContext(
+          browser_->profile())->RemoveObserver(this);
 
       if (toolbar_actions_bar_) {
         toolbar_actions_bar_->SetPopupOwner(nullptr);

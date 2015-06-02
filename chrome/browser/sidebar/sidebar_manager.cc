@@ -10,7 +10,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/extension_service.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sidebar/sidebar_container.h"
 #include "chrome/browser/sidebar/sidebar_manager_observer.h"
 #include "content/public/browser/notification_service.h"
@@ -19,6 +18,7 @@
 #include "extensions/common/switches.h"
 #include "url/gurl.h"
 
+using content::BrowserContext;
 using content::WebContents;
 
 namespace extensions {
@@ -31,11 +31,8 @@ struct SidebarManager::SidebarStateForTab {
 
 
 // static
-SidebarManager* SidebarManager::GetInstanceFromProfile(Profile* profile) {
-  SidebarManager* sidebar_manager =
-      ExtensionSystem::Get(profile)->sidebar_manager();
-  DCHECK(sidebar_manager);
-  return sidebar_manager;
+SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
+  return ExtensionSystem::Get(context)->sidebar_manager();
 }
 
 SidebarManager::SidebarManager() {

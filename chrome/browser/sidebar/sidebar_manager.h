@@ -16,11 +16,11 @@
 #include "content/public/browser/notification_registrar.h"
 
 class GURL;
-class Profile;
 class SidebarContainer;
 class SidebarManagerObserver;
 
 namespace content {
+class BrowserContext;
 class WebContents;
 }
 
@@ -34,8 +34,8 @@ namespace extensions {
 class SidebarManager : public content::NotificationObserver,
                        public base::RefCounted<SidebarManager> {
  public:
-  // Returns s singleton instance.
-  static SidebarManager* GetInstanceFromProfile(Profile* profile);
+  // Returns SidebarManager instance registered with BrowserContext.
+  static SidebarManager* GetFromContext(content::BrowserContext* context);
 
   SidebarManager();
 

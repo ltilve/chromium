@@ -118,7 +118,6 @@
 #include "content/public/browser/user_metrics.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
-#include "extensions/browser/extension_system.h"
 #include "grit/theme_resources.h"
 #include "ui/accessibility/ax_view_state.h"
 #include "ui/base/accelerators/accelerator.h"
@@ -469,7 +468,8 @@ BrowserView::BrowserView()
 #endif
       force_location_bar_focus_(false),
       activate_modal_dialog_factory_(this) {
-  extensions::SidebarManager *sidebar_manager = extensions::ExtensionSystem::Get(browser_->profile())->sidebar_manager();
+  extensions::SidebarManager *sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
   sidebar_manager->AddObserver(this);
 }
 
@@ -2145,9 +2145,8 @@ void BrowserView::InitViews() {
 void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
-  extensions::ExtensionSystem* extension_system =
-      extensions::ExtensionSystem::Get(browser_->profile());
-  extensions::SidebarManager* sidebar_manager = extension_system->sidebar_manager();
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
   if (!sidebar_manager)
     return;  // Happens only in tests.s
 

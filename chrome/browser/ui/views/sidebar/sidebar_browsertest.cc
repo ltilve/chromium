@@ -63,7 +63,7 @@ class SidebarTest : public ExtensionBrowserTest {
     WebContents* tab = static_cast<WebContents*>(
         browser()->tab_strip_model()->GetActiveWebContents());
 
-    SidebarManager* sidebar_manager = extensions::ExtensionSystem::Get(browser()->profile())->sidebar_manager();
+    SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
 
     SidebarContainer* sidebar_container =
         sidebar_manager->GetSidebarContainerFor(tab, content_id_);
@@ -79,14 +79,14 @@ class SidebarTest : public ExtensionBrowserTest {
 
   void ShowSidebar(WebContents* temp, const std::string& test_page) {
     WebContents* tab = static_cast<WebContents*>(temp);
-    SidebarManager* sidebar_manager = extensions::ExtensionSystem::Get(browser()->profile())->sidebar_manager();
+    SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
     GURL url = test_server()->GetURL(test_page);
     sidebar_manager->ShowSidebar(tab, content_id_, url, browser());
   }
 
   void HideSidebar(WebContents* temp) {
     WebContents* tab = static_cast<WebContents*>(temp);
-    SidebarManager* sidebar_manager = extensions::ExtensionSystem::Get(browser()->profile())->sidebar_manager();
+    SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
     sidebar_manager->HideSidebar(tab, content_id_);
     if (browser()->tab_strip_model()->GetActiveWebContents() == tab)
       EXPECT_EQ(0, browser_view()->GetSidebarWidth());

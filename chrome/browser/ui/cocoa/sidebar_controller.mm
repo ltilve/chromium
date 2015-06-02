@@ -66,10 +66,10 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 }
 
 - (void)updateSidebarForTabContents:(content::WebContents*)contents
-                        withProfile:(Profile*)profile {
+                        withContext:(content::BrowserContext*)context {
   // Get the active sidebar content.
   extensions::SidebarManager* sidebarManager =
-     extensions::SidebarManager::GetInstanceFromProfile(profile);
+     extensions::SidebarManager::GetFromContext(context);
 
   if (sidebarManager == NULL)  // Happens in tests.
     return;

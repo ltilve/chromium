@@ -55,7 +55,7 @@ class ViewIDTest : public InProcessBrowserTest {
     const char sidebar_content_id[] = "test_content_id";
     GURL test_page_url = test_server()->GetURL(kSimplePage);
     extensions::SidebarManager* sidebar_manager =
-        extensions::SidebarManager::GetInstanceFromProfile(browser()->profile());
+        extensions::SidebarManager::GetFromContext(browser()->profile());
 
     sidebar_manager->ShowSidebar(static_cast<content::WebContents*>(
             browser()->tab_strip_model()->GetActiveWebContents()),
