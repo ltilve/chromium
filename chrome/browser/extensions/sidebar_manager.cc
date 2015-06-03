@@ -29,7 +29,6 @@ struct SidebarManager::SidebarStateForTab {
   std::string active_content_id;
 };
 
-
 // static
 SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
   return ExtensionSystem::Get(context)->sidebar_manager();

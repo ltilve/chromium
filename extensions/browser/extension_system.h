@@ -118,7 +118,6 @@ class ExtensionSystem : public KeyedService {
       const Extension* extension) = 0;
 
   virtual SidebarManager* sidebar_manager();
-
 };
 
 }  // namespace extensions

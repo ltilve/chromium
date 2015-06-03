@@ -457,10 +457,10 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
   // Handle SidebarManager events
-   void OnSidebarShown(content::WebContents* tab,
+  void OnSidebarShown(content::WebContents* tab,
+                      const std::string& content_id) override;
+  void OnSidebarHidden(content::WebContents* tab,
                        const std::string& content_id) override;
-   void OnSidebarHidden(content::WebContents* tab,
-                        const std::string& content_id) override;
 
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate

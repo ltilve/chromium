@@ -559,15 +559,14 @@ void ExtensionSystemImpl::UnregisterExtensionWithRequestContexts(
 }
 
 SidebarManager* ExtensionSystemImpl::sidebar_manager() {
-   if (!sidebar_manager_)
-     CreateSidebarManager();
-   return sidebar_manager_.get();
+  if (!sidebar_manager_)
+    CreateSidebarManager();
+  return sidebar_manager_.get();
 }
 
 void ExtensionSystemImpl::CreateSidebarManager() {
-   DCHECK(sidebar_manager_.get() == NULL);
-   sidebar_manager_ = new SidebarManager();
+  DCHECK(sidebar_manager_.get() == NULL);
+  sidebar_manager_ = new SidebarManager();
 }
-
 
 }  // namespace extensions

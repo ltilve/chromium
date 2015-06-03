@@ -62,7 +62,6 @@ class ExtensionSystemImpl : public ExtensionSystem {
   SidebarManager* sidebar_manager() override;
   void CreateSidebarManager();
 
-
  private:
   friend class ExtensionSystemSharedFactory;
 

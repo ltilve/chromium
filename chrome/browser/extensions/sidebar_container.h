@@ -36,7 +36,8 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
  public:
   // Interface to implement to listen for sidebar update notification.
 
-  SidebarContainer(Browser* browser, content::WebContents* tab,
+  SidebarContainer(Browser* browser,
+                   content::WebContents* tab,
                    const GURL& url);
   ~SidebarContainer() override;
 

@@ -140,8 +140,8 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
 
   browser_->search_model()->AddObserver(this);
 
-  extensions::SidebarManager *sidebar_manager =
-    extensions::SidebarManager::GetFromContext(browser_->profile());
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
   sidebar_manager->AddObserver(this);
 }
 
@@ -860,11 +860,11 @@ void BrowserWindowCocoa::HideDownloadShelf() {
 }
 
 void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
-                                 const std::string& content_id) {
+                                        const std::string& content_id) {
   UpdateSidebarForContents(tab);
 }
 
 void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
-                                  const std::string& content_id) {
+                                         const std::string& content_id) {
   UpdateSidebarForContents(tab);
 }

@@ -34,7 +34,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_skia_operations.h"
 
-
 using extensions::ActionInfo;
 using extensions::CommandService;
 
@@ -419,8 +418,8 @@ void ExtensionActionViewController::OnSidebarHidden(
     active_in_webcontents_.erase(
         active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
     if (active_in_webcontents_.size() == 0) {
-      extensions::SidebarManager::GetFromContext(
-          browser_->profile())->RemoveObserver(this);
+      extensions::SidebarManager::GetFromContext(browser_->profile())
+          ->RemoveObserver(this);
 
       if (toolbar_actions_bar_) {
         toolbar_actions_bar_->SetPopupOwner(nullptr);

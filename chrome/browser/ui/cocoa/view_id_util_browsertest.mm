@@ -57,9 +57,10 @@ class ViewIDTest : public InProcessBrowserTest {
     extensions::SidebarManager* sidebar_manager =
         extensions::SidebarManager::GetFromContext(browser()->profile());
 
-    sidebar_manager->ShowSidebar(static_cast<content::WebContents*>(
+    sidebar_manager->ShowSidebar(
+        static_cast<content::WebContents*>(
             browser()->tab_strip_model()->GetActiveWebContents()),
-            sidebar_content_id, test_page_url, browser());
+        sidebar_content_id, test_page_url, browser());
 
     // Make sure docked devtools is created to test VIEW_ID_DEV_TOOLS_DOCKED
     DevToolsWindow* devtools_window =

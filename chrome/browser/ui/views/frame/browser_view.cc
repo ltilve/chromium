@@ -525,7 +525,7 @@ void BrowserView::Init(Browser* browser) {
   immersive_mode_controller_.reset(
       chrome::CreateImmersiveModeController(browser_->host_desktop_type()));
 
-  extensions::SidebarManager *sidebar_manager =
+  extensions::SidebarManager* sidebar_manager =
       extensions::SidebarManager::GetFromContext(browser_->profile());
   sidebar_manager->AddObserver(this);
 }
@@ -2156,8 +2156,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host =
-        sidebar_manager->GetActiveSidebarContainerFor(
-            new_contents);
+        sidebar_manager->GetActiveSidebarContainerFor(new_contents);
     if (client_host)
       sidebar_contents = client_host->host_contents();
   }
@@ -2173,8 +2172,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
 
   sidebar_web_view_->SetWebContents(sidebar_contents);
 
-  sidebar_manager->NotifyStateChanges(old_contents,
-                                      sidebar_contents);
+  sidebar_manager->NotifyStateChanges(old_contents, sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {

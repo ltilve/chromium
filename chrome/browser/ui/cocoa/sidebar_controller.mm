@@ -69,7 +69,7 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
                         withContext:(content::BrowserContext*)context {
   // Get the active sidebar content.
   extensions::SidebarManager* sidebarManager =
-     extensions::SidebarManager::GetFromContext(context);
+      extensions::SidebarManager::GetFromContext(context);
 
   if (sidebarManager == NULL)  // Happens in tests.
     return;
