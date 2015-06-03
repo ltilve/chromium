@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
-#define CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
+#ifndef CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
+#define CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
 
 #include <string>
 
@@ -84,4 +84,4 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
 
-#endif  // CHROME_BROWSER_SIDEBAR_SIDEBAR_CONTAINER_H_
+#endif  // CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_

@@ -307,4 +307,5 @@ void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
 void SidebarManager::RemoveObserver(SidebarManagerObserver* observer) {
   observer_list_.RemoveObserver(observer);
 }
-}
+
+} // namespace extensions
