@@ -100,7 +100,7 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
   if (!container) {
     container = new SidebarContainer(browser, tab, url);
-    RegisterSidebarContainerFor(tab, container);
+    BindSidebarContainer(tab, container);
   }
 
   container->Show();
@@ -202,30 +202,13 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
   return NULL;
 }
 
-void SidebarManager::RegisterSidebarContainerFor(
-    WebContents* tab,
-    SidebarContainer* container) {
-  DCHECK(!GetSidebarContainerFor(tab, container->extension_id()));
-
-  // If it's a first sidebar for this tab, register destroy notification.
-  if (tab_to_sidebar_container_.find(tab) == tab_to_sidebar_container_.end()) {
-    registrar_.Add(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
-                   content::Source<WebContents>(tab));
-  }
-
-  BindSidebarContainer(tab, container);
-}
-
 void SidebarManager::BindSidebarContainer(WebContents* tab,
-                                     SidebarContainer* container) {
-  const std::string& content_id = container->extension_id();
+                                          SidebarContainer* container) {
 
-  DCHECK(GetSidebarContainerFor(tab, content_id) == NULL);
-  DCHECK(sidebar_container_to_tab_.find(container) == sidebar_container_to_tab_.end());
-
-  tab_to_sidebar_container_[tab].content_id_to_sidebar_container[content_id] =
-      container;
+  tab_to_sidebar_container_[tab] = container;
   sidebar_container_to_tab_[container] = tab;
+  registrar_.Add(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
+                 content::Source<WebContents>(tab));
 }
 
 void SidebarManager::UnbindSidebarContainer(WebContents* tab,

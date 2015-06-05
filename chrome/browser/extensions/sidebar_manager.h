@@ -91,11 +91,6 @@ class SidebarManager : public content::NotificationObserver,
   SidebarContainer* FindSidebarContainerFor(
       content::WebContents* sidebar_contents);
 
-  // Registers new SidebarContainer for |tab|. There must be no
-  // other SidebarContainers registered for the RenderViewHost at the moment.
-  void RegisterSidebarContainerFor(content::WebContents* tab,
-                                   SidebarContainer* container);
-
   // Records the link between |tab| and |container|.
   void BindSidebarContainer(content::WebContents* tab,
                        SidebarContainer* container);
