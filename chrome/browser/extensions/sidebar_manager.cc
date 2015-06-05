@@ -129,23 +129,6 @@ void SidebarManager::ExpandSidebar(content::WebContents* tab,
   container->Expand();
 }
 
-void SidebarManager::CollapseSidebar(content::WebContents* tab,
-                                     const std::string& content_id) {
-  DCHECK(!content_id.empty());
-  TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
-  if (it == tab_to_sidebar_container_.end())
-    return;
-  // If it's not the one active now, bail out.
-  if (it->second.active_content_id != content_id)
-    return;
-
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
-  DCHECK(container);
-  if (!container)
-    return;
-  it->second.active_content_id.clear();
-}
-
 void SidebarManager::HideSidebar(WebContents* tab,
                                  const std::string& content_id) {
   DCHECK(!content_id.empty());
@@ -157,7 +140,6 @@ void SidebarManager::HideSidebar(WebContents* tab,
 
   SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
   DCHECK(container);
-  CollapseSidebar(tab, content_id);
   UnregisterSidebarContainerFor(tab, content_id);
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
