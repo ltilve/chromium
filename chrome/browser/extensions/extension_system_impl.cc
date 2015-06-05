@@ -566,7 +566,8 @@ SidebarManager* ExtensionSystemImpl::sidebar_manager() {
 
 void ExtensionSystemImpl::CreateSidebarManager() {
   DCHECK(sidebar_manager_.get() == NULL);
-  sidebar_manager_ = new SidebarManager();
+  sidebar_manager_.reset(new SidebarManager());
+
 }
 
 }  // namespace extensions

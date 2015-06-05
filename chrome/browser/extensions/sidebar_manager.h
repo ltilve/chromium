@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 
-#include "base/memory/ref_counted.h"
 #include "base/observer_list.h"
 #include "base/strings/string16.h"
 #include "chrome/browser/extensions/sidebar_container.h"
@@ -31,8 +30,8 @@ namespace extensions {
 //  This class is a singleton that manages SidebarContainer instances and
 //  maintains a connection between tabs and sidebars.
 //
-class SidebarManager : public content::NotificationObserver,
-                       public base::RefCounted<SidebarManager> {
+class SidebarManager : public content::NotificationObserver {
+
  public:
   // Returns SidebarManager instance registered with BrowserContext.
   static SidebarManager* GetFromContext(content::BrowserContext* context);
@@ -63,10 +62,9 @@ class SidebarManager : public content::NotificationObserver,
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
 
- private:
-  friend class base::RefCounted<SidebarManager>;
-
   ~SidebarManager() override;
+
+ private:
 
   // Overridden from content::NotificationObserver.
   void Observe(int type,

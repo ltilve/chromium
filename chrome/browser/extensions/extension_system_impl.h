@@ -132,7 +132,7 @@ class ExtensionSystemImpl : public ExtensionSystem {
 
   Shared* shared_;
 
-  scoped_refptr<SidebarManager> sidebar_manager_;
+  scoped_ptr<SidebarManager> sidebar_manager_;
 
   DISALLOW_COPY_AND_ASSIGN(ExtensionSystemImpl);
 };
