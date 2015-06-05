@@ -34,7 +34,7 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
   if (it == tab_to_sidebar_container_.end())
-    return NULL;
+    return nullptr;
   return it->second;
 }
 
@@ -45,22 +45,22 @@ void SidebarManager::NotifyStateChanges(
     return;
 
   SidebarContainer* was_active_container =
-      was_active_sidebar_contents == NULL
-          ? NULL
+      was_active_sidebar_contents == nullptr
+          ? nullptr
           : FindSidebarContainerFor(was_active_sidebar_contents);
   SidebarContainer* active_container =
-      active_sidebar_contents == NULL
-          ? NULL
+      active_sidebar_contents == nullptr
+          ? nullptr
           : FindSidebarContainerFor(active_sidebar_contents);
 
   content::WebContents* old_tab =
-      was_active_container == NULL ? NULL : was_active_container->web_contents();
+      was_active_container == nullptr ? nullptr : was_active_container->web_contents();
   content::WebContents* new_tab =
-      active_container == NULL ? NULL : active_container->web_contents();
+      active_container == nullptr ? nullptr : active_container->web_contents();
   const std::string& old_content_id =
-      was_active_container == NULL ? "" : was_active_container->extension_id();
+      was_active_container == nullptr ? "" : was_active_container->extension_id();
   const std::string& new_content_id =
-      active_container == NULL ? "" : active_container->extension_id();
+      active_container == nullptr ? "" : active_container->extension_id();
 
   FOR_EACH_OBSERVER(
       SidebarManagerObserver, observer_list_,
@@ -127,7 +127,7 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
     if (sidebar_contents == it->first->host_contents())
       return it->first;
   }
-  return NULL;
+  return nullptr;
 }
 
 void SidebarManager::BindSidebarContainer(WebContents* tab,

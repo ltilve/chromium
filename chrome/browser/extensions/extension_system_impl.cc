@@ -565,7 +565,7 @@ SidebarManager* ExtensionSystemImpl::sidebar_manager() {
 }
 
 void ExtensionSystemImpl::CreateSidebarManager() {
-  DCHECK(sidebar_manager_.get() == NULL);
+  DCHECK(sidebar_manager_.get() == nullptr);
   sidebar_manager_.reset(new SidebarManager());
 
 }

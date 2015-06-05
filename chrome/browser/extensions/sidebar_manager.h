@@ -38,7 +38,7 @@ class SidebarManager : public content::NotificationObserver {
 
   SidebarManager();
 
-  // Returns SidebarContainer registered for |tab| or NULL if there is no
+  // Returns SidebarContainer registered for |tab| or nullptr if there is no
   // SidebarContainer registered for |tab|.
   SidebarContainer* GetSidebarContainerFor(content::WebContents* tab);
 

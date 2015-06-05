@@ -1600,7 +1600,7 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     infobar_container_->ChangeInfoBarManager(nullptr);
     UpdateDevToolsForContents(nullptr, true);
   }
-  UpdateSidebarForContents(NULL);
+  UpdateSidebarForContents(nullptr);
 }
 
 void BrowserView::TabDeactivated(WebContents* contents) {
@@ -2153,7 +2153,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   if (!sidebar_manager)
     return;  // Happens only in tests.s
 
-  WebContents* sidebar_contents = NULL;
+  WebContents* sidebar_contents = nullptr;
   if (new_contents) {
     extensions::SidebarContainer* client_host =
         sidebar_manager->GetSidebarContainerFor(new_contents);
@@ -2161,7 +2161,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
       sidebar_contents = client_host->host_contents();
   }
 
-  bool visible = NULL != sidebar_contents;
+  bool visible = nullptr != sidebar_contents;
 
   bool should_show = visible && !sidebar_container_->visible();
   bool should_hide = !visible && sidebar_container_->visible();
