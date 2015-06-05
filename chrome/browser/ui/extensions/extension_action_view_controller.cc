@@ -338,8 +338,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     content::WebContents* web_contents =
         view_delegate_->GetCurrentWebContents();
 
-    if (active_in_webcontents_.find(web_contents) !=
-        active_in_webcontents_.end()) {
+    if (sidebar_manager->GetSidebarContainerFor(web_contents)) {
       sidebar_manager->HideSidebar(web_contents);
       return false;
     }

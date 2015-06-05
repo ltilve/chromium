@@ -70,10 +70,11 @@ void SidebarManager::NotifyStateChanges(
 void SidebarManager::ShowSidebar(content::WebContents* tab,
                                  const GURL& url, Browser* browser) {
   SidebarContainer* container = GetSidebarContainerFor(tab);
-  if (!container) {
-    container = new SidebarContainer(browser, tab, url);
-    BindSidebarContainer(tab, container);
-  }
+  if (container)
+    HideSidebar(tab);
+
+  container = new SidebarContainer(browser, tab, url);
+  BindSidebarContainer(tab, container);
 
   container->Show();
   container->Expand();
