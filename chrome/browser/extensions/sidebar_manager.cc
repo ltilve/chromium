@@ -22,13 +22,6 @@ using content::BrowserContext;
 using content::WebContents;
 
 namespace extensions {
-struct SidebarManager::SidebarStateForTab {
-  // Sidebars linked to this tab.
-  ContentIdToSidebarContainerMap content_id_to_sidebar_container;
-  // Content id of the currently active (expanded and visible) sidebar.
-  std::string active_content_id;
-};
-
 // static
 SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
   return ExtensionSystem::Get(context)->sidebar_manager();
@@ -37,31 +30,12 @@ SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
 SidebarManager::SidebarManager() {
 }
 
-SidebarContainer* SidebarManager::GetActiveSidebarContainerFor(
+SidebarContainer* SidebarManager::GetSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
   if (it == tab_to_sidebar_container_.end())
     return NULL;
-  if (it->second.active_content_id.empty())
-    return NULL;
-  ContentIdToSidebarContainerMap::iterator container_it =
-      it->second.content_id_to_sidebar_container.find(it->second.active_content_id);
-  DCHECK(container_it != it->second.content_id_to_sidebar_container.end());
-  return container_it->second;
-}
-
-SidebarContainer* SidebarManager::GetSidebarContainerFor(
-    WebContents* tab,
-    const std::string& content_id) {
-  DCHECK(!content_id.empty());
-  TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
-  if (it == tab_to_sidebar_container_.end())
-    return NULL;
-  ContentIdToSidebarContainerMap::iterator container_it =
-      it->second.content_id_to_sidebar_container.find(content_id);
-  if (container_it == it->second.content_id_to_sidebar_container.end())
-    return NULL;
-  return container_it->second;
+  return it->second;
 }
 
 void SidebarManager::NotifyStateChanges(
@@ -94,10 +68,8 @@ void SidebarManager::NotifyStateChanges(
 }
 
 void SidebarManager::ShowSidebar(content::WebContents* tab,
-                                 const std::string& content_id,
                                  const GURL& url, Browser* browser) {
-  DCHECK(!content_id.empty());
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
+  SidebarContainer* container = GetSidebarContainerFor(tab);
   if (!container) {
     container = new SidebarContainer(browser, tab, url);
     BindSidebarContainer(tab, container);
@@ -106,31 +78,30 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   container->Show();
   container->Expand();
 
+  const std::string id = container->extension_id();
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarShown(tab, content_id));
+                    OnSidebarShown(tab, id));
 }
 
 void SidebarManager::HideSidebar(WebContents* tab) {
   SidebarContainer* container = GetSidebarContainerFor(tab);
-  DCHECK(container);
-  const std::string content_id = container.extension_id();
+  if (!container)
+    return;
 
-  UnbindSidebarContainerFor(tab, container);
+  const std::string content_id = container->extension_id();
+  UnbindSidebarContainer(tab, container);
   delete container;
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
                     OnSidebarHidden(tab, content_id));
 }
 
-void SidebarManager::NavigateSidebar(content::WebContents* tab,
-                                     const std::string& content_id,
-                                     const GURL& url) {
-  DCHECK(!content_id.empty());
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
+void SidebarManager::NavigateSidebar(content::WebContents* tab) {
+  SidebarContainer* container = GetSidebarContainerFor(tab);
   if (!container)
     return;
 
-  container->Navigate(url);
+  container->Navigate();
 }
 
 SidebarManager::~SidebarManager() {

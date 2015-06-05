@@ -53,8 +53,8 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   // Notifies hosting window that this sidebar was expanded.
   void Expand();
 
-  // Navigates sidebar contents to the |url|.
-  void Navigate(const GURL& url);
+  // Navigates sidebar contents|.
+  void Navigate();
 
   const std::string& extension_id() { return host_->extension_id(); }
 

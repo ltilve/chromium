@@ -66,14 +66,14 @@ class SidebarTest : public ExtensionBrowserTest {
     SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
 
     SidebarContainer* sidebar_container =
-        sidebar_manager->GetSidebarContainerFor(tab, content_id_);
+        sidebar_manager->GetSidebarContainerFor(tab);
     WebContents* client_contents = sidebar_container->host_contents();
 
     content::WindowedNotificationObserver observer(
         content::NOTIFICATION_LOAD_STOP,
         content::Source<NavigationController>(
             &client_contents->GetController()));
-    sidebar_manager->NavigateSidebar(tab, content_id_, url);
+    sidebar_manager->NavigateSidebar(tab);
     observer.Wait();
   }
 
@@ -81,13 +81,13 @@ class SidebarTest : public ExtensionBrowserTest {
     WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
     GURL url("chrome-extension://" + content_id_ + kSimplePage);
-    sidebar_manager->ShowSidebar(tab, content_id_, url, browser());
+    sidebar_manager->ShowSidebar(tab, url, browser());
   }
 
   void HideSidebar(WebContents* temp) {
     WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
-    sidebar_manager->HideSidebar(tab, content_id_);
+    sidebar_manager->HideSidebar(tab);
     if (browser()->tab_strip_model()->GetActiveWebContents() == tab)
       EXPECT_EQ(0, browser_view()->GetSidebarWidth());
   }

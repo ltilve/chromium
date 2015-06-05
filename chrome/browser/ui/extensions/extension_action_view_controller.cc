@@ -71,7 +71,7 @@ ExtensionActionViewController::~ExtensionActionViewController() {
   for (std::set<content::WebContents*>::iterator it =
            active_in_webcontents_.begin();
        it != active_in_webcontents_.end(); ++it)
-    sidebar_manager->HideSidebar(*it, GetId());
+    sidebar_manager->HideSidebar(*it);
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
@@ -340,14 +340,14 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
     if (active_in_webcontents_.find(web_contents) !=
         active_in_webcontents_.end()) {
-      sidebar_manager->HideSidebar(web_contents, GetId());
+      sidebar_manager->HideSidebar(web_contents);
       return false;
     }
 
     active_in_webcontents_.insert(web_contents);
     sidebar_manager->AddObserver(this);
 
-    sidebar_manager->ShowSidebar(web_contents, GetId(), popup_url, browser_);
+    sidebar_manager->ShowSidebar(web_contents, popup_url, browser_);
     return true;
   }
 

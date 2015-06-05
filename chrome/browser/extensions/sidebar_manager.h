@@ -39,23 +39,17 @@ class SidebarManager : public content::NotificationObserver,
 
   SidebarManager();
 
-  // Returns SidebarContainer registered for |tab| and active or NULL if
-  // there is no alive and active SidebarContainer registered for |tab|.
-  SidebarContainer* GetActiveSidebarContainerFor(content::WebContents* tab);
-
-  // Returns SidebarContainer registered for |tab| and |content_id| or NULL if
-  // there is no such SidebarContainer registered.
-  SidebarContainer* GetSidebarContainerFor(content::WebContents* tab,
-                                           const std::string& content_id);
+  // Returns SidebarContainer registered for |tab| or NULL if there is no
+  // SidebarContainer registered for |tab|.
+  SidebarContainer* GetSidebarContainerFor(content::WebContents* tab);
 
   // Sends sidebar state change notification to extensions.
   void NotifyStateChanges(content::WebContents* was_active_sidebar_contents,
                           content::WebContents* active_sidebar_contents);
 
-  // Shows sidebar identified by |tab| and |content_id| (only sidebar's
+  // Shows sidebar identified by |tab| (only sidebar's
   // mini tab is visible).
   void ShowSidebar(content::WebContents* tab,
-                   const std::string& content_id,
                    const GURL& url,
                    Browser* browser);
 
@@ -63,10 +57,8 @@ class SidebarManager : public content::NotificationObserver,
   // mini tab).
   void HideSidebar(content::WebContents* tab);
 
-  // Navigates sidebar identified by |tab| and |content_id| to |url|.
-  void NavigateSidebar(content::WebContents* tab,
-                       const std::string& content_id,
-                       const GURL& url);
+  // Navigates sidebar identified by |tab|.
+  void NavigateSidebar(content::WebContents* tab);
 
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
@@ -104,8 +96,7 @@ class SidebarManager : public content::NotificationObserver,
   //
   // SidebarManager start listening to SidebarContainers when they are put
   // into these maps and removes them when they are closing.
-  struct SidebarStateForTab;
-  typedef std::map<content::WebContents*, SidebarStateForTab>
+  typedef std::map<content::WebContents*, SidebarContainer*>
       TabToSidebarContainerMap;
   TabToSidebarContainerMap tab_to_sidebar_container_;
 

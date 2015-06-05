@@ -2156,7 +2156,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
   WebContents* sidebar_contents = NULL;
   if (new_contents) {
     SidebarContainer* client_host =
-        sidebar_manager->GetActiveSidebarContainerFor(new_contents);
+        sidebar_manager->GetSidebarContainerFor(new_contents);
     if (client_host)
       sidebar_contents = client_host->host_contents();
   }
