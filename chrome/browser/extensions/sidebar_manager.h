@@ -62,9 +62,9 @@ class SidebarManager : public content::NotificationObserver,
   // Expands sidebar identified by |tab| and |content_id|.
   void ExpandSidebar(content::WebContents* tab, const std::string& content_id);
 
-  // Hides sidebar identified by |tab| and |content_id| (removes sidebar's
+  // Hides sidebar identified by |tab| (removes sidebar's
   // mini tab).
-  void HideSidebar(content::WebContents* tab, const std::string& content_id);
+  void HideSidebar(content::WebContents* tab);
 
   // Navigates sidebar identified by |tab| and |content_id| to |url|.
   void NavigateSidebar(content::WebContents* tab,
@@ -83,9 +83,6 @@ class SidebarManager : public content::NotificationObserver,
   void Observe(int type,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
-
-  // Hides all sidebars registered for |tab|.
-  void HideAllSidebars(content::WebContents* tab);
 
   // Returns SidebarContainer corresponding to |sidebar_contents|.
   SidebarContainer* FindSidebarContainerFor(

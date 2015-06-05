@@ -129,17 +129,11 @@ void SidebarManager::ExpandSidebar(content::WebContents* tab,
   container->Expand();
 }
 
-void SidebarManager::HideSidebar(WebContents* tab,
-                                 const std::string& content_id) {
-  DCHECK(!content_id.empty());
-  TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
-  if (it == tab_to_sidebar_container_.end())
-    return;
-  if (it->second.active_content_id == content_id)
-    it->second.active_content_id.clear();
-
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
+void SidebarManager::HideSidebar(WebContents* tab) {
+  SidebarContainer* container = GetSidebarContainerFor(tab);
   DCHECK(container);
+  const std::string content_id = container.extension_id();
+
   UnbindSidebarContainerFor(tab, container);
   delete container;
 
@@ -167,28 +161,9 @@ void SidebarManager::Observe(int type,
                              const content::NotificationSource& source,
                              const content::NotificationDetails& details) {
   if (type == content::NOTIFICATION_WEB_CONTENTS_DESTROYED) {
-    HideAllSidebars(content::Source<WebContents>(source).ptr());
+    HideSidebar(content::Source<WebContents>(source).ptr());
   } else {
     NOTREACHED() << "Got a notification we didn't register for!";
-  }
-}
-
-void SidebarManager::HideAllSidebars(WebContents* tab) {
-  TabToSidebarContainerMap::iterator tab_it = tab_to_sidebar_container_.find(tab);
-  if (tab_it == tab_to_sidebar_container_.end())
-    return;
-  const ContentIdToSidebarContainerMap& containers =
-      tab_it->second.content_id_to_sidebar_container;
-
-  std::vector<std::string> content_ids;
-  for (ContentIdToSidebarContainerMap::const_iterator it = containers.begin();
-       it != containers.end(); ++it) {
-    content_ids.push_back(it->first);
-  }
-
-  for (std::vector<std::string>::iterator it = content_ids.begin();
-       it != content_ids.end(); ++it) {
-    HideSidebar(tab, *it);
   }
 }
 
