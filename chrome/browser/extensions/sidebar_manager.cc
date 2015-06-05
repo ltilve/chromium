@@ -104,29 +104,10 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
   }
 
   container->Show();
-  ExpandSidebar(tab, content_id);
+  container->Expand();
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
                     OnSidebarShown(tab, content_id));
-}
-
-void SidebarManager::ExpandSidebar(content::WebContents* tab,
-                                   const std::string& content_id) {
-  DCHECK(!content_id.empty());
-  TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
-  if (it == tab_to_sidebar_container_.end())
-    return;
-  // If it's already active, bail out.
-  if (it->second.active_content_id == content_id)
-    return;
-
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
-  DCHECK(container);
-  if (!container)
-    return;
-  it->second.active_content_id = content_id;
-
-  container->Expand();
 }
 
 void SidebarManager::HideSidebar(WebContents* tab) {
