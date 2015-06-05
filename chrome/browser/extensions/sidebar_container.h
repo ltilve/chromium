@@ -22,9 +22,6 @@ class WebContents;
 }
 
 namespace extensions {
-class Extension;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // SidebarContainer
 //
@@ -84,4 +81,5 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
 
+} // namespace extensions
 #endif  // CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_

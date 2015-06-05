@@ -19,6 +19,7 @@
 #include "extensions/common/extension_resource.h"
 #include "url/gurl.h"
 
+namespace extensions {
 SidebarContainer::SidebarContainer(Browser* browser,
                                    content::WebContents* tab,
                                    const GURL& url)
@@ -71,3 +72,5 @@ void SidebarContainer::Observe(int type,
     extensions::SidebarManager::GetFromContext(host_->browser_context())
         ->HideSidebar(tab_);
 }
+
+} // namespace extensions

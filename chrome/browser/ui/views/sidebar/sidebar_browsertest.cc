@@ -65,7 +65,7 @@ class SidebarTest : public ExtensionBrowserTest {
 
     SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
 
-    SidebarContainer* sidebar_container =
+    extensions::SidebarContainer* sidebar_container =
         sidebar_manager->GetSidebarContainerFor(tab);
     WebContents* client_contents = sidebar_container->host_contents();
 
