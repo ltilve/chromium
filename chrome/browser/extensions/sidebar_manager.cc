@@ -50,17 +50,6 @@ SidebarContainer* SidebarManager::GetActiveSidebarContainerFor(
   return container_it->second;
 }
 
-SidebarContainer* SidebarManager::MigrateSidebarTo(WebContents* tab) {
-  if (tab_to_sidebar_container_.empty())
-    return NULL;
-  SidebarContainer* container =
-      GetActiveSidebarContainerFor(tab_to_sidebar_container_.begin()->first);
-  if (container)
-    return NULL;
-
-  return container;
-}
-
 SidebarContainer* SidebarManager::GetSidebarContainerFor(
     WebContents* tab,
     const std::string& content_id) {

@@ -78,8 +78,6 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
   if (contents) {
     SidebarContainer* activeSidebar =
         sidebarManager->GetActiveSidebarContainerFor(contents);
-    if (!activeSidebar)
-      activeSidebar = sidebarManager->MigrateSidebarTo(contents);
     if (activeSidebar)
       sidebarContents = activeSidebar->host_contents();
   }
