@@ -140,7 +140,8 @@ void SidebarManager::HideSidebar(WebContents* tab,
 
   SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
   DCHECK(container);
-  UnregisterSidebarContainerFor(tab, content_id);
+  UnbindSidebarContainerFor(tab, container);
+  delete container;
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
                     OnSidebarHidden(tab, content_id));
@@ -215,26 +216,6 @@ void SidebarManager::RegisterSidebarContainerFor(
   BindSidebarContainer(tab, container);
 }
 
-void SidebarManager::UnregisterSidebarContainerFor(
-    WebContents* tab,
-    const std::string& content_id) {
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
-  DCHECK(container);
-  if (!container)
-    return;
-
-  UnbindSidebarContainer(tab, container);
-
-  // If there's no more sidebars linked to this tab, unsubscribe.
-  if (tab_to_sidebar_container_.find(tab) == tab_to_sidebar_container_.end()) {
-    registrar_.Remove(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
-                      content::Source<WebContents>(tab));
-  }
-
-  // Destroy sidebar container.
-  delete container;
-}
-
 void SidebarManager::BindSidebarContainer(WebContents* tab,
                                      SidebarContainer* container) {
   const std::string& content_id = container->extension_id();
@@ -249,16 +230,10 @@ void SidebarManager::BindSidebarContainer(WebContents* tab,
 
 void SidebarManager::UnbindSidebarContainer(WebContents* tab,
                                        SidebarContainer* container) {
-  const std::string& content_id = container->extension_id();
-
-  DCHECK(GetSidebarContainerFor(tab, content_id) == container);
-  DCHECK(sidebar_container_to_tab_.find(container)->second == tab);
-  DCHECK(tab_to_sidebar_container_[tab].active_content_id != content_id);
-
-  tab_to_sidebar_container_[tab].content_id_to_sidebar_container.erase(content_id);
-  if (tab_to_sidebar_container_[tab].content_id_to_sidebar_container.empty())
-    tab_to_sidebar_container_.erase(tab);
+  tab_to_sidebar_container_.erase(tab);
   sidebar_container_to_tab_.erase(container);
+  registrar_.Remove(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
+                    content::Source<WebContents>(tab));
 }
 
 void SidebarManager::AddObserver(SidebarManagerObserver* observer) {

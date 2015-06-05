@@ -96,10 +96,6 @@ class SidebarManager : public content::NotificationObserver,
   void RegisterSidebarContainerFor(content::WebContents* tab,
                                    SidebarContainer* container);
 
-  // Unregisters SidebarContainer identified by |tab| and |content_id|.
-  void UnregisterSidebarContainerFor(content::WebContents* tab,
-                                     const std::string& content_id);
-
   // Records the link between |tab| and |container|.
   void BindSidebarContainer(content::WebContents* tab,
                        SidebarContainer* container);
