@@ -48,10 +48,6 @@ class SidebarManager : public content::NotificationObserver,
   SidebarContainer* GetSidebarContainerFor(content::WebContents* tab,
                                            const std::string& content_id);
 
-  // Returns sidebar's TabContents registered for |tab| and |content_id|.
-  content::WebContents* GetSidebarTabContents(content::WebContents* tab,
-                                              const std::string& content_id);
-
   // Sends sidebar state change notification to extensions.
   void NotifyStateChanges(content::WebContents* was_active_sidebar_contents,
                           content::WebContents* active_sidebar_contents);

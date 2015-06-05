@@ -64,16 +64,6 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
   return container_it->second;
 }
 
-content::WebContents* SidebarManager::GetSidebarTabContents(
-    content::WebContents* tab,
-    const std::string& content_id) {
-  DCHECK(!content_id.empty());
-  SidebarContainer* container = GetSidebarContainerFor(tab, content_id);
-  if (!container)
-    return NULL;
-  return container->host_contents();
-}
-
 void SidebarManager::NotifyStateChanges(
     content::WebContents* was_active_sidebar_contents,
     content::WebContents* active_sidebar_contents) {
