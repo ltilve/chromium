@@ -25,6 +25,7 @@
 #include "chrome/browser/extensions/navigation_observer.h"
 #include "chrome/browser/extensions/shared_module_service.h"
 #include "chrome/browser/extensions/shared_user_script_master.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/state_store_notification_observer.h"
 #include "chrome/browser/extensions/unpacked_installer.h"
 #include "chrome/browser/profiles/profile.h"
@@ -400,6 +401,17 @@ void ExtensionSystemImpl::UnregisterExtensionWithRequestContexts(
       BrowserThread::IO,
       FROM_HERE,
       base::Bind(&InfoMap::RemoveExtension, info_map(), extension_id, reason));
+}
+
+SidebarManager* ExtensionSystemImpl::sidebar_manager() {
+  if (!sidebar_manager_)
+    CreateSidebarManager();
+  return sidebar_manager_.get();
+}
+
+void ExtensionSystemImpl::CreateSidebarManager() {
+  DCHECK(sidebar_manager_.get() == nullptr);
+  sidebar_manager_.reset(new SidebarManager());
 }
 
 }  // namespace extensions
