@@ -8,6 +8,7 @@
 #include "base/mac/scoped_nsobject.h"
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/extensions/extension_keybinding_registry.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/signin/chrome_signin_helper.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
@@ -36,6 +37,7 @@ class BrowserWindowCocoa
     : public BrowserWindow,
       public ExclusiveAccessContext,
       public extensions::ExtensionKeybindingRegistry::Delegate,
+      public SidebarManagerObserver,
       public SearchModelObserver {
  public:
   BrowserWindowCocoa(Browser* browser,
@@ -179,12 +181,18 @@ class BrowserWindowCocoa
   // Returns the cocoa-world BrowserWindowController
   BrowserWindowController* cocoa_controller() { return controller_; }
 
+  // Handle SidebarManager events
+  void OnSidebarShown(content::WebContents* tab,
+                      const std::string& content_id) override;
+  void OnSidebarHidden(content::WebContents* tab,
+                       const std::string& content_id) override;
+
  protected:
   void DestroyBrowser() override;
 
  private:
   NSWindow* window() const;  // Accessor for the (current) |NSWindow|.
-
+  void UpdateSidebarForContents(content::WebContents* tab_contents);
   Browser* browser_;  // weak, owned by controller
   BrowserWindowController* controller_;  // weak, owns us
   base::scoped_nsobject<NSString> pending_window_title_;
