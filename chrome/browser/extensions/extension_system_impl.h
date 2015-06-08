@@ -19,6 +19,7 @@ class ExtensionSystemSharedFactory;
 class NavigationObserver;
 class SharedUserScriptMaster;
 class StateStoreNotificationObserver;
+// class SidebarManager;
 
 // The ExtensionSystem for ProfileImpl and OffTheRecordProfileImpl.
 // Implementation details: non-shared services are owned by
@@ -55,6 +56,9 @@ class ExtensionSystemImpl : public ExtensionSystem {
   ContentVerifier* content_verifier() override;  // shared
   scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) override;
+
+  SidebarManager* sidebar_manager() override;
+  void CreateSidebarManager();
 
  private:
   friend class ExtensionSystemSharedFactory;
@@ -121,6 +125,8 @@ class ExtensionSystemImpl : public ExtensionSystem {
   Profile* profile_;
 
   Shared* shared_;
+
+  scoped_ptr<SidebarManager> sidebar_manager_;
 
   DISALLOW_COPY_AND_ASSIGN(ExtensionSystemImpl);
 };
