@@ -76,8 +76,8 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
   content::WebContents* sidebarContents = nullptr;
   if (contents) {
-    SidebarContainer* activeSidebar =
-        sidebarManager->GetActiveSidebarContainerFor(contents);
+    extensions::SidebarContainer* activeSidebar =
+        sidebarManager->GetSidebarContainerFor(contents);
     if (activeSidebar)
       sidebarContents = activeSidebar->host_contents();
   }
