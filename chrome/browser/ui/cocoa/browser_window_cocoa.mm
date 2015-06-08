@@ -15,6 +15,8 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/download/download_shelf.h"
+#include "chrome/browser/extensions/sidebar_container.h"
+#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/fullscreen.h"
 #include "chrome/browser/profiles/profile.h"
@@ -139,6 +141,10 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
                                            &initial_show_state_);
 
   browser_->search_model()->AddObserver(this);
+
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  sidebar_manager->AddObserver(this);
 }
 
 BrowserWindowCocoa::~BrowserWindowCocoa() {
@@ -314,6 +320,7 @@ void BrowserWindowCocoa::BookmarkBarStateChanged(
 void BrowserWindowCocoa::UpdateDevTools() {
   [controller_ updateDevToolsForContents:
       browser_->tab_strip_model()->GetActiveWebContents()];
+  UpdateSidebarForContents(browser_->tab_strip_model()->GetActiveWebContents());
 }
 
 void BrowserWindowCocoa::UpdateLoadingAnimations(bool should_animate) {
@@ -821,6 +828,13 @@ void BrowserWindowCocoa::CloseAvatarBubbleFromAvatarButton() {
   [[controller_ avatarButtonController] closeAvatarBubble];
 }
 
+void BrowserWindowCocoa::UpdateSidebarForContents(
+    content::WebContents* tab_contents) {
+  if (tab_contents == browser_->tab_strip_model()->GetActiveWebContents()) {
+    [controller_ updateSidebarForContents:tab_contents];
+  }
+}
+
 int
 BrowserWindowCocoa::GetRenderViewHeightInsetWithDetachedBookmarkBar() {
   if (browser_->bookmark_bar_state() != BookmarkBar::DETACHED)
@@ -855,4 +869,14 @@ void BrowserWindowCocoa::HideDownloadShelf() {
   StatusBubble* statusBubble = GetStatusBubble();
   if (statusBubble)
     statusBubble->Hide();
+}
+
+void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
+                                        const std::string& content_id) {
+  UpdateSidebarForContents(tab);
+}
+
+void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
+                                         const std::string& content_id) {
+  UpdateSidebarForContents(tab);
 }
