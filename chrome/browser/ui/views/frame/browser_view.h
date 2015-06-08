@@ -14,6 +14,7 @@
 #include "base/timer/timer.h"
 #include "build/build_config.h"
 #include "chrome/browser/devtools/devtools_window.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
@@ -30,6 +31,7 @@
 #include "ui/base/models/simple_menu_model.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/views/controls/button/button.h"
+#include "ui/views/controls/single_split_view_listener.h"
 #include "ui/views/controls/webview/unhandled_keyboard_event_handler.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/widget_observer.h"
@@ -68,6 +70,7 @@ class Extension;
 namespace views {
 class AccessiblePaneView;
 class ExternalFocusTracker;
+class SingleSplitView;
 class WebView;
 }
 
@@ -86,7 +89,9 @@ class BrowserView : public BrowserWindow,
                     public InfoBarContainerDelegate,
                     public LoadCompleteListener::Delegate,
                     public OmniboxPopupModelObserver,
+                    public views::SingleSplitViewListener,
                     public ExclusiveAccessContext,
+                    public SidebarManagerObserver,
                     public ExclusiveAccessBubbleViewsContext {
  public:
   // The browser view's class name.
@@ -100,7 +105,7 @@ class BrowserView : public BrowserWindow,
 
   void set_frame(BrowserFrame* frame) { frame_ = frame; }
   BrowserFrame* frame() const { return frame_; }
-
+  int GetSidebarWidth() const;
   // Returns a pointer to the BrowserView* interface implementation (an
   // instance of this object, typically) for a given native window, or null if
   // there is no such association.
@@ -449,6 +454,12 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetContentsWebViewForTest() { return contents_web_view_; }
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
+  // Handle SidebarManager events
+  void OnSidebarShown(content::WebContents* tab,
+                      const std::string& content_id) override;
+  void OnSidebarHidden(content::WebContents* tab,
+                       const std::string& content_id) override;
+
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate
   // interface to keep these two classes decoupled and testable.
@@ -513,7 +524,7 @@ class BrowserView : public BrowserWindow,
   // |contents|. |contents| can be null. In this case, all optional UI will be
   // removed.
   void UpdateUIForContents(content::WebContents* contents);
-
+  bool SplitHandleMoved(views::SingleSplitView* sender) override;
   // Invoked to update the necessary things when our fullscreen state changes
   // to |fullscreen|. On Windows this is invoked immediately when we toggle the
   // full screen state. On Linux changing the fullscreen state is async, so we
@@ -542,6 +553,7 @@ class BrowserView : public BrowserWindow,
 
   // Initialize the hung plugin detector.
   void InitHangMonitor();
+  void UpdateSidebarForContents(content::WebContents* new_contents);
 
   // Possibly records a user metrics action corresponding to the passed-in
   // accelerator.  Only implemented for Chrome OS, where we're interested in
@@ -683,6 +695,12 @@ class BrowserView : public BrowserWindow,
   base::RepeatingTimer<BrowserView> loading_animation_timer_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
+
+  views::WebView* sidebar_web_view_;
+
+  views::View* sidebar_container_;
+
+  views::SingleSplitView* sidebar_split_;
 
   // Used to measure the loading spinner animation rate.
   base::TimeTicks last_animation_time_;

@@ -17,6 +17,7 @@ namespace chrome {
 
 void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(prefs::kOptionsWindowLastTabIndex, 0);
+  registry->RegisterIntegerPref(prefs::kExtensionSidebarWidth, -1);
   registry->RegisterBooleanPref(prefs::kAllowFileSelectionDialogs, true);
   registry->RegisterIntegerPref(prefs::kShowFirstRunBubbleOption,
                              first_run::FIRST_RUN_BUBBLE_DONT_SHOW);
