@@ -23,4 +23,8 @@ ExtensionSystem* ExtensionSystem::Get(content::BrowserContext* context) {
       ->GetForBrowserContext(context);
 }
 
+SidebarManager* ExtensionSystem::sidebar_manager() {
+  return nullptr;
+}
+
 }  // namespace extensions
