@@ -101,7 +101,7 @@ class SidebarManager : public content::NotificationObserver {
       SidebarContainerToTabMap;
   SidebarContainerToTabMap sidebar_container_to_tab_;
 
-  ObserverList<SidebarManagerObserver> observer_list_;
+  base::ObserverList<SidebarManagerObserver> observer_list_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
 };
