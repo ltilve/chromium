@@ -1636,8 +1636,8 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     contents_web_view_->SetWebContents(nullptr);
     infobar_container_->ChangeInfoBarManager(nullptr);
     UpdateDevToolsForContents(nullptr, true);
+    UpdateSidebarForContents(nullptr);
   }
-  UpdateSidebarForContents(nullptr);
 }
 
 void BrowserView::TabDeactivated(WebContents* contents) {
