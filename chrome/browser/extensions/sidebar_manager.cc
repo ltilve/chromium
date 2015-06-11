@@ -69,7 +69,7 @@ void SidebarManager::NotifyStateChanges(
       OnSidebarSwitched(old_tab, old_content_id, new_tab, new_content_id));
 }
 
-void SidebarManager::ShowSidebar(content::WebContents* tab,
+void SidebarManager::CreateSidebar(content::WebContents* tab,
                                  const GURL& url,
                                  Browser* browser) {
   SidebarContainer* container = GetSidebarContainerFor(tab);
@@ -78,9 +78,6 @@ void SidebarManager::ShowSidebar(content::WebContents* tab,
 
   container = new SidebarContainer(browser, tab, url);
   BindSidebarContainer(tab, container);
-
-  container->Show();
-  container->Expand();
 
   const std::string id = container->extension_id();
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
@@ -98,14 +95,6 @@ void SidebarManager::HideSidebar(WebContents* tab) {
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
                     OnSidebarHidden(tab, content_id));
-}
-
-void SidebarManager::NavigateSidebar(content::WebContents* tab) {
-  SidebarContainer* container = GetSidebarContainerFor(tab);
-  if (!container)
-    return;
-
-  container->Navigate();
 }
 
 SidebarManager::~SidebarManager() {
