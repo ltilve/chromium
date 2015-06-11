@@ -28,8 +28,7 @@ namespace extensions {
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer : public extensions::ExtensionHostObserver,
-                         public content::NotificationObserver {
+class SidebarContainer : public content::NotificationObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
 
@@ -53,9 +52,6 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
 
  private:
   scoped_ptr<extensions::ExtensionViewHost> host_;
-
-  ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
-      host_observer_;
 
   content::NotificationRegistrar registrar_;
 
