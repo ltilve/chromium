@@ -59,6 +59,9 @@ InspectableViewsFinder::View InspectableViewsFinder::ConstructView(
     case VIEW_TYPE_EXTENSION_POPUP:
       view->type = api::developer_private::VIEW_TYPE_EXTENSION_POPUP;
       break;
+    case VIEW_TYPE_EXTENSION_SIDEBAR:
+      view->type = api::developer_private::VIEW_TYPE_EXTENSION_SIDEBAR;
+      break;
     case VIEW_TYPE_LAUNCHER_PAGE:
       view->type = api::developer_private::VIEW_TYPE_LAUNCHER_PAGE;
       break;
@@ -135,7 +138,8 @@ void InspectableViewsFinder::GetViewsForExtensionProcess(
         content::WebContents::FromRenderFrameHost(host);
     ViewType host_type = GetViewType(web_contents);
     if (host_type == VIEW_TYPE_EXTENSION_POPUP ||
-        host_type == VIEW_TYPE_EXTENSION_DIALOG) {
+        host_type == VIEW_TYPE_EXTENSION_DIALOG ||
+        host_type == VIEW_TYPE_EXTENSION_SIDEBAR) {
       continue;
     }
 
