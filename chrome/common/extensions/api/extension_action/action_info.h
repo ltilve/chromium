@@ -65,6 +65,7 @@ struct ActionInfo {
   GURL default_popup_url;
   // action id -- only used with legacy page actions API.
   std::string id;
+  bool open_in_sidebar;
 };
 
 }  // namespace extensions

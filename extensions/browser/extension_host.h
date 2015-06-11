@@ -139,6 +139,9 @@ class ExtensionHost : public DeferredStartRenderHost,
   // Navigates to the initial page.
   virtual void LoadInitialURL();
 
+  // Navigates to the page.
+  virtual void LoadURL(const GURL& url);
+
   // Returns true if we're hosting a background page.
   virtual bool IsBackgroundPage() const;
 
