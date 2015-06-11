@@ -25,11 +25,9 @@ SidebarContainer::SidebarContainer(Browser* browser,
                                    const GURL& url)
     : host_(extensions::ExtensionViewHostFactory::CreateSidebarHost(url,
                                                                     browser)),
-      host_observer_(this),
       tab_(tab) {
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       host_contents());
-  host_observer_.Add(host_.get());
 
   // Listen for the containing view calling window.close();
   registrar_.Add(
