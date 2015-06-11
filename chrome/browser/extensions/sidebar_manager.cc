@@ -97,6 +97,10 @@ void SidebarManager::HideSidebar(WebContents* tab) {
                     OnSidebarHidden(tab, content_id));
 }
 
+bool SidebarManager::HasSidebar(WebContents* tab) {
+  return GetSidebarContainerFor(tab) != nullptr;
+}
+
 SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_container_.empty());
   DCHECK(sidebar_container_to_tab_.empty());
