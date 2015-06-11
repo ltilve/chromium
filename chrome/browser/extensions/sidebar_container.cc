@@ -26,8 +26,7 @@ SidebarContainer::SidebarContainer(Browser* browser,
     : host_(extensions::ExtensionViewHostFactory::CreateSidebarHost(url,
                                                                     browser)),
       host_observer_(this),
-      tab_(tab),
-      navigate_to_default_page_on_expand_(true) {
+      tab_(tab) {
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       host_contents());
   host_observer_.Add(host_.get());
@@ -36,26 +35,12 @@ SidebarContainer::SidebarContainer(Browser* browser,
   registrar_.Add(
       this, extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE,
       content::Source<content::BrowserContext>(host_->browser_context()));
-}
 
-SidebarContainer::~SidebarContainer() {
-}
-
-void SidebarContainer::Show() {
   host_->CreateRenderViewSoon();
-}
-
-void SidebarContainer::Expand() {
-  if (navigate_to_default_page_on_expand_)
-    navigate_to_default_page_on_expand_ = false;
-
   host_contents()->SetInitialFocus();
 }
 
-void SidebarContainer::Navigate() {
-  navigate_to_default_page_on_expand_ = false;
-
-  host_->LoadInitialURL();
+SidebarContainer::~SidebarContainer() {
 }
 
 void SidebarContainer::Observe(int type,

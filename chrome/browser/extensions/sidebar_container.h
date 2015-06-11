@@ -44,15 +44,6 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
   // Returns TabContents sidebar is linked to.
   content::WebContents* web_contents() const { return tab_; }
 
-  // Notifies hosting window that this sidebar was expanded.
-  void Show();
-
-  // Notifies hosting window that this sidebar was expanded.
-  void Expand();
-
-  // Navigates sidebar contents|.
-  void Navigate();
-
   const std::string& extension_id() { return host_->extension_id(); }
 
   // content::NotificationObserver overrides.
@@ -70,12 +61,6 @@ class SidebarContainer : public extensions::ExtensionHostObserver,
 
   // Contents of the tab this sidebar is linked to.
   content::WebContents* tab_;
-
-  // On the first expand sidebar will be automatically navigated to the default
-  // page (specified in the extension manifest), but only if the extension has
-  // not explicitly navigated it yet. This variable is set to false on the first
-  // sidebar navigation.
-  bool navigate_to_default_page_on_expand_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
