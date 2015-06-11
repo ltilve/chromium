@@ -45,18 +45,14 @@ class SidebarManager : public content::NotificationObserver {
   void NotifyStateChanges(content::WebContents* was_active_sidebar_contents,
                           content::WebContents* active_sidebar_contents);
 
-  // Shows sidebar identified by |tab| (only sidebar's
-  // mini tab is visible).
-  void ShowSidebar(content::WebContents* tab,
-                   const GURL& url,
-                   Browser* browser);
+  // Creates a new sidebar identified by |tab| (adds sidebar's mini tab).
+  void CreateSidebar(content::WebContents* tab,
+                     const GURL& url,
+                     Browser* browser);
 
-  // Hides sidebar identified by |tab| (removes sidebar's
-  // mini tab).
+  // Hides and destroys sidebar identified by |tab| (removes sidebar's mini
+  // tab).
   void HideSidebar(content::WebContents* tab);
-
-  // Navigates sidebar identified by |tab|.
-  void NavigateSidebar(content::WebContents* tab);
 
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
