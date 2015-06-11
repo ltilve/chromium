@@ -70,8 +70,8 @@ void SidebarManager::NotifyStateChanges(
 }
 
 void SidebarManager::CreateSidebar(content::WebContents* tab,
-                                 const GURL& url,
-                                 Browser* browser) {
+                                   const GURL& url,
+                                   Browser* browser) {
   SidebarContainer* container = GetSidebarContainerFor(tab);
   if (container)
     HideSidebar(tab);
