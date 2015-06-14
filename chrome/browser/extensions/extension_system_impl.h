@@ -62,9 +62,6 @@ class ExtensionSystemImpl : public ExtensionSystem {
   SidebarManager* sidebar_manager() override;
   void CreateSidebarManager();
 
-  bool created_sidebar_manager_;
-  scoped_refptr<SidebarManager> sidebar_manager_;
-
 
  private:
   friend class ExtensionSystemSharedFactory;
@@ -135,6 +132,8 @@ class ExtensionSystemImpl : public ExtensionSystem {
   Profile* profile_;
 
   Shared* shared_;
+
+  scoped_refptr<SidebarManager> sidebar_manager_;
 
   DISALLOW_COPY_AND_ASSIGN(ExtensionSystemImpl);
 };
