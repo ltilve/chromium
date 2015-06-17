@@ -74,12 +74,6 @@ SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_container_.empty());
 }
 
-void SidebarManager::TabClosingAt(TabStripModel* tab_strip_model,
-                                  WebContents* contents,
-                                  int index) {
-  HideSidebar(contents);
-}
-
 SidebarContainer* SidebarManager::FindSidebarContainerFor(
     content::WebContents* sidebar_contents) {
   for (TabToSidebarContainerMap::iterator it =
