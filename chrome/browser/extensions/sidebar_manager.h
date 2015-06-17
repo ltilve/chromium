@@ -11,8 +11,7 @@
 #include "base/observer_list.h"
 #include "base/strings/string16.h"
 #include "chrome/browser/extensions/sidebar_container.h"
-#include "content/public/browser/notification_observer.h"
-#include "content/public/browser/notification_registrar.h"
+#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 
 class GURL;
 class SidebarContainer;
@@ -30,7 +29,7 @@ namespace extensions {
 //  This class is a singleton that manages SidebarContainer instances and
 //  maintains a connection between tabs and sidebars.
 //
-class SidebarManager : public content::NotificationObserver {
+class SidebarManager : public TabStripModelObserver {
  public:
   // Returns SidebarManager instance registered with BrowserContext.
   static SidebarManager* GetFromContext(content::BrowserContext* context);
@@ -59,24 +58,14 @@ class SidebarManager : public content::NotificationObserver {
   ~SidebarManager() override;
 
  private:
-  // Overridden from content::NotificationObserver.
-  void Observe(int type,
-               const content::NotificationSource& source,
-               const content::NotificationDetails& details) override;
+  // Overridden from TabStripModelObserver.
+  void TabClosingAt(TabStripModel* tab_strip_model,
+                    content::WebContents* contents,
+                    int index);
 
   // Returns SidebarContainer corresponding to |sidebar_contents|.
   SidebarContainer* FindSidebarContainerFor(
       content::WebContents* sidebar_contents);
-
-  // Records the link between |tab| and |container|.
-  void BindSidebarContainer(content::WebContents* tab,
-                            SidebarContainer* container);
-
-  // Forgets the link between |tab| and |container|.
-  void UnbindSidebarContainer(content::WebContents* tab,
-                              SidebarContainer* container);
-
-  content::NotificationRegistrar registrar_;
 
   // This map stores sidebars linked to a particular tab. Sidebars are
   // identified by their unique content id (string).
