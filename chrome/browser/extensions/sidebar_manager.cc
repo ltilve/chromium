@@ -38,37 +38,6 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
   return it->second;
 }
 
-void SidebarManager::NotifyStateChanges(
-    content::WebContents* was_active_sidebar_contents,
-    content::WebContents* active_sidebar_contents) {
-  if (was_active_sidebar_contents == active_sidebar_contents)
-    return;
-
-  SidebarContainer* was_active_container =
-      was_active_sidebar_contents == nullptr
-          ? nullptr
-          : FindSidebarContainerFor(was_active_sidebar_contents);
-  SidebarContainer* active_container =
-      active_sidebar_contents == nullptr
-          ? nullptr
-          : FindSidebarContainerFor(active_sidebar_contents);
-
-  content::WebContents* old_tab = was_active_container == nullptr
-                                      ? nullptr
-                                      : was_active_container->web_contents();
-  content::WebContents* new_tab =
-      active_container == nullptr ? nullptr : active_container->web_contents();
-  const std::string& old_content_id =
-      was_active_container == nullptr ? ""
-                                      : was_active_container->extension_id();
-  const std::string& new_content_id =
-      active_container == nullptr ? "" : active_container->extension_id();
-
-  FOR_EACH_OBSERVER(
-      SidebarManagerObserver, observer_list_,
-      OnSidebarSwitched(old_tab, old_content_id, new_tab, new_content_id));
-}
-
 void SidebarManager::CreateSidebar(content::WebContents* tab,
                                    const GURL& url,
                                    Browser* browser) {

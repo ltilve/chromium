@@ -41,10 +41,6 @@ class SidebarManager : public content::NotificationObserver {
   // SidebarContainer registered for |tab|.
   SidebarContainer* GetSidebarContainerFor(content::WebContents* tab);
 
-  // Sends sidebar state change notification to extensions.
-  void NotifyStateChanges(content::WebContents* was_active_sidebar_contents,
-                          content::WebContents* active_sidebar_contents);
-
   // Creates a new sidebar identified by |tab| (adds sidebar's mini tab).
   void CreateSidebar(content::WebContents* tab,
                      const GURL& url,
