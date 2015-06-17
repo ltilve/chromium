@@ -72,7 +72,6 @@ bool SidebarManager::HasSidebar(WebContents* tab) {
 
 SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_container_.empty());
-  DCHECK(sidebar_container_to_tab_.empty());
 }
 
 void SidebarManager::Observe(int type,
@@ -87,11 +86,11 @@ void SidebarManager::Observe(int type,
 
 SidebarContainer* SidebarManager::FindSidebarContainerFor(
     content::WebContents* sidebar_contents) {
-  for (SidebarContainerToTabMap::iterator it =
-           sidebar_container_to_tab_.begin();
-       it != sidebar_container_to_tab_.end(); ++it) {
-    if (sidebar_contents == it->first->host_contents())
-      return it->first;
+  for (TabToSidebarContainerMap::iterator it =
+           tab_to_sidebar_container_.begin();
+       it != tab_to_sidebar_container_.end(); ++it) {
+    if (sidebar_contents == it->second->host_contents())
+      return it->second;
   }
   return nullptr;
 }
@@ -99,7 +98,6 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
 void SidebarManager::BindSidebarContainer(WebContents* tab,
                                           SidebarContainer* container) {
   tab_to_sidebar_container_[tab] = container;
-  sidebar_container_to_tab_[container] = tab;
   registrar_.Add(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
                  content::Source<WebContents>(tab));
 }
@@ -107,7 +105,6 @@ void SidebarManager::BindSidebarContainer(WebContents* tab,
 void SidebarManager::UnbindSidebarContainer(WebContents* tab,
                                             SidebarContainer* container) {
   tab_to_sidebar_container_.erase(tab);
-  sidebar_container_to_tab_.erase(container);
   registrar_.Remove(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
                     content::Source<WebContents>(tab));
 }
