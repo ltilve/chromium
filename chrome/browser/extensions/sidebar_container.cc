@@ -11,6 +11,8 @@
 #include "chrome/browser/extensions/extension_view_host_factory.h"
 #include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "components/app_modal/javascript_dialog_manager.h"
 #include "content/public/browser/notification_details.h"
 #include "content/public/browser/notification_source.h"
@@ -25,7 +27,8 @@ SidebarContainer::SidebarContainer(Browser* browser,
                                    const GURL& url)
     : host_(extensions::ExtensionViewHostFactory::CreateSidebarHost(url,
                                                                     browser)),
-      tab_(tab) {
+      tab_(tab),
+      browser_(browser) {
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       host_contents());
 
@@ -36,9 +39,18 @@ SidebarContainer::SidebarContainer(Browser* browser,
 
   host_->CreateRenderViewSoon();
   host_contents()->SetInitialFocus();
+  browser_->tab_strip_model()->AddObserver(this);
 }
 
 SidebarContainer::~SidebarContainer() {
+  browser_->tab_strip_model()->RemoveObserver(this);
+}
+
+void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
+                                    content::WebContents* contents,
+                                    int index) {
+  if (tab_ == contents)
+    extensions::SidebarManager::GetFromContext(host_->browser_context())->HideSidebar(tab_);
 }
 
 void SidebarContainer::Observe(int type,

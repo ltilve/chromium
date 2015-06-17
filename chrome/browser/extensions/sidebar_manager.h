@@ -11,7 +11,6 @@
 #include "base/observer_list.h"
 #include "base/strings/string16.h"
 #include "chrome/browser/extensions/sidebar_container.h"
-#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 
 class GURL;
 class SidebarContainer;
@@ -29,7 +28,7 @@ namespace extensions {
 //  This class is a singleton that manages SidebarContainer instances and
 //  maintains a connection between tabs and sidebars.
 //
-class SidebarManager : public TabStripModelObserver {
+class SidebarManager {
  public:
   // Returns SidebarManager instance registered with BrowserContext.
   static SidebarManager* GetFromContext(content::BrowserContext* context);
@@ -55,14 +54,9 @@ class SidebarManager : public TabStripModelObserver {
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
 
-  ~SidebarManager() override;
+  ~SidebarManager();
 
  private:
-  // Overridden from TabStripModelObserver.
-  void TabClosingAt(TabStripModel* tab_strip_model,
-                    content::WebContents* contents,
-                    int index);
-
   // Returns SidebarContainer corresponding to |sidebar_contents|.
   SidebarContainer* FindSidebarContainerFor(
       content::WebContents* sidebar_contents);

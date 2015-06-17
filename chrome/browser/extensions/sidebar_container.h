@@ -12,10 +12,13 @@
 #include "base/memory/scoped_ptr.h"
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_view_host.h"
+#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "extensions/browser/extension_host_observer.h"
+
+class Browser;
 
 namespace content {
 class WebContents;
@@ -28,7 +31,9 @@ namespace extensions {
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer : public content::NotificationObserver {
+class SidebarContainer
+    : public content::NotificationObserver,
+      public TabStripModelObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
 
@@ -50,6 +55,11 @@ class SidebarContainer : public content::NotificationObserver {
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
 
+  // TabStripModelObserver overrides.
+  void TabClosingAt(TabStripModel* tab_strip_model,
+                    content::WebContents* contents,
+                    int index);
+
  private:
   scoped_ptr<extensions::ExtensionViewHost> host_;
 
@@ -57,6 +67,9 @@ class SidebarContainer : public content::NotificationObserver {
 
   // Contents of the tab this sidebar is linked to.
   content::WebContents* tab_;
+
+  // Reference to browser
+  Browser* browser_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
