@@ -9,6 +9,7 @@
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_action_icon_factory.h"
 #include "chrome/browser/extensions/extension_context_menu_model.h"
+#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_controller.h"
 #include "extensions/browser/extension_host_observer.h"
 #include "ui/gfx/image/image.h"
@@ -36,6 +37,7 @@ class ExtensionActionViewController
     : public ToolbarActionViewController,
       public ExtensionActionIconFactory::Observer,
       public ExtensionContextMenuModel::PopupDelegate,
+      public SidebarManagerObserver,
       public extensions::ExtensionHostObserver {
  public:
   // The different options for showing a popup.
@@ -136,6 +138,17 @@ class ExtensionActionViewController
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
 
+  void OnPopupShown(bool grant_tab_permissions);
+
+  // Handles sidebar events
+  void OnSidebarHidden(content::WebContents* tab,
+                       const std::string& content_id) override;
+
+  void OnSidebarSwitched(content::WebContents* old_tab,
+                         const std::string& old_content_id,
+                         content::WebContents* new_tab,
+                         const std::string& new_content_id) override;
+
   // Returns the image source for the icon.
   scoped_ptr<IconWithBadgeImageSource> GetIconImageSource(
       content::WebContents* web_contents,
@@ -185,6 +198,8 @@ class ExtensionActionViewController
 
   ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
       popup_host_observer_;
+
+  std::set<content::WebContents*> active_in_webcontents_;
 
   base::WeakPtrFactory<ExtensionActionViewController> weak_factory_;
 
