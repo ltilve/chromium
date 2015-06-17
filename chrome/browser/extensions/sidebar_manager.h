@@ -92,10 +92,6 @@ class SidebarManager : public content::NotificationObserver {
       TabToSidebarContainerMap;
   TabToSidebarContainerMap tab_to_sidebar_container_;
 
-  typedef std::map<SidebarContainer*, content::WebContents*>
-      SidebarContainerToTabMap;
-  SidebarContainerToTabMap sidebar_container_to_tab_;
-
   base::ObserverList<SidebarManagerObserver> observer_list_;
 
   DISALLOW_COPY_AND_ASSIGN(SidebarManager);
