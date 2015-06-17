@@ -46,7 +46,7 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
     HideSidebar(tab);
 
   container = new SidebarContainer(browser, tab, url);
-  BindSidebarContainer(tab, container);
+  tab_to_sidebar_container_[tab] = container;
 
   const std::string id = container->extension_id();
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
@@ -59,7 +59,7 @@ void SidebarManager::HideSidebar(WebContents* tab) {
     return;
 
   const std::string content_id = container->extension_id();
-  UnbindSidebarContainer(tab, container);
+  tab_to_sidebar_container_.erase(tab);
   delete container;
 
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
@@ -74,14 +74,10 @@ SidebarManager::~SidebarManager() {
   DCHECK(tab_to_sidebar_container_.empty());
 }
 
-void SidebarManager::Observe(int type,
-                             const content::NotificationSource& source,
-                             const content::NotificationDetails& details) {
-  if (type == content::NOTIFICATION_WEB_CONTENTS_DESTROYED) {
-    HideSidebar(content::Source<WebContents>(source).ptr());
-  } else {
-    NOTREACHED() << "Got a notification we didn't register for!";
-  }
+void SidebarManager::TabClosingAt(TabStripModel* tab_strip_model,
+                                  WebContents* contents,
+                                  int index) {
+  HideSidebar(contents);
 }
 
 SidebarContainer* SidebarManager::FindSidebarContainerFor(
@@ -93,20 +89,6 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
       return it->second;
   }
   return nullptr;
-}
-
-void SidebarManager::BindSidebarContainer(WebContents* tab,
-                                          SidebarContainer* container) {
-  tab_to_sidebar_container_[tab] = container;
-  registrar_.Add(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
-                 content::Source<WebContents>(tab));
-}
-
-void SidebarManager::UnbindSidebarContainer(WebContents* tab,
-                                            SidebarContainer* container) {
-  tab_to_sidebar_container_.erase(tab);
-  registrar_.Remove(this, content::NOTIFICATION_WEB_CONTENTS_DESTROYED,
-                    content::Source<WebContents>(tab));
 }
 
 void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
