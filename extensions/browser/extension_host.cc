@@ -223,11 +223,6 @@ void ExtensionHost::LoadInitialURL() {
       std::string());
 }
 
-void ExtensionHost::LoadURL(const GURL& url) {
-  initial_url_ = url;
-  LoadInitialURL();
-}
-
 bool ExtensionHost::IsBackgroundPage() const {
   DCHECK_EQ(extension_host_type_, VIEW_TYPE_EXTENSION_BACKGROUND_PAGE);
   return true;
