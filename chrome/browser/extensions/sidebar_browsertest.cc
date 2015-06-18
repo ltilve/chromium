@@ -6,6 +6,8 @@
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
 #include "base/path_service.h"
+#include "chrome/browser/extensions/browser_action_test_util.h"
+#include "chrome/browser/extensions/extension_action_manager.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/sidebar_manager.h"
@@ -20,12 +22,13 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
+#include "extensions/test/result_catcher.h"
 
 using content::NavigationController;
 using content::WebContents;
 using extensions::SidebarManager;
 
-namespace {
+namespace extensions {
 
 const char kSimplePage[] = "/simple_page.html";
 
@@ -42,15 +45,31 @@ class SidebarTest : public ExtensionBrowserTest {
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
     extension_path = extension_path.AppendASCII("sidebar");
+    extension_ = LoadExtension(extension_path);
 
-    ASSERT_TRUE(LoadExtension(extension_path));
+    // ASSERT_TRUE(LoadExtension(extension_path));
+    ASSERT_TRUE(extension_);
+
 
     // For now content_id == extension_id.
     content_id_ = last_loaded_extension_id();
   }
 
+  ExtensionAction* GetBrowserAction(const Extension& extension) {
+    return ExtensionActionManager::Get(browser()->profile())->
+        GetBrowserAction(extension);
+  }
+
+  BrowserActionTestUtil* GetBrowserActionsBar() {
+    if (!browser_action_test_util_)
+      browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
+    return browser_action_test_util_.get();
+  }
+
   void CreateSidebarForCurrentTab() {
-    CreateSidebar(browser()->tab_strip_model()->GetActiveWebContents());
+    ASSERT_TRUE(extension_);
+    // Simulate click
+   GetBrowserActionsBar()->Press(0);
   }
 
   void HideSidebarForCurrentTab() {
@@ -93,6 +112,9 @@ class SidebarTest : public ExtensionBrowserTest {
 
  private:
   std::string content_id_;
+  const Extension* extension_;
+
+  scoped_ptr<BrowserActionTestUtil> browser_action_test_util_;
 };
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, OpenClose) {
@@ -103,6 +125,22 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, OpenClose) {
   CreateSidebarForCurrentTab();
 
   HideSidebarForCurrentTab();
+}
+
+IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
+  SidebarManager* sidebar_manager =
+      SidebarManager::GetFromContext(browser()->profile());
+
+  CreateSidebarForCurrentTab();
+
+  EXPECT_TRUE(sidebar_manager->HasSidebar(
+      browser()->tab_strip_model()->GetActiveWebContents()));
+
+  CreateSidebarForCurrentTab();
+
+  EXPECT_FALSE(sidebar_manager->HasSidebar(
+      browser()->tab_strip_model()->GetActiveWebContents()));
+
 }
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
@@ -129,6 +167,8 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
 }
 
 IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
+
+
   SidebarManager* sidebar_manager =
       SidebarManager::GetFromContext(browser()->profile());
 
@@ -153,13 +193,6 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
   EXPECT_FALSE(sidebar_manager->HasSidebar(
       browser()->tab_strip_model()->GetActiveWebContents()));
 
-  // Switch back to the second tab.
-  tab_strip_model->ActivateTabAt(1, false);
-  // Make sure sidebar is visible now.
-  EXPECT_TRUE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-
-  HideSidebarForCurrentTab();
 }
 
 }  // namespace
