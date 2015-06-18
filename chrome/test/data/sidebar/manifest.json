@@ -2,5 +2,9 @@
   "name": "SidebarTest",
   "version": "0.1",
   "manifest_version": 2,
-  "description": "interactive_ui_tests, SidebarTest.*"
+  "description": "browser_tests, SidebarTest.*",
+  "browser_action": {
+    "default_popup": "simple_page.html",
+    "open_in_sidebar": true
+  }
 }
