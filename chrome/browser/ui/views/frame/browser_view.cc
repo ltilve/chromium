@@ -490,6 +490,10 @@ BrowserView::~BrowserView() {
 
   browser_->tab_strip_model()->RemoveObserver(this);
 
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  sidebar_manager->RemoveObserver(this);
+
 #if defined(OS_WIN)
   // Stop hung plugin monitoring.
   ticker_.Stop();
