@@ -50,7 +50,8 @@ void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
                                     content::WebContents* contents,
                                     int index) {
   if (tab_ == contents)
-    extensions::SidebarManager::GetFromContext(host_->browser_context())->HideSidebar(tab_);
+    extensions::SidebarManager::GetFromContext(host_->browser_context())
+        ->HideSidebar(tab_);
 }
 
 void SidebarContainer::Observe(int type,

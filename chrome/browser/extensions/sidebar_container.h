@@ -31,9 +31,8 @@ namespace extensions {
 //  Stores one particular sidebar state: sidebar's content, its content id,
 //  tab it is linked to, mini tab icon, title etc.
 //
-class SidebarContainer
-    : public content::NotificationObserver,
-      public TabStripModelObserver {
+class SidebarContainer : public content::NotificationObserver,
+                         public TabStripModelObserver {
  public:
   // Interface to implement to listen for sidebar update notification.
 
