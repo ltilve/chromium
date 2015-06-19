@@ -13,6 +13,7 @@
 #include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
@@ -22,7 +23,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
-#include "extensions/test/result_catcher.h"
 
 using content::NavigationController;
 using content::WebContents;
@@ -47,11 +47,8 @@ class SidebarTest : public ExtensionBrowserTest {
     extension_path = extension_path.AppendASCII("sidebar");
     extension_ = LoadExtension(extension_path);
 
-    // ASSERT_TRUE(LoadExtension(extension_path));
     ASSERT_TRUE(extension_);
 
-
-    // For now content_id == extension_id.
     content_id_ = last_loaded_extension_id();
   }
 
@@ -66,14 +63,8 @@ class SidebarTest : public ExtensionBrowserTest {
     return browser_action_test_util_.get();
   }
 
-  void CreateSidebarForCurrentTab() {
-    ASSERT_TRUE(extension_);
-    // Simulate click
-   GetBrowserActionsBar()->Press(0);
-  }
-
-  void HideSidebarForCurrentTab() {
-    HideSidebar(browser()->tab_strip_model()->GetActiveWebContents());
+  void ClickExtensionBrowserAction() {
+    GetBrowserActionsBar()->Press(0);
   }
 
   void CreateSidebar(WebContents* temp) {
@@ -91,15 +82,6 @@ class SidebarTest : public ExtensionBrowserTest {
     sidebar_manager->HideSidebar(tab);
     EXPECT_FALSE(sidebar_manager->HasSidebar(tab));
   }
-  // Opens a new tab and waits for navigations to finish. If there are pending
-  // navigations, the constrained prompt might be dismissed when the navigation
-  // completes.
-  void OpenNewTab() {
-    ui_test_utils::NavigateToURLWithDisposition(
-        browser(), GURL("about:blank"), NEW_FOREGROUND_TAB,
-        ui_test_utils::BROWSER_TEST_WAIT_FOR_TAB |
-            ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
-  }
 
   WebContents* web_contents(int i) {
     return static_cast<WebContents*>(
@@ -110,71 +92,62 @@ class SidebarTest : public ExtensionBrowserTest {
     return BrowserView::GetBrowserViewForBrowser(browser());
   }
 
+  void DisableOpenInSidebar() {
+	  GetBrowserAction(*extension_)->set_open_in_sidebar(false);
+  }
+
+  bool HasSidebarForCurrentTab() {
+	  SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
+	  return sidebar_manager->HasSidebar(
+			  browser()->tab_strip_model()->GetActiveWebContents());
+}
+
  private:
   std::string content_id_;
   const Extension* extension_;
-
   scoped_ptr<BrowserActionTestUtil> browser_action_test_util_;
 };
 
-IN_PROC_BROWSER_TEST_F(SidebarTest, OpenClose) {
-  CreateSidebarForCurrentTab();
-
-  HideSidebarForCurrentTab();
-
-  CreateSidebarForCurrentTab();
-
-  HideSidebarForCurrentTab();
-}
-
+// Tests that cliking on the browser action show/hides the sidebar
 IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
-  SidebarManager* sidebar_manager =
-      SidebarManager::GetFromContext(browser()->profile());
-
-  CreateSidebarForCurrentTab();
-
-  EXPECT_TRUE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-
-  CreateSidebarForCurrentTab();
-
-  EXPECT_FALSE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-
+  ClickExtensionBrowserAction();
+  EXPECT_TRUE(HasSidebarForCurrentTab());
+  ClickExtensionBrowserAction();
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
+// Tests that sidebars are not shown if open_in_sidebar: false
+IN_PROC_BROWSER_TEST_F(SidebarTest, CreateDisabledSidebar) {
+  DisableOpenInSidebar();
+  ClickExtensionBrowserAction();
+  EXPECT_FALSE(HasSidebarForCurrentTab());
+}
+
+// Tests that sidebar is only visible at the proper tab
 IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
-  SidebarManager* sidebar_manager =
-      SidebarManager::GetFromContext(browser()->profile());
-
-  CreateSidebarForCurrentTab();
-
-  OpenNewTab();
+  ClickExtensionBrowserAction();
+  chrome::NewTab(browser());
 
   // Make sure sidebar is not visbile for the newly opened tab.
-  EXPECT_FALSE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 
   // Switch back to the first tab.
   TabStripModel* tab_strip_model = browser()->tab_strip_model();
   tab_strip_model->ActivateTabAt(0, false);
 
   // Make sure it is visible now.
-  EXPECT_TRUE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
+  EXPECT_TRUE(HasSidebarForCurrentTab());
 
-  HideSidebarForCurrentTab();
+  ClickExtensionBrowserAction();
+
+  // Make sure it is not visible any more
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
+// Tests hiding sidebars on inactive tabs
 IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
-
-
-  SidebarManager* sidebar_manager =
-      SidebarManager::GetFromContext(browser()->profile());
-
-  CreateSidebarForCurrentTab();
-
-  OpenNewTab();
+  ClickExtensionBrowserAction();
+  chrome::NewTab(browser());
 
   // Hide sidebar on inactive (first) tab.
   HideSidebar(web_contents(0));
@@ -184,14 +157,13 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
   tab_strip_model->ActivateTabAt(0, false);
 
   // Make sure sidebar is not visbile anymore.
-  EXPECT_FALSE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 
   // Show sidebar on inactive (second) tab.
   CreateSidebar(web_contents(1));
+
   // Make sure sidebar is not visible yet.
-  EXPECT_FALSE(sidebar_manager->HasSidebar(
-      browser()->tab_strip_model()->GetActiveWebContents()));
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 
 }
 
