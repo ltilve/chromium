@@ -16,7 +16,6 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -53,8 +52,8 @@ class SidebarTest : public ExtensionBrowserTest {
   }
 
   ExtensionAction* GetBrowserAction(const Extension& extension) {
-    return ExtensionActionManager::Get(browser()->profile())->
-        GetBrowserAction(extension);
+    return ExtensionActionManager::Get(browser()->profile())
+        ->GetBrowserAction(extension);
   }
 
   BrowserActionTestUtil* GetBrowserActionsBar() {
@@ -88,19 +87,16 @@ class SidebarTest : public ExtensionBrowserTest {
         browser()->tab_strip_model()->GetWebContentsAt(i));
   }
 
-  BrowserView* browser_view() const {
-    return BrowserView::GetBrowserViewForBrowser(browser());
-  }
-
   void DisableOpenInSidebar() {
-	  GetBrowserAction(*extension_)->set_open_in_sidebar(false);
+    GetBrowserAction(*extension_)->set_open_in_sidebar(false);
   }
 
   bool HasSidebarForCurrentTab() {
-	  SidebarManager* sidebar_manager = SidebarManager::GetFromContext(browser()->profile());
-	  return sidebar_manager->HasSidebar(
-			  browser()->tab_strip_model()->GetActiveWebContents());
-}
+    SidebarManager* sidebar_manager =
+        SidebarManager::GetFromContext(browser()->profile());
+    return sidebar_manager->HasSidebar(
+        browser()->tab_strip_model()->GetActiveWebContents());
+  }
 
  private:
   std::string content_id_;
@@ -164,7 +160,6 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
 
   // Make sure sidebar is not visible yet.
   EXPECT_FALSE(HasSidebarForCurrentTab());
-
 }
 
 }  // namespace
