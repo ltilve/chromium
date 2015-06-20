@@ -57,7 +57,7 @@ class SidebarContainer : public content::NotificationObserver,
   // TabStripModelObserver overrides.
   void TabClosingAt(TabStripModel* tab_strip_model,
                     content::WebContents* contents,
-                    int index);
+                    int index) override;
 
  private:
   scoped_ptr<extensions::ExtensionViewHost> host_;
