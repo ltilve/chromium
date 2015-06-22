@@ -95,6 +95,9 @@ class ExtensionActionViewController
   }
 
  private:
+  // Update button state to be pressed/unpressed
+  void UpdateButtonState();
+
   // ExtensionActionIconFactory::Observer:
   void OnIconUpdated() override;
 
@@ -192,8 +195,6 @@ class ExtensionActionViewController
 
   ScopedObserver<extensions::ExtensionHost, extensions::ExtensionHostObserver>
       popup_host_observer_;
-
-  std::set<content::WebContents*> active_in_webcontents_;
 
   base::WeakPtrFactory<ExtensionActionViewController> weak_factory_;
 

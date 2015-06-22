@@ -21,7 +21,6 @@
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_delegate.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
 #include "chrome/common/extensions/api/extension_action/action_info.h"
@@ -59,6 +58,10 @@ ExtensionActionViewController::ExtensionActionViewController(
   DCHECK(extension_action->action_type() == ActionInfo::TYPE_PAGE ||
          extension_action->action_type() == ActionInfo::TYPE_BROWSER);
   DCHECK(extension);
+
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  sidebar_manager->AddObserver(this);
 }
 
 ExtensionActionViewController::~ExtensionActionViewController() {
@@ -68,10 +71,18 @@ ExtensionActionViewController::~ExtensionActionViewController() {
       extensions::SidebarManager::GetFromContext(browser_->profile());
 
   sidebar_manager->RemoveObserver(this);
-  for (std::set<content::WebContents*>::iterator it =
-           active_in_webcontents_.begin();
-       it != active_in_webcontents_.end(); ++it)
-    sidebar_manager->HideSidebar(*it);
+  if (GetPreferredPopupViewController() == this) {
+    int count = browser_->tab_strip_model()->count();
+    for (int i = 0; i < count; ++i) {
+      content::WebContents* contents = browser_->tab_strip_model()->GetWebContentsAt(i);
+      if (contents) {
+        extensions::SidebarContainer* sidebar =
+          sidebar_manager->GetSidebarContainerFor(contents);
+        if (sidebar && sidebar->extension_id() == GetId())
+          sidebar_manager->HideSidebar(contents);
+      }
+    }
+  }
 }
 
 const std::string& ExtensionActionViewController::GetId() const {
@@ -345,7 +356,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
       return false;
     }
 
-    active_in_webcontents_.insert(web_contents);
     sidebar_manager->AddObserver(this);
 
     sidebar_manager->CreateSidebar(web_contents, popup_url, browser_);
@@ -410,25 +420,11 @@ void ExtensionActionViewController::OnPopupShown(bool grant_tab_permissions) {
   view_delegate_->OnPopupShown(grant_tab_permissions);
 }
 
+
 void ExtensionActionViewController::OnSidebarHidden(
     content::WebContents* tab,
     const std::string& content_id) {
-  if (view_delegate_->GetCurrentWebContents() == tab && content_id == GetId()) {
-    view_delegate_->OnPopupClosed();
-    active_in_webcontents_.erase(
-        active_in_webcontents_.find(view_delegate_->GetCurrentWebContents()));
-    if (active_in_webcontents_.size() == 0) {
-      extensions::SidebarManager::GetFromContext(browser_->profile())
-          ->RemoveObserver(this);
-
-      if (toolbar_actions_bar_) {
-        toolbar_actions_bar_->SetPopupOwner(nullptr);
-        if (toolbar_actions_bar_->popped_out_action() == this &&
-            !view_delegate_->IsMenuRunning())
-          toolbar_actions_bar_->UndoPopOut();
-      }
-    }
-  }
+  UpdateButtonState();
 }
 
 void ExtensionActionViewController::OnSidebarSwitched(
@@ -436,38 +432,47 @@ void ExtensionActionViewController::OnSidebarSwitched(
     const std::string& old_content_id,
     content::WebContents* new_tab,
     const std::string& new_content_id) {
-  if (browser_->tab_strip_model()->GetIndexOfWebContents(
-          new_tab ? new_tab : old_tab) == TabStripModel::kNoTab)
+  UpdateButtonState();
+}
+
+void ExtensionActionViewController::UpdateButtonState() {
+  if (GetPreferredPopupViewController() != this)
     return;
 
-  if (old_content_id == GetId() && old_content_id != new_content_id) {
-    if (toolbar_actions_bar_) {
-      toolbar_actions_bar_->SetPopupOwner(nullptr);
-      if (toolbar_actions_bar_->popped_out_action() == this &&
-          !view_delegate_->IsMenuRunning())
-        toolbar_actions_bar_->UndoPopOut();
+  // Should the button be depressed?
+  content::WebContents *current = view_delegate_->GetCurrentWebContents();
+  if (current) {
+    extensions::SidebarManager *sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+    extensions::SidebarContainer* sidebar =
+      sidebar_manager->GetSidebarContainerFor(current);
+    if (sidebar) {
+      if (sidebar->extension_id() == GetId()) {
+        toolbar_actions_bar_->SetPopupOwner(this);
+        if (toolbar_actions_bar_ && !toolbar_actions_bar_->IsActionVisible(this) &&
+            extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
+          platform_delegate_->CloseOverflowMenu();
+          toolbar_actions_bar_->PopOutAction(
+              this, base::Bind(&ExtensionActionViewController::OnPopupShown,
+                               weak_factory_.GetWeakPtr(), true));
+        } else {
+          // Without the popup corner arrow indicator, marking the browserAction
+          // icon
+          // is necessary for extension attribution
+          view_delegate_->OnPopupShown(true);
+        }
+        return;
+      }
     }
-    view_delegate_->OnPopupClosed();
   }
 
-  if (view_delegate_->GetCurrentWebContents() == new_tab &&
-      new_content_id == GetId() && old_content_id != new_content_id) {
-    if (toolbar_actions_bar_)
-      toolbar_actions_bar_->SetPopupOwner(this);
-    if (toolbar_actions_bar_ && !toolbar_actions_bar_->IsActionVisible(this) &&
-        extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
-      platform_delegate_->CloseOverflowMenu();
-      toolbar_actions_bar_->PopOutAction(
-          this, base::Bind(&ExtensionActionViewController::OnPopupShown,
-                           weak_factory_.GetWeakPtr(), true));
-    } else {
-      // Without the popup corner arrow indicator, marking the browserAction
-      // icon
-      // is necessary for extension attribution
-      view_delegate_->OnPopupShown(true);
+  // Reset button state
+  if (toolbar_actions_bar_) {
+    toolbar_actions_bar_->SetPopupOwner(nullptr);
+    if (toolbar_actions_bar_->popped_out_action() == this &&
+        !view_delegate_->IsMenuRunning()) {
+      toolbar_actions_bar_->UndoPopOut();
     }
   }
-
-  if (old_tab == new_tab && old_content_id == GetId())
-    OnSidebarHidden(old_tab, old_content_id);
+  view_delegate_->OnPopupClosed();
 }
