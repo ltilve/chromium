@@ -57,10 +57,8 @@ void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
 void SidebarContainer::Observe(int type,
                                const content::NotificationSource& source,
                                const content::NotificationDetails& details) {
-  if (type != extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE) {
-    NOTREACHED() << L"Received unexpected notification";
-    return;
-  }
+  DCHECK_EQ(type, extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE)
+     << "Received unexpected notification";
 
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
