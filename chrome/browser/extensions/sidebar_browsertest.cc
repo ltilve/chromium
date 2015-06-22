@@ -67,24 +67,22 @@ class SidebarTest : public ExtensionBrowserTest {
   }
 
   void CreateSidebar(WebContents* temp) {
-    WebContents* tab = static_cast<WebContents*>(temp);
+//    WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
     GURL url("chrome-extension://" + content_id_ + kSimplePage);
-    sidebar_manager->CreateSidebar(tab, url, browser());
+    sidebar_manager->CreateSidebar(temp, url, browser());
   }
 
   void HideSidebar(WebContents* temp) {
-    WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
-    sidebar_manager->HideSidebar(tab);
-    EXPECT_FALSE(sidebar_manager->HasSidebar(tab));
+    sidebar_manager->HideSidebar(temp);
+    EXPECT_FALSE(sidebar_manager->HasSidebar(temp));
   }
 
   WebContents* web_contents(int i) {
-    return static_cast<WebContents*>(
-        browser()->tab_strip_model()->GetWebContentsAt(i));
+    return browser()->tab_strip_model()->GetWebContentsAt(i);
   }
 
   void DisableOpenInSidebar() {
