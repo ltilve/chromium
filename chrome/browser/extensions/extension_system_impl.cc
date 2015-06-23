@@ -234,6 +234,8 @@ void ExtensionSystemImpl::Shared::Init(bool extensions_enabled) {
       }
     }
   }
+
+  sidebar_manager_.reset(new SidebarManager());
 }
 
 void ExtensionSystemImpl::Shared::Shutdown() {
@@ -284,6 +286,10 @@ AppSorting* ExtensionSystemImpl::Shared::app_sorting() {
 
 ContentVerifier* ExtensionSystemImpl::Shared::content_verifier() {
   return content_verifier_.get();
+}
+
+SidebarManager* ExtensionSystemImpl::Shared::sidebar_manager() {
+  return sidebar_manager_.get();
 }
 
 //
@@ -404,14 +410,7 @@ void ExtensionSystemImpl::UnregisterExtensionWithRequestContexts(
 }
 
 SidebarManager* ExtensionSystemImpl::sidebar_manager() {
-  if (!sidebar_manager_)
-    CreateSidebarManager();
-  return sidebar_manager_.get();
-}
-
-void ExtensionSystemImpl::CreateSidebarManager() {
-  DCHECK(sidebar_manager_.get() == nullptr);
-  sidebar_manager_.reset(new SidebarManager());
+  return shared_->sidebar_manager();
 }
 
 }  // namespace extensions
