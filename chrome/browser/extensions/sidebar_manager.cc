@@ -79,7 +79,7 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
   for (TabToSidebarContainerMap::iterator it =
            tab_to_sidebar_container_.begin();
        it != tab_to_sidebar_container_.end(); ++it) {
-    if (sidebar_contents == it->second->host_contents())
+    if (sidebar_contents == it->second->sidebar_contents())
       return it->second;
   }
   return nullptr;

@@ -29,8 +29,6 @@ SidebarContainer::SidebarContainer(Browser* browser,
                                                                     browser)),
       tab_(tab),
       browser_(browser) {
-  extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
-      host_contents());
 
   // Listen for the containing view calling window.close();
   registrar_.Add(
@@ -38,7 +36,8 @@ SidebarContainer::SidebarContainer(Browser* browser,
       content::Source<content::BrowserContext>(host_->browser_context()));
 
   host_->CreateRenderViewSoon();
-  host_contents()->SetInitialFocus();
+  sidebar_contents()->SetInitialFocus();
+
   browser_->tab_strip_model()->AddObserver(this);
 }
 
