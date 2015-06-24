@@ -38,10 +38,10 @@ class SidebarContainer : public content::NotificationObserver,
   ~SidebarContainer() override;
 
   // Returns HostContents sidebar is linked to.
-  content::WebContents* host_contents() const { return host_->host_contents(); }
+  content::WebContents* sidebar_contents() const { return host_->host_contents(); }
 
   // Returns TabContents sidebar is linked to.
-  content::WebContents* web_contents() const { return tab_; }
+  content::WebContents* tab_contents() const { return tab_; }
 
   const std::string& extension_id() { return host_->extension_id(); }
 
