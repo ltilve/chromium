@@ -2176,7 +2176,7 @@ void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
     extensions::SidebarContainer* client_host =
         sidebar_manager->GetSidebarContainerFor(new_contents);
     if (client_host)
-      sidebar_contents = client_host->host_contents();
+      sidebar_contents = client_host->sidebar_contents();
   }
 
   bool visible = nullptr != sidebar_contents;
