@@ -25,23 +25,19 @@ class WebContents;
 }
 
 namespace extensions {
-///////////////////////////////////////////////////////////////////////////////
-// SidebarContainer
-//
-//  Stores one particular sidebar state: sidebar's content, its content id,
-//  tab it is linked to, mini tab icon, title etc.
-//
+
+// Stores one particular sidebar state: sidebar's content, its content id,
+// tab it is linked to, mini tab icon, title etc.
 class SidebarContainer : public content::NotificationObserver,
                          public TabStripModelObserver {
  public:
-  // Interface to implement to listen for sidebar update notification.
 
   SidebarContainer(Browser* browser,
                    content::WebContents* tab,
                    const GURL& url);
   ~SidebarContainer() override;
 
-  // Retruns HostContents sidebar is linked to.
+  // Returns HostContents sidebar is linked to.
   content::WebContents* host_contents() const { return host_->host_contents(); }
 
   // Returns TabContents sidebar is linked to.
@@ -49,17 +45,18 @@ class SidebarContainer : public content::NotificationObserver,
 
   const std::string& extension_id() { return host_->extension_id(); }
 
-  // content::NotificationObserver overrides.
-  void Observe(int type,
-               const content::NotificationSource& source,
-               const content::NotificationDetails& details) override;
-
-  // TabStripModelObserver overrides.
+  // TabStripModelObserver
   void TabClosingAt(TabStripModel* tab_strip_model,
                     content::WebContents* contents,
                     int index) override;
 
  private:
+
+  // content::NotificationObserver
+  void Observe(int type,
+               const content::NotificationSource& source,
+               const content::NotificationDetails& details) override;
+
   scoped_ptr<extensions::ExtensionViewHost> host_;
 
   content::NotificationRegistrar registrar_;
