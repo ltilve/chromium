@@ -34,9 +34,10 @@ const char kSimplePage[] = "/simple_page.html";
 class SidebarTest : public ExtensionBrowserTest {
  public:
   SidebarTest() {}
+  ~SidebarTest() {}
 
  protected:
-  // InProcessBrowserTest overrides.
+  // InProcessBrowserTest
   void SetUpOnMainThread() override {
     ExtensionBrowserTest::SetUpOnMainThread();
 
@@ -48,7 +49,7 @@ class SidebarTest : public ExtensionBrowserTest {
 
     ASSERT_TRUE(extension_);
 
-    content_id_ = last_loaded_extension_id();
+    browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
   }
 
   ExtensionAction* GetBrowserAction(const Extension& extension) {
@@ -57,8 +58,6 @@ class SidebarTest : public ExtensionBrowserTest {
   }
 
   BrowserActionTestUtil* GetBrowserActionsBar() {
-    if (!browser_action_test_util_)
-      browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
     return browser_action_test_util_.get();
   }
 
@@ -67,10 +66,9 @@ class SidebarTest : public ExtensionBrowserTest {
   }
 
   void CreateSidebar(WebContents* temp) {
-//    WebContents* tab = static_cast<WebContents*>(temp);
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
-    GURL url("chrome-extension://" + content_id_ + kSimplePage);
+    GURL url("chrome-extension://" + extension_->id() + kSimplePage);
     sidebar_manager->CreateSidebar(temp, url, browser());
   }
 
@@ -97,7 +95,6 @@ class SidebarTest : public ExtensionBrowserTest {
   }
 
  private:
-  std::string content_id_;
   const Extension* extension_;
   scoped_ptr<BrowserActionTestUtil> browser_action_test_util_;
 };
