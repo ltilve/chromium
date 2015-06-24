@@ -761,6 +761,7 @@
       'browser/extensions/permissions_based_management_policy_provider_unittest.cc',
       'browser/extensions/permissions_updater_unittest.cc',
       'browser/extensions/shared_module_service_unittest.cc',
+      'browser/extensions/sidebar_unittest.cc',
       'browser/extensions/standard_management_policy_provider_unittest.cc',
       'browser/extensions/token_cache/token_cache_service_unittest.cc',
       'browser/extensions/updater/extension_cache_fake.cc',
