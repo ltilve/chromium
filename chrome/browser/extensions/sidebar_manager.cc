@@ -50,9 +50,9 @@ void SidebarManager::NotifyStateChanges(
 
   content::WebContents* old_tab = was_active_container == nullptr
                                       ? nullptr
-                                      : was_active_container->web_contents();
+                                      : was_active_container->tab_contents();
   content::WebContents* new_tab =
-      active_container == nullptr ? nullptr : active_container->web_contents();
+      active_container == nullptr ? nullptr : active_container->tab_contents();
   const std::string& old_content_id =
       was_active_container == nullptr ? ""
                                       : was_active_container->extension_id();
