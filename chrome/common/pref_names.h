@@ -523,7 +523,6 @@ extern const char kRelaunchMode[];
 
 extern const char kDisableExtensions[];
 extern const char kDisablePluginFinder[];
-extern const char kExtensionSidebarWidth[];
 
 extern const char kNtpAppPageNames[];
 #if defined(OS_ANDROID)
