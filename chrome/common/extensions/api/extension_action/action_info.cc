@@ -182,11 +182,6 @@ scoped_ptr<ActionInfo> ActionInfo::Load(const Extension* extension,
     }
   }
 
-  // Should open popup in sidebar?
-  if (!dict->GetBoolean(keys::kPageActionOpenInSidebar,
-                        &result->open_in_sidebar))
-    result->open_in_sidebar = false;
-
   return result.Pass();
 }
 

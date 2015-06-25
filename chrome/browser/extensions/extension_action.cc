@@ -342,6 +342,8 @@ void ExtensionAction::Populate(const extensions::Extension& extension,
   SetTitle(kDefaultTabId, title);
   SetPopupUrl(kDefaultTabId, manifest_data.default_popup_url);
   set_id(manifest_data.id);
+
+  // Initialize open_in_sidebar
   set_open_in_sidebar(manifest_data.open_in_sidebar);
 
   // Initialize the specified icon set.
