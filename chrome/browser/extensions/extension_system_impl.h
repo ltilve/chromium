@@ -19,7 +19,6 @@ class ExtensionSystemSharedFactory;
 class NavigationObserver;
 class SharedUserScriptMaster;
 class StateStoreNotificationObserver;
-// class SidebarManager;
 
 // The ExtensionSystem for ProfileImpl and OffTheRecordProfileImpl.
 // Implementation details: non-shared services are owned by
