@@ -6,10 +6,8 @@
 #define CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_
 
 #include <map>
-#include <string>
 
 #include "base/observer_list.h"
-#include "base/strings/string16.h"
 #include "chrome/browser/extensions/sidebar_container.h"
 
 class GURL;
@@ -22,18 +20,17 @@ class WebContents;
 }
 
 namespace extensions {
-///////////////////////////////////////////////////////////////////////////////
-// SidebarManager
-//
-//  This class is a singleton that manages SidebarContainer instances and
-//  maintains a connection between tabs and sidebars.
-//
+
+// Singleton that manages SidebarContainer instances and
+// maintains a connection between tabs and sidebars.
 class SidebarManager {
  public:
   // Returns SidebarManager instance registered with BrowserContext.
   static SidebarManager* GetFromContext(content::BrowserContext* context);
 
   SidebarManager();
+
+  ~SidebarManager();
 
   // Returns SidebarContainer registered for |tab| or nullptr if there is no
   // SidebarContainer registered for |tab|.
@@ -54,17 +51,10 @@ class SidebarManager {
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
 
-  ~SidebarManager();
-
  private:
   // Returns SidebarContainer corresponding to |sidebar_contents|.
   SidebarContainer* FindSidebarContainerFor(
       content::WebContents* sidebar_contents);
-
-  // This map stores sidebars linked to a particular tab. Sidebars are
-  // identified by their unique content id (string).
-  typedef std::map<std::string, SidebarContainer*>
-      ContentIdToSidebarContainerMap;
 
   // These two maps are for tracking dependencies between tabs and
   // their SidebarContainers.

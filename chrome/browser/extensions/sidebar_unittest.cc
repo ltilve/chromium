@@ -70,7 +70,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   }
 
    void CreateSidebarForCurrentTab() {
-       CreateSidebar(browser()->tab_strip_model()->GetActiveWebContents(););
+       CreateSidebar(browser()->tab_strip_model()->GetActiveWebContents());
    }
 
   void CreateSidebar(WebContents* temp) {
