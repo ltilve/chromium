@@ -30,6 +30,10 @@ SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
 SidebarManager::SidebarManager() {
 }
 
+SidebarManager::~SidebarManager() {
+  DCHECK(tab_to_sidebar_container_.empty());
+}
+
 SidebarContainer* SidebarManager::GetSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
@@ -68,10 +72,6 @@ void SidebarManager::HideSidebar(WebContents* tab) {
 
 bool SidebarManager::HasSidebar(WebContents* tab) {
   return GetSidebarContainerFor(tab) != nullptr;
-}
-
-SidebarManager::~SidebarManager() {
-  DCHECK(tab_to_sidebar_container_.empty());
 }
 
 SidebarContainer* SidebarManager::FindSidebarContainerFor(

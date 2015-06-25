@@ -15,7 +15,6 @@ namespace extensions {
 class ExtensionSystemSharedFactory;
 class NavigationObserver;
 class StateStoreNotificationObserver;
-// class SidebarManager;
 
 // The ExtensionSystem for ProfileImpl and OffTheRecordProfileImpl.
 // Implementation details: non-shared services are owned by
