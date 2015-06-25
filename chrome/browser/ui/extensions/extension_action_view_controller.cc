@@ -321,8 +321,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
   // Always hide the current popup, even if it's not owned by this extension.
   // Only one popup should be visible at a time.
-  if (!use_sidebar)
-    HideActivePopup();
+  HideActivePopup();
 
   // If we were showing a popup already, then we treat the action to open the
   // same one as a desire to close it (like clicking a menu button that was
@@ -330,12 +329,12 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (already_showing)
     return false;
 
-  if (use_sidebar) {
-    extensions::SidebarManager* sidebar_manager =
-        extensions::SidebarManager::GetFromContext(browser_->profile());
+  extensions::SidebarManager* sidebar_manager =
+          extensions::SidebarManager::GetFromContext(browser_->profile());
+  content::WebContents* web_contents =
+      view_delegate_->GetCurrentWebContents();
 
-    content::WebContents* web_contents =
-        view_delegate_->GetCurrentWebContents();
+  if (use_sidebar) {
 
     extensions::SidebarContainer* sidebar =
         sidebar_manager->GetSidebarContainerFor(web_contents);
@@ -348,6 +347,11 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
     sidebar_manager->CreateSidebar(web_contents, popup_url, browser_);
     return true;
+  }
+
+  // Hide sidebar if visible
+  if (sidebar_manager->HasSidebar(web_contents)) {
+	  sidebar_manager->HideSidebar(web_contents);
   }
 
   scoped_ptr<extensions::ExtensionViewHost> host(
