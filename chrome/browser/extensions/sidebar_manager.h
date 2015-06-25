@@ -51,6 +51,10 @@ class SidebarManager {
   void RemoveObserver(SidebarManagerObserver* observer);
 
  private:
+  // Returns SidebarContainer corresponding to |sidebar_contents|.
+  SidebarContainer* FindSidebarContainerFor(
+      content::WebContents* sidebar_contents);
+
   // These two maps are for tracking dependencies between tabs and
   // their SidebarContainers.
   //
