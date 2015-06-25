@@ -61,8 +61,9 @@ class SidebarManager {
   //
   // SidebarManager start listening to SidebarContainers when they are put
   // into these maps and removes them when they are closing.
-  typedef std::map<content::WebContents*, SidebarContainer*>
-      TabToSidebarContainerMap;
+  using TabToSidebarContainerMap =
+    std::map<content::WebContents*, SidebarContainer*>;
+
   TabToSidebarContainerMap tab_to_sidebar_container_;
 
   base::ObserverList<SidebarManagerObserver> observer_list_;

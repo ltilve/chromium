@@ -18,12 +18,12 @@
 #include "extensions/common/switches.h"
 #include "url/gurl.h"
 
-using content::BrowserContext;
 using content::WebContents;
 
 namespace extensions {
+
 // static
-SidebarManager* SidebarManager::GetFromContext(BrowserContext* context) {
+SidebarManager* SidebarManager::GetFromContext(content::BrowserContext* context) {
   return ExtensionSystem::Get(context)->sidebar_manager();
 }
 
@@ -37,9 +37,7 @@ SidebarManager::~SidebarManager() {
 SidebarContainer* SidebarManager::GetSidebarContainerFor(
     content::WebContents* tab) {
   TabToSidebarContainerMap::iterator it = tab_to_sidebar_container_.find(tab);
-  if (it == tab_to_sidebar_container_.end())
-    return nullptr;
-  return it->second;
+  return it == tab_to_sidebar_container_.end() ? nullptr : it->second;
 }
 
 void SidebarManager::CreateSidebar(content::WebContents* tab,
