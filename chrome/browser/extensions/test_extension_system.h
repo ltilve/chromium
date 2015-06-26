@@ -49,6 +49,7 @@ class TestExtensionSystem : public ExtensionSystem {
   SharedUserScriptMaster* shared_user_script_master() override;
   StateStore* state_store() override;
   StateStore* rules_store() override;
+  SidebarManager* sidebar_manager() override;
   TestingValueStore* value_store() { return value_store_; }
   InfoMap* info_map() override;
   QuotaService* quota_service() override;
@@ -75,6 +76,7 @@ class TestExtensionSystem : public ExtensionSystem {
 
  private:
   scoped_ptr<StateStore> state_store_;
+  scoped_ptr<SidebarManager> sidebar_manager_;
   // A pointer to the TestingValueStore owned by |state_store_|.
   TestingValueStore* value_store_;
   scoped_ptr<ManagementPolicy> management_policy_;

@@ -128,6 +128,10 @@ StateStore* ShellExtensionSystem::rules_store() {
   return nullptr;
 }
 
+SidebarManager* ShellExtensionSystem::sidebar_manager() {
+  return nullptr;
+}
+
 InfoMap* ShellExtensionSystem::info_map() {
   if (!info_map_.get())
     info_map_ = new InfoMap;
