@@ -28,7 +28,8 @@ SidebarContainer::SidebarContainer(Browser* browser,
     : host_(extensions::ExtensionViewHostFactory::CreateSidebarHost(url,
                                                                     browser)),
       tab_(tab),
-      browser_(browser) {
+      browser_(browser),
+      tab_strip_model_observer_(this) {
 
   // Listen for the containing view calling window.close();
   registrar_.Add(
@@ -38,11 +39,11 @@ SidebarContainer::SidebarContainer(Browser* browser,
   host_->CreateRenderViewSoon();
   sidebar_contents()->SetInitialFocus();
 
-  browser_->tab_strip_model()->AddObserver(this);
+  tab_strip_model_observer_.Add(browser_->tab_strip_model());
 }
 
 SidebarContainer::~SidebarContainer() {
-  browser_->tab_strip_model()->RemoveObserver(this);
+  tab_strip_model_observer_.Remove(browser_->tab_strip_model());
 }
 
 void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
