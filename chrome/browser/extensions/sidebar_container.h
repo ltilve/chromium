@@ -67,6 +67,9 @@ class SidebarContainer : public content::NotificationObserver,
   // Reference to browser
   Browser* browser_;
 
+  ScopedObserver<TabStripModel, TabStripModelObserver>
+      tab_strip_model_observer_;
+
   DISALLOW_COPY_AND_ASSIGN(SidebarContainer);
 };
 
