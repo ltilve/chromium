@@ -43,6 +43,7 @@ SidebarContainer* SidebarManager::GetSidebarContainerFor(
 void SidebarManager::CreateSidebar(content::WebContents* tab,
                                    const GURL& url,
                                    Browser* browser) {
+  DCHECK(tab);
   SidebarContainer* container = GetSidebarContainerFor(tab);
   if (container)
     HideSidebar(tab);
@@ -56,6 +57,7 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
 }
 
 void SidebarManager::HideSidebar(WebContents* tab) {
+  DCHECK(tab);
   SidebarContainer* container = GetSidebarContainerFor(tab);
   if (!container)
     return;
