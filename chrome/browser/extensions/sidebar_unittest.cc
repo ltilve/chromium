@@ -59,24 +59,25 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     TestExtensionSystem* system =
       static_cast<TestExtensionSystem*>(ExtensionSystem::Get(browser()->profile()));
 
-    system->CreateExtensionService(base::CommandLine::ForCurrentProcess(),
-                                   extension_path, false);
+    ExtensionService* extension_service = system->CreateExtensionService(base::CommandLine::ForCurrentProcess(),
+                                          extension_path, false);
 
     extension_path = extension_path.AppendASCII("sidebar");
 
     // extension_ = LoadExtension(extension_path);
 
     std::string error;
-    scoped_refptr<Extension> extension(file_util::LoadExtension(
-               extension_path, Manifest::UNPACKED, Extension::NO_FLAGS, &error));
+    extension_ = file_util::LoadExtension(
+               extension_path, Manifest::UNPACKED, Extension::NO_FLAGS, &error);
 
-    ASSERT_TRUE(extension.get());
+    ASSERT_TRUE(extension_.get());
 
-    extension_ = extension.get();
-
-    ASSERT_TRUE(extension_);
+    extension_service->AddExtension(extension_.get());
 
     browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
+
+    chrome::NewTab(browser());
+    browser()->tab_strip_model()->ActivateTabAt(0,false);
   }
 
    void CreateSidebarForCurrentTab() {
@@ -86,7 +87,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   void CreateSidebar(WebContents* temp) {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
-    GURL url("chrome-extension://" + extension_->id() + kSimplePage);
+    GURL url("chrome-extension://" + extension_.get()->id() + kSimplePage);
     sidebar_manager->CreateSidebar(temp, url, browser());
   }
 
@@ -109,7 +110,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   }
 
  private:
-  const Extension* extension_;
+  scoped_refptr<Extension> extension_;
   scoped_ptr<BrowserActionTestUtil> browser_action_test_util_;
 };
 
