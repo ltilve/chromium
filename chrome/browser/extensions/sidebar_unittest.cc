@@ -20,6 +20,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
+#include "extensions/browser/extension_system.h"
 #include "extensions/common/extension.h"
 
 #include "chrome/browser/extensions/browser_action_test_util.h"
@@ -29,6 +30,7 @@
 #include "extensions/common/manifest.h"
 #include "chrome/test/base/testing_profile_manager.h"
 #include "chrome/browser/extensions/extension_api_unittest.h"
+#include "chrome/browser/extensions/test_extension_system.h"
 
 
 using content::NavigationController;
@@ -52,6 +54,14 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     // Load test sidebar extension.
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
+
+
+    TestExtensionSystem* system =
+      static_cast<TestExtensionSystem*>(ExtensionSystem::Get(browser()->profile()));
+
+    system->CreateExtensionService(base::CommandLine::ForCurrentProcess(),
+                                   extension_path, false);
+
     extension_path = extension_path.AppendASCII("sidebar");
 
     // extension_ = LoadExtension(extension_path);
