@@ -2,35 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/command_line.h"
-#include "base/files/file_path.h"
-#include "base/memory/ref_counted.h"
 #include "base/path_service.h"
-#include "chrome/browser/extensions/extension_action_manager.h"
+#include "chrome/browser/extensions/browser_action_test_util.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/sidebar_manager.h"
+#include "chrome/browser/extensions/test_extension_system.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
-#include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/common/chrome_paths.h"
-#include "chrome/common/chrome_switches.h"
-#include "chrome/test/base/in_process_browser_test.h"
+#include "chrome/test/base/browser_with_test_window_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/common/extension.h"
-
-#include "chrome/browser/extensions/browser_action_test_util.h"
-#include "chrome/test/base/browser_with_test_window_test.h"
-#include "extensions/common/extension.h"
 #include "extensions/common/file_util.h"
-#include "extensions/common/manifest.h"
-#include "chrome/test/base/testing_profile_manager.h"
-#include "chrome/browser/extensions/extension_api_unittest.h"
-#include "chrome/browser/extensions/test_extension_system.h"
+
 
 
 using content::NavigationController;
@@ -55,7 +44,6 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
 
-
     TestExtensionSystem* system =
       static_cast<TestExtensionSystem*>(ExtensionSystem::Get(browser()->profile()));
 
@@ -63,8 +51,6 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
                                           extension_path, false);
 
     extension_path = extension_path.AppendASCII("sidebar");
-
-    // extension_ = LoadExtension(extension_path);
 
     std::string error;
     extension_ = file_util::LoadExtension(
@@ -80,9 +66,9 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     browser()->tab_strip_model()->ActivateTabAt(0,false);
   }
 
-   void CreateSidebarForCurrentTab() {
-       CreateSidebar(browser()->tab_strip_model()->GetActiveWebContents());
-   }
+  void CreateSidebarForCurrentTab() {
+    CreateSidebar(browser()->tab_strip_model()->GetActiveWebContents());
+  }
 
   void CreateSidebar(WebContents* temp) {
     SidebarManager* sidebar_manager =
@@ -142,5 +128,28 @@ TEST_F(SidebarManagerTest, SwitchingTabs) {
   // Make sure it is not visible any more
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
+
+// Tests hiding sidebars on inactive tabs
+TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
+  CreateSidebarForCurrentTab();
+  chrome::NewTab(browser());
+
+  // Hide sidebar on inactive (first) tab.
+  HideSidebar(web_contents(0));
+
+  // Switch back to the first tab.
+  TabStripModel* tab_strip_model = browser()->tab_strip_model();
+  tab_strip_model->ActivateTabAt(0, false);
+
+  // Make sure sidebar is not visbile anymore.
+  EXPECT_FALSE(HasSidebarForCurrentTab());
+
+  // Show sidebar on inactive (second) tab.
+  CreateSidebar(web_contents(1));
+
+  // Make sure sidebar is not visible yet.
+  EXPECT_FALSE(HasSidebarForCurrentTab());
+}
+
 
 }  // namespace
