@@ -54,7 +54,7 @@ class ExtensionSystemImpl : public ExtensionSystem {
   scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) override;
 
-  SidebarManager* sidebar_manager() override; //shared
+  SidebarManager* sidebar_manager() override;  // shared
 
  private:
   friend class ExtensionSystemSharedFactory;

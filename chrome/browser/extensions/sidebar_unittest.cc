@@ -20,8 +20,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/file_util.h"
 
-
-
 using content::NavigationController;
 using content::WebContents;
 using extensions::SidebarManager;
@@ -36,7 +34,6 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   ~SidebarManagerTest() {}
 
  protected:
-
   void SetUp() override {
     BrowserWithTestWindowTest::SetUp();
 
@@ -44,17 +41,17 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
 
-    TestExtensionSystem* system =
-      static_cast<TestExtensionSystem*>(ExtensionSystem::Get(browser()->profile()));
+    TestExtensionSystem* system = static_cast<TestExtensionSystem*>(
+        ExtensionSystem::Get(browser()->profile()));
 
-    ExtensionService* extension_service = system->CreateExtensionService(base::CommandLine::ForCurrentProcess(),
-                                          extension_path, false);
+    ExtensionService* extension_service = system->CreateExtensionService(
+        base::CommandLine::ForCurrentProcess(), extension_path, false);
 
     extension_path = extension_path.AppendASCII("sidebar");
 
     std::string error;
-    extension_ = file_util::LoadExtension(
-               extension_path, Manifest::UNPACKED, Extension::NO_FLAGS, &error);
+    extension_ = file_util::LoadExtension(extension_path, Manifest::UNPACKED,
+                                          Extension::NO_FLAGS, &error);
 
     ASSERT_TRUE(extension_.get());
 
@@ -63,7 +60,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
 
     chrome::NewTab(browser());
-    browser()->tab_strip_model()->ActivateTabAt(0,false);
+    browser()->tab_strip_model()->ActivateTabAt(0, false);
   }
 
   void CreateSidebarForCurrentTab() {
@@ -150,6 +147,5 @@ TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
   // Make sure sidebar is not visible yet.
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
-
 
 }  // namespace

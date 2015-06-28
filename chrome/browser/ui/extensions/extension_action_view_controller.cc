@@ -74,10 +74,11 @@ ExtensionActionViewController::~ExtensionActionViewController() {
   if (GetPreferredPopupViewController() == this) {
     int count = browser_->tab_strip_model()->count();
     for (int i = 0; i < count; ++i) {
-      content::WebContents* contents = browser_->tab_strip_model()->GetWebContentsAt(i);
+      content::WebContents* contents =
+          browser_->tab_strip_model()->GetWebContentsAt(i);
       if (contents) {
         extensions::SidebarContainer* sidebar =
-          sidebar_manager->GetSidebarContainerFor(contents);
+            sidebar_manager->GetSidebarContainerFor(contents);
         if (sidebar && sidebar->extension_id() == GetId())
           sidebar_manager->HideSidebar(contents);
       }
@@ -329,12 +330,10 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     return false;
 
   extensions::SidebarManager* sidebar_manager =
-          extensions::SidebarManager::GetFromContext(browser_->profile());
-  content::WebContents* web_contents =
-      view_delegate_->GetCurrentWebContents();
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
 
   if (use_sidebar) {
-
     extensions::SidebarContainer* sidebar =
         sidebar_manager->GetSidebarContainerFor(web_contents);
     if (sidebar && sidebar->extension_id() == GetId()) {
@@ -350,7 +349,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
   // Hide sidebar if visible
   if (sidebar_manager->HasSidebar(web_contents)) {
-	  sidebar_manager->HideSidebar(web_contents);
+    sidebar_manager->HideSidebar(web_contents);
   }
 
   scoped_ptr<extensions::ExtensionViewHost> host(
@@ -430,17 +429,19 @@ void ExtensionActionViewController::UpdateButtonState() {
     return;
 
   // Should the button be depressed?
-  content::WebContents *current = view_delegate_->GetCurrentWebContents();
+  content::WebContents* current = view_delegate_->GetCurrentWebContents();
   if (current) {
-    extensions::SidebarManager *sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
+    extensions::SidebarManager* sidebar_manager =
+        extensions::SidebarManager::GetFromContext(browser_->profile());
     extensions::SidebarContainer* sidebar =
-      sidebar_manager->GetSidebarContainerFor(current);
+        sidebar_manager->GetSidebarContainerFor(current);
     if (sidebar) {
       if (sidebar->extension_id() == GetId()) {
         toolbar_actions_bar_->SetPopupOwner(this);
-        if (toolbar_actions_bar_ && !toolbar_actions_bar_->IsActionVisible(this) &&
-            extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
+        if (toolbar_actions_bar_ &&
+            !toolbar_actions_bar_->IsActionVisible(this) &&
+            extensions::FeatureSwitch::extension_action_redesign()
+                ->IsEnabled()) {
           platform_delegate_->CloseOverflowMenu();
           toolbar_actions_bar_->PopOutAction(
               this, base::Bind(&ExtensionActionViewController::OnPopupShown,
