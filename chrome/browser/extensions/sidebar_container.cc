@@ -24,7 +24,6 @@ SidebarContainer::SidebarContainer(Browser* browser,
       tab_(tab),
       browser_(browser),
       tab_strip_model_observer_(this) {
-
   // Listen for the containing view calling window.close();
   registrar_.Add(
       this, extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE,
@@ -52,7 +51,7 @@ void SidebarContainer::Observe(int type,
                                const content::NotificationSource& source,
                                const content::NotificationDetails& details) {
   DCHECK_EQ(type, extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE)
-     << "Received unexpected notification";
+      << "Received unexpected notification";
 
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)

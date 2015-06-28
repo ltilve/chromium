@@ -58,9 +58,7 @@ class SidebarTest : public ExtensionBrowserTest {
     return browser_action_test_util_.get();
   }
 
-  void ClickExtensionBrowserAction() {
-    GetBrowserActionsBar()->Press(0);
-  }
+  void ClickExtensionBrowserAction() { GetBrowserActionsBar()->Press(0); }
 
   void CreateSidebar(WebContents* temp) {
     SidebarManager* sidebar_manager =

@@ -50,14 +50,13 @@ class SidebarManager {
   void RemoveObserver(SidebarManagerObserver* observer);
 
  private:
-
   // These two maps are for tracking dependencies between tabs and
   // their SidebarContainers.
   //
   // SidebarManager start listening to SidebarContainers when they are put
   // into these maps and removes them when they are closing.
   using TabToSidebarContainerMap =
-    std::map<content::WebContents*, SidebarContainer*>;
+      std::map<content::WebContents*, SidebarContainer*>;
 
   TabToSidebarContainerMap tab_to_sidebar_container_;
 

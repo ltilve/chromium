@@ -10,9 +10,7 @@ class WebContents;
 };
 
 class SidebarManagerObserver {
-
  public:
-
   virtual ~SidebarManagerObserver() {}
 
   // Called when sidebar is shown.

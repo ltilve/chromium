@@ -26,14 +26,15 @@ namespace extensions {
 class SidebarContainer : public content::NotificationObserver,
                          public TabStripModelObserver {
  public:
-
   SidebarContainer(Browser* browser,
                    content::WebContents* tab,
                    const GURL& url);
   ~SidebarContainer() override;
 
   // Returns HostContents sidebar is linked to.
-  content::WebContents* sidebar_contents() const { return host_->host_contents(); }
+  content::WebContents* sidebar_contents() const {
+    return host_->host_contents();
+  }
 
   // Returns TabContents sidebar is linked to.
   content::WebContents* tab_contents() const { return tab_; }
@@ -46,7 +47,6 @@ class SidebarContainer : public content::NotificationObserver,
                     int index) override;
 
  private:
-
   // content::NotificationObserver
   void Observe(int type,
                const content::NotificationSource& source,
