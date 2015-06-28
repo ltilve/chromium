@@ -4,21 +4,15 @@
 
 #include "chrome/browser/extensions/sidebar_container.h"
 
-#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/chrome_notification_types.h"
-#include "chrome/browser/extensions/chrome_extension_web_contents_observer.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
 #include "chrome/browser/extensions/sidebar_manager.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "components/app_modal/javascript_dialog_manager.h"
 #include "content/public/browser/notification_details.h"
 #include "content/public/browser/notification_source.h"
 #include "content/public/browser/web_contents.h"
-#include "extensions/common/extension.h"
-#include "extensions/common/extension_resource.h"
 #include "url/gurl.h"
 
 namespace extensions {
