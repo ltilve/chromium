@@ -278,6 +278,7 @@
       'browser/extensions/sandboxed_pages_apitest.cc',
       'browser/extensions/service_worker_apitest.cc',
       'browser/extensions/shared_module_apitest.cc',
+      'browser/extensions/sidebar_browsertest.cc',
       'browser/extensions/signin/gaia_auth_extension_loader_browsertest.cc',
       'browser/extensions/startup_helper_browsertest.cc',
       'browser/extensions/stubs_apitest.cc',
