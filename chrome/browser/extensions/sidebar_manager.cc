@@ -15,7 +15,8 @@ using content::WebContents;
 namespace extensions {
 
 // static
-SidebarManager* SidebarManager::GetFromContext(content::BrowserContext* context) {
+SidebarManager* SidebarManager::GetFromContext(
+    content::BrowserContext* context) {
   return ExtensionSystem::Get(context)->sidebar_manager();
 }
 
