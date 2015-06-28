@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/command_line.h"
 #include "base/files/file_path.h"
-#include "base/memory/ref_counted.h"
 #include "base/path_service.h"
 #include "chrome/browser/extensions/browser_action_test_util.h"
 #include "chrome/browser/extensions/extension_action_manager.h"
@@ -20,7 +18,6 @@
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
 
 using content::NavigationController;
@@ -79,10 +76,6 @@ class SidebarTest : public ExtensionBrowserTest {
     EXPECT_FALSE(sidebar_manager->HasSidebar(temp));
   }
 
-  WebContents* web_contents(int i) {
-    return browser()->tab_strip_model()->GetWebContentsAt(i);
-  }
-
   void DisableOpenInSidebar() {
     GetBrowserAction(*extension_)->set_open_in_sidebar(false);
   }
@@ -111,49 +104,6 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
 IN_PROC_BROWSER_TEST_F(SidebarTest, CreateDisabledSidebar) {
   DisableOpenInSidebar();
   ClickExtensionBrowserAction();
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-}
-
-// Tests that sidebar is only visible at the proper tab
-IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
-  ClickExtensionBrowserAction();
-  chrome::NewTab(browser());
-
-  // Make sure sidebar is not visbile for the newly opened tab.
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-
-  // Switch back to the first tab.
-  TabStripModel* tab_strip_model = browser()->tab_strip_model();
-  tab_strip_model->ActivateTabAt(0, false);
-
-  // Make sure it is visible now.
-  EXPECT_TRUE(HasSidebarForCurrentTab());
-
-  ClickExtensionBrowserAction();
-
-  // Make sure it is not visible any more
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-}
-
-// Tests hiding sidebars on inactive tabs
-IN_PROC_BROWSER_TEST_F(SidebarTest, SidebarOnInactiveTab) {
-  ClickExtensionBrowserAction();
-  chrome::NewTab(browser());
-
-  // Hide sidebar on inactive (first) tab.
-  HideSidebar(web_contents(0));
-
-  // Switch back to the first tab.
-  TabStripModel* tab_strip_model = browser()->tab_strip_model();
-  tab_strip_model->ActivateTabAt(0, false);
-
-  // Make sure sidebar is not visbile anymore.
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-
-  // Show sidebar on inactive (second) tab.
-  CreateSidebar(web_contents(1));
-
-  // Make sure sidebar is not visible yet.
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
