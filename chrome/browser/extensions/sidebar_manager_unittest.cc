@@ -148,4 +148,4 @@ TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
-}  // namespace
+}  // namespace extensions
