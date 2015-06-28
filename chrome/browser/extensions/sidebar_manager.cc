@@ -4,18 +4,10 @@
 
 #include "chrome/browser/extensions/sidebar_manager.h"
 
-#include <vector>
-
-#include "base/command_line.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/chrome_notification_types.h"
-#include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/sidebar_container.h"
 #include "chrome/browser/extensions/sidebar_manager_observer.h"
-#include "content/public/browser/notification_service.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_system.h"
-#include "extensions/common/switches.h"
 #include "url/gurl.h"
 
 using content::WebContents;

@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/extensions/extension_action_view_controller.h"
 
 #include "base/logging.h"
-#include "base/prefs/pref_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/api/commands/command_service.h"
 #include "chrome/browser/extensions/api/extension_action/extension_action_api.h"

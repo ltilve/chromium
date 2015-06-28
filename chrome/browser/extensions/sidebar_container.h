@@ -5,17 +5,12 @@
 #ifndef CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
 #define CHROME_BROWSER_EXTENSIONS_SIDEBAR_CONTAINER_H_
 
-#include <string>
-
-#include "base/basictypes.h"
-#include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
-#include "content/public/browser/web_contents_delegate.h"
 #include "extensions/browser/extension_host_observer.h"
 
 class Browser;

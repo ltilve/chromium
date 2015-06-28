@@ -5,8 +5,6 @@
 #ifndef CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_
 #define CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_H_
 
-#include <map>
-
 #include "base/observer_list.h"
 #include "chrome/browser/extensions/sidebar_container.h"
 
