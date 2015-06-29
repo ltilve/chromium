@@ -63,10 +63,6 @@ void SidebarManager::HideSidebar(WebContents* tab) {
                     OnSidebarHidden(tab, content_id));
 }
 
-bool SidebarManager::HasSidebar(WebContents* tab) {
-  return GetSidebarContainerFor(tab) != nullptr;
-}
-
 void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
   observer_list_.AddObserver(observer);
 }
