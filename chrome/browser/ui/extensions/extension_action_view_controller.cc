@@ -416,14 +416,6 @@ void ExtensionActionViewController::OnSidebarHidden(
   UpdateButtonState();
 }
 
-void ExtensionActionViewController::OnSidebarSwitched(
-    content::WebContents* old_tab,
-    const std::string& old_content_id,
-    content::WebContents* new_tab,
-    const std::string& new_content_id) {
-  UpdateButtonState();
-}
-
 void ExtensionActionViewController::UpdateButtonState() {
   if (GetPreferredPopupViewController() != this)
     return;
