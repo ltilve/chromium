@@ -78,7 +78,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
     sidebar_manager->HideSidebar(temp);
-    EXPECT_FALSE(sidebar_manager->HasSidebar(temp));
+    EXPECT_FALSE(sidebar_manager->GetSidebarContainerFor(temp) != nullptr);
   }
 
   WebContents* web_contents(int i) {
@@ -88,8 +88,8 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   bool HasSidebarForCurrentTab() {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
-    return sidebar_manager->HasSidebar(
-        browser()->tab_strip_model()->GetActiveWebContents());
+    return sidebar_manager->GetSidebarContainerFor(
+        browser()->tab_strip_model()->GetActiveWebContents()) != nullptr;
   }
 
  private:

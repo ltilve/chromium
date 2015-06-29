@@ -348,7 +348,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   }
 
   // Hide sidebar if visible
-  if (sidebar_manager->HasSidebar(web_contents)) {
+  if (sidebar_manager->GetSidebarContainerFor(web_contents) != nullptr) {
     sidebar_manager->HideSidebar(web_contents);
   }
 

@@ -43,9 +43,6 @@ class SidebarManager {
   // tab).
   void HideSidebar(content::WebContents* tab);
 
-  // Check if |tab| has a sidebar assigned.
-  bool HasSidebar(content::WebContents* tab);
-
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);
 
