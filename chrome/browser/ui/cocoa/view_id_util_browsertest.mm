@@ -56,7 +56,7 @@ class ViewIDTest : public InProcessBrowserTest {
     extensions::SidebarManager* sidebar_manager =
         extensions::SidebarManager::GetFromContext(browser()->profile());
 
-    sidebar_manager->ShowSidebar(
+    sidebar_manager->CreateSidebar(
         static_cast<content::WebContents*>(
             browser()->tab_strip_model()->GetActiveWebContents()),
             test_page_url, browser());
