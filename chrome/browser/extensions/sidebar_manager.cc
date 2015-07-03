@@ -105,17 +105,6 @@ SidebarContainer* SidebarManager::FindSidebarContainerFor(
   return nullptr;
 }
 
-SidebarContainer* SidebarManager::FindSidebarContainerFor(
-    content::WebContents* sidebar_contents) {
-  for (TabToSidebarContainerMap::iterator it =
-           tab_to_sidebar_container_.begin();
-       it != tab_to_sidebar_container_.end(); ++it) {
-    if (sidebar_contents == it->second->sidebar_contents())
-      return it->second;
-  }
-  return nullptr;
-}
-
 void SidebarManager::AddObserver(SidebarManagerObserver* observer) {
   observer_list_.AddObserver(observer);
 }
