@@ -85,7 +85,7 @@ class ExtensionActionViewController
   ExtensionAction* extension_action() { return extension_action_; }
   const ExtensionAction* extension_action() const { return extension_action_; }
   ToolbarActionViewDelegate* view_delegate() { return view_delegate_; }
-  bool is_showing_popup() const { return popup_host_ != nullptr; }
+  bool is_showing_popup() const { return is_showing_popup_; }
 
   void set_icon_observer(ExtensionActionIconFactory::Observer* icon_observer) {
     icon_observer_ = icon_observer;
@@ -96,8 +96,12 @@ class ExtensionActionViewController
       const gfx::Size& size);
 
  private:
-  // Update button state to be pressed/unpressed
-  void UpdateButtonState();
+  // Update button state to be pressed
+  void PressButton(bool grant_tab_permissions);
+  void PressButtonWithSlideOutIfEnabled(const base::Closure& closure);
+
+  // Update button state to be unpressed
+  void RaiseButton();
 
   // ExtensionActionIconFactory::Observer:
   void OnIconUpdated() override;
@@ -133,6 +137,13 @@ class ExtensionActionViewController
                            const GURL& popup_url,
                            bool grant_tab_permissions);
 
+  // Begins the process of showing the sidebar for the extension action,
+  // given the associated |popup_url|.
+  // The sidebar may not be shown synchronously if the extension is hidden and
+  // first needs to slide itself out.
+  // Returns true if a sidebar will be shown.
+  bool TriggerSidebarWithUrl(const GURL& popup_url);
+
   // Shows the popup with the given |host|.
   void ShowPopup(scoped_ptr<extensions::ExtensionViewHost> host,
                  bool grant_tab_permissions,
@@ -140,8 +151,6 @@ class ExtensionActionViewController
 
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
-
-  void OnPopupShown(bool grant_tab_permissions);
 
   // Handles sidebar events
   void OnSidebarHidden(content::WebContents* tab,
@@ -171,6 +180,9 @@ class ExtensionActionViewController
 
   // The extension popup's host if the popup is visible; null otherwise.
   extensions::ExtensionViewHost* popup_host_;
+
+  // If the sidebar is visible it is true; false otherwise.
+  bool is_showing_popup_;
 
   // The context menu model for the extension.
   scoped_refptr<ExtensionContextMenuModel> context_menu_model_;
