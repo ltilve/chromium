@@ -46,6 +46,7 @@ ExtensionActionViewController::ExtensionActionViewController(
       extension_action_(extension_action),
       toolbar_actions_bar_(toolbar_actions_bar),
       popup_host_(nullptr),
+      is_showing_popup_(false),
       view_delegate_(nullptr),
       platform_delegate_(ExtensionActionPlatformDelegate::Create(this)),
       icon_factory_(browser->profile(), extension, extension_action, this),
@@ -65,7 +66,7 @@ ExtensionActionViewController::ExtensionActionViewController(
 }
 
 ExtensionActionViewController::~ExtensionActionViewController() {
-  DCHECK(!is_showing_popup());
+  DCHECK(!popup_host_);
 
   extensions::SidebarManager* sidebar_manager =
       extensions::SidebarManager::GetFromContext(browser_->profile());
@@ -97,7 +98,7 @@ void ExtensionActionViewController::SetDelegate(
     view_delegate_ = delegate;
     platform_delegate_->OnDelegateSet();
   } else {
-    if (is_showing_popup())
+    if (popup_host_)
       HidePopup();
     platform_delegate_.reset();
     view_delegate_ = nullptr;
@@ -172,6 +173,7 @@ void ExtensionActionViewController::HidePopup() {
     if (popup_host_)
       OnPopupClosed();
   }
+  is_showing_popup_ = false;
 }
 
 gfx::NativeView ExtensionActionViewController::GetPopupNativeView() {
@@ -227,7 +229,12 @@ bool ExtensionActionViewController::ExecuteAction(PopupShowAction show_action,
       ExtensionAction::ACTION_SHOW_POPUP) {
     GURL popup_url = extension_action_->GetPopupUrl(
         SessionTabHelper::IdForTab(view_delegate_->GetCurrentWebContents()));
-    return GetPreferredPopupViewController()
+
+    if (extension_action_->open_in_sidebar())
+      return GetPreferredPopupViewController()
+        ->TriggerSidebarWithUrl(popup_url);
+    else
+      return GetPreferredPopupViewController()
         ->TriggerPopupWithUrl(show_action, popup_url, grant_tab_permissions);
   }
   return false;
@@ -313,39 +320,19 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     PopupShowAction show_action,
     const GURL& popup_url,
     bool grant_tab_permissions) {
-  if (!ExtensionIsValid())
-    return false;
-
-  bool already_showing = is_showing_popup();
-  bool use_sidebar = extension_action_->open_in_sidebar();
 
   // Always hide the current popup, even if it's not owned by this extension.
   // Only one popup should be visible at a time.
-  if (!use_sidebar)
-    HideActivePopup();
-
   // If we were showing a popup already, then we treat the action to open the
   // same one as a desire to close it (like clicking a menu button that was
   // already open).
-  if (already_showing)
+  if (is_showing_popup()) {
+    if (popup_host_)
+      HideActivePopup();
+    else
+      is_showing_popup_ = false;
+
     return false;
-
-  if (use_sidebar) {
-    extensions::SidebarManager* sidebar_manager =
-        extensions::SidebarManager::GetFromContext(browser_->profile());
-
-    content::WebContents* web_contents =
-        view_delegate_->GetCurrentWebContents();
-
-    extensions::SidebarContainer* sidebar =
-        sidebar_manager->GetSidebarContainerFor(web_contents);
-    if (sidebar && sidebar->extension_id() == GetId()) {
-      sidebar_manager->HideSidebarForTab(web_contents);
-      return false;
-    }
-
-    sidebar_manager->CreateSidebar(web_contents, popup_url, browser_);
-    return true;
   }
 
   scoped_ptr<extensions::ExtensionViewHost> host(
@@ -359,19 +346,29 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (toolbar_actions_bar_)
     toolbar_actions_bar_->SetPopupOwner(this);
 
-  if (toolbar_actions_bar_ &&
-      !toolbar_actions_bar_->IsActionVisibleOnMainBar(this) &&
-      extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
-    platform_delegate_->CloseOverflowMenu();
-    toolbar_actions_bar_->PopOutAction(
-        this,
-        base::Bind(&ExtensionActionViewController::ShowPopup,
-                   weak_factory_.GetWeakPtr(),
-                   base::Passed(host.Pass()),
-                   grant_tab_permissions,
-                   show_action));
-  } else {
-    ShowPopup(host.Pass(), grant_tab_permissions, show_action);
+  PressButtonWithSlideOutIfEnabled(
+      base::Bind(&ExtensionActionViewController::ShowPopup,
+                 weak_factory_.GetWeakPtr(),
+                 base::Passed(host.Pass()),
+                 grant_tab_permissions,
+                 show_action));
+
+  return true;
+}
+
+bool ExtensionActionViewController::TriggerSidebarWithUrl(const GURL& popup_url)
+{
+  extensions::SidebarManager* sidebar_manager =
+      extensions::SidebarManager::GetFromContext(browser_->profile());
+
+  content::WebContents* web_contents =
+      view_delegate_->GetCurrentWebContents();
+
+  extensions::SidebarContainer* sidebar =
+      sidebar_manager->GetSidebarContainerFor(web_contents);
+  if (sidebar && sidebar->extension_id() == GetId()) {
+    sidebar_manager->HideSidebarForTab(web_contents);
+    return false;
   }
 
   return true;
@@ -387,61 +384,51 @@ void ExtensionActionViewController::ShowPopup(
     return;
   platform_delegate_->ShowPopup(
       popup_host.Pass(), grant_tab_permissions, show_action);
-  view_delegate_->OnPopupShown(grant_tab_permissions);
+  PressButton(grant_tab_permissions);
+  is_showing_popup_ = true;
 }
 
 void ExtensionActionViewController::OnPopupClosed() {
-  popup_host_observer_.Remove(popup_host_);
-  popup_host_ = nullptr;
-  if (toolbar_actions_bar_) {
-    toolbar_actions_bar_->SetPopupOwner(nullptr);
-    if (toolbar_actions_bar_->popped_out_action() == this &&
-        !view_delegate_->IsMenuRunning())
-      toolbar_actions_bar_->UndoPopOut();
+  if (popup_host_) {
+    popup_host_observer_.Remove(popup_host_);
+    popup_host_ = nullptr;
   }
-  view_delegate_->OnPopupClosed();
-}
-
-void ExtensionActionViewController::OnPopupShown(bool grant_tab_permissions) {
-  view_delegate_->OnPopupShown(grant_tab_permissions);
+  toolbar_actions_bar_->SetPopupOwner(nullptr);
+  RaiseButton();
 }
 
 void ExtensionActionViewController::OnSidebarHidden(
     content::WebContents* tab,
     const std::string& content_id) {
-  UpdateButtonState();
+  RaiseButton();
 }
 
-void ExtensionActionViewController::UpdateButtonState() {
-  if (GetPreferredPopupViewController() != this)
-    return;
 
-  // Should the button be depressed?
-  content::WebContents* current = view_delegate_->GetCurrentWebContents();
-  if (current) {
-    extensions::SidebarManager* sidebar_manager =
-        extensions::SidebarManager::GetFromContext(browser_->profile());
-    extensions::SidebarContainer* sidebar =
-        sidebar_manager->GetSidebarContainerFor(current);
-    if (sidebar) {
-      if (sidebar->extension_id() == GetId()) {
-        if (toolbar_actions_bar_ &&
-            !toolbar_actions_bar_->IsActionVisible(this) &&
-            extensions::FeatureSwitch::extension_action_redesign()
-                ->IsEnabled()) {
-          platform_delegate_->CloseOverflowMenu();
-        } else {
-          // Without the popup corner arrow indicator, marking the browserAction
-          // icon
-          // is necessary for extension attribution
-          view_delegate_->OnPopupShown(true);
-        }
-        return;
-      }
+void ExtensionActionViewController::RaiseButton() {
+  // Reset button state
+  if (toolbar_actions_bar_) {
+    if (toolbar_actions_bar_->popped_out_action() == this &&
+        !view_delegate_->IsMenuRunning()) {
+      toolbar_actions_bar_->UndoPopOut();
     }
   }
-
   view_delegate_->OnPopupClosed();
+}
+
+void ExtensionActionViewController::PressButtonWithSlideOutIfEnabled(
+                                                const base::Closure& closure) {
+  if (!toolbar_actions_bar_ || toolbar_actions_bar_->IsActionVisible(this) ||
+      !extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
+    closure.Run();
+    return;
+  }
+
+  platform_delegate_->CloseOverflowMenu();
+  toolbar_actions_bar_->PopOutAction(this, closure);
+}
+
+void ExtensionActionViewController::PressButton(bool grant_tab_permissions) {
+  view_delegate_->OnPopupShown(grant_tab_permissions);
 }
 
 scoped_ptr<IconWithBadgeImageSource>
@@ -479,3 +466,4 @@ ExtensionActionViewController::GetIconImageSource(
 
   return image_source.Pass();
 }
+
