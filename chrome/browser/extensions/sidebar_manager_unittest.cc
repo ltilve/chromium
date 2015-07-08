@@ -74,10 +74,10 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     sidebar_manager->CreateSidebar(temp, url, browser());
   }
 
-  void HideSidebar(WebContents* temp) {
+  void HideSidebarForTab(WebContents* temp) {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
-    sidebar_manager->HideSidebar(temp);
+    sidebar_manager->HideSidebarForTab(temp);
     EXPECT_FALSE(sidebar_manager->GetSidebarContainerFor(temp) != nullptr);
   }
 
@@ -101,7 +101,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
 TEST_F(SidebarManagerTest, CreateSidebar) {
   CreateSidebarForCurrentTab();
   EXPECT_TRUE(HasSidebarForCurrentTab());
-  HideSidebar(web_contents(0));
+  HideSidebarForTab(web_contents(0));
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
@@ -120,7 +120,7 @@ TEST_F(SidebarManagerTest, SwitchingTabs) {
   // Make sure it is visible now.
   EXPECT_TRUE(HasSidebarForCurrentTab());
 
-  HideSidebar(web_contents(0));
+  HideSidebarForTab(web_contents(0));
 
   // Make sure it is not visible any more
   EXPECT_FALSE(HasSidebarForCurrentTab());
@@ -132,7 +132,7 @@ TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
   chrome::NewTab(browser());
 
   // Hide sidebar on inactive (first) tab.
-  HideSidebar(web_contents(0));
+  HideSidebarForTab(web_contents(0));
 
   // Switch back to the first tab.
   TabStripModel* tab_strip_model = browser()->tab_strip_model();

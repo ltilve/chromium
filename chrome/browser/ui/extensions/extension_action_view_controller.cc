@@ -80,7 +80,7 @@ ExtensionActionViewController::~ExtensionActionViewController() {
         extensions::SidebarContainer* sidebar =
             sidebar_manager->GetSidebarContainerFor(contents);
         if (sidebar && sidebar->extension_id() == GetId())
-          sidebar_manager->HideSidebar(contents);
+          sidebar_manager->HideSidebarForTab(contents);
       }
     }
   }
@@ -337,7 +337,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     extensions::SidebarContainer* sidebar =
         sidebar_manager->GetSidebarContainerFor(web_contents);
     if (sidebar && sidebar->extension_id() == GetId()) {
-      sidebar_manager->HideSidebar(web_contents);
+      sidebar_manager->HideSidebarForTab(web_contents);
       return false;
     }
 
@@ -349,7 +349,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
   // Hide sidebar if visible
   if (sidebar_manager->GetSidebarContainerFor(web_contents) != nullptr) {
-    sidebar_manager->HideSidebar(web_contents);
+    sidebar_manager->HideSidebarForTab(web_contents);
   }
 
   scoped_ptr<extensions::ExtensionViewHost> host(
