@@ -59,7 +59,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
 
     browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
 
-    chrome::NewTab(browser());
+    BrowserWithTestWindowTest::AddTab(browser(), GURL(url::kAboutBlankURL));
     browser()->tab_strip_model()->ActivateTabAt(0, false);
   }
 
@@ -108,7 +108,7 @@ TEST_F(SidebarManagerTest, CreateSidebar) {
 // Tests that sidebar is only visible at the proper tab
 TEST_F(SidebarManagerTest, SwitchingTabs) {
   CreateSidebarForCurrentTab();
-  chrome::NewTab(browser());
+  BrowserWithTestWindowTest::AddTab(browser(), GURL(url::kAboutBlankURL));
 
   // Make sure sidebar is not visbile for the newly opened tab.
   EXPECT_FALSE(HasSidebarForCurrentTab());
@@ -129,7 +129,7 @@ TEST_F(SidebarManagerTest, SwitchingTabs) {
 // Tests hiding sidebars on inactive tabs
 TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
   CreateSidebarForCurrentTab();
-  chrome::NewTab(browser());
+  BrowserWithTestWindowTest::AddTab(browser(), GURL(url::kAboutBlankURL));
 
   // Hide sidebar on inactive (first) tab.
   HideSidebarForTab(web_contents(0));
