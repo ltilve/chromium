@@ -41,7 +41,7 @@ class SidebarManager {
 
   // Hides and destroys sidebar identified by |tab| (removes sidebar's mini
   // tab).
-  void HideSidebar(content::WebContents* tab);
+  void HideSidebarForTab(content::WebContents* tab);
 
   void AddObserver(SidebarManagerObserver* observer);
   void RemoveObserver(SidebarManagerObserver* observer);

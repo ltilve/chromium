@@ -39,7 +39,7 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
   DCHECK(tab);
   SidebarContainer* container = GetSidebarContainerFor(tab);
 
-  HideSidebar(tab);
+  HideSidebarForTab(tab);
 
   container = new SidebarContainer(browser, tab, url);
   tab_to_sidebar_container_[tab] = container;
@@ -49,7 +49,7 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
                     OnSidebarShown(tab, id));
 }
 
-void SidebarManager::HideSidebar(WebContents* tab) {
+void SidebarManager::HideSidebarForTab(WebContents* tab) {
   DCHECK(tab);
   SidebarContainer* container = GetSidebarContainerFor(tab);
   if (!container)

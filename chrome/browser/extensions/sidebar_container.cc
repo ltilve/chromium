@@ -44,7 +44,7 @@ void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
                                     int index) {
   if (tab_ == contents)
     extensions::SidebarManager::GetFromContext(host_->browser_context())
-        ->HideSidebar(tab_);
+        ->HideSidebarForTab(tab_);
 }
 
 void SidebarContainer::Observe(int type,
@@ -56,7 +56,7 @@ void SidebarContainer::Observe(int type,
   // If we aren't the host of the popup, then disregard the notification.
   if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
     extensions::SidebarManager::GetFromContext(host_->browser_context())
-        ->HideSidebar(tab_);
+        ->HideSidebarForTab(tab_);
 }
 
 }  // namespace extensions
