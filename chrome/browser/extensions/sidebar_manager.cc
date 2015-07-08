@@ -38,8 +38,8 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
                                    Browser* browser) {
   DCHECK(tab);
   SidebarContainer* container = GetSidebarContainerFor(tab);
-  if (container)
-    HideSidebar(tab);
+
+  HideSidebar(tab);
 
   container = new SidebarContainer(browser, tab, url);
   tab_to_sidebar_container_[tab] = container;
