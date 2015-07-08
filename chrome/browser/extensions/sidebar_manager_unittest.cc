@@ -89,7 +89,7 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
     return sidebar_manager->GetSidebarContainerFor(
-        browser()->tab_strip_model()->GetActiveWebContents()) != nullptr;
+               browser()->tab_strip_model()->GetActiveWebContents()) != nullptr;
   }
 
  private:
@@ -97,39 +97,16 @@ class SidebarManagerTest : public BrowserWithTestWindowTest {
   scoped_ptr<BrowserActionTestUtil> browser_action_test_util_;
 };
 
-// Tests that creating/hiding sidebar
-TEST_F(SidebarManagerTest, CreateSidebar) {
-  CreateSidebarForCurrentTab();
-  EXPECT_TRUE(HasSidebarForCurrentTab());
-  HideSidebarForTab(web_contents(0));
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-}
-
 // Tests that sidebar is only visible at the proper tab
 TEST_F(SidebarManagerTest, SwitchingTabs) {
-  CreateSidebarForCurrentTab();
-  BrowserWithTestWindowTest::AddTab(browser(), GURL(url::kAboutBlankURL));
-
-  // Make sure sidebar is not visbile for the newly opened tab.
+  // Do not expect initial sidebar and create at current Tab
   EXPECT_FALSE(HasSidebarForCurrentTab());
-
-  // Switch back to the first tab.
-  TabStripModel* tab_strip_model = browser()->tab_strip_model();
-  tab_strip_model->ActivateTabAt(0, false);
-
-  // Make sure it is visible now.
+  CreateSidebarForCurrentTab();
   EXPECT_TRUE(HasSidebarForCurrentTab());
 
-  HideSidebarForTab(web_contents(0));
-
-  // Make sure it is not visible any more
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-}
-
-// Tests hiding sidebars on inactive tabs
-TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
-  CreateSidebarForCurrentTab();
+  // Switch to new tab and make sure that sidebar is not visible
   BrowserWithTestWindowTest::AddTab(browser(), GURL(url::kAboutBlankURL));
+  EXPECT_FALSE(HasSidebarForCurrentTab());
 
   // Hide sidebar on inactive (first) tab.
   HideSidebarForTab(web_contents(0));
@@ -138,14 +115,16 @@ TEST_F(SidebarManagerTest, SidebarOnInactiveTab) {
   TabStripModel* tab_strip_model = browser()->tab_strip_model();
   tab_strip_model->ActivateTabAt(0, false);
 
-  // Make sure sidebar is not visbile anymore.
+  // Make sure it is not visible now.
   EXPECT_FALSE(HasSidebarForCurrentTab());
 
   // Show sidebar on inactive (second) tab.
   CreateSidebar(web_contents(1));
 
-  // Make sure sidebar is not visible yet.
-  EXPECT_FALSE(HasSidebarForCurrentTab());
+  tab_strip_model->ActivateTabAt(1, false);
+
+  // Make sure sidebar is now visible
+  EXPECT_TRUE(HasSidebarForCurrentTab());
 }
 
 }  // namespace extensions
