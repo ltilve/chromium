@@ -344,8 +344,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
       return false;
     }
 
-    sidebar_manager->AddObserver(this);
-
     sidebar_manager->CreateSidebar(web_contents, popup_url, browser_);
     return true;
   }
@@ -427,7 +425,6 @@ void ExtensionActionViewController::UpdateButtonState() {
         sidebar_manager->GetSidebarContainerFor(current);
     if (sidebar) {
       if (sidebar->extension_id() == GetId()) {
-        toolbar_actions_bar_->SetPopupOwner(this);
         if (toolbar_actions_bar_ &&
             !toolbar_actions_bar_->IsActionVisible(this) &&
             extensions::FeatureSwitch::extension_action_redesign()
@@ -449,7 +446,6 @@ void ExtensionActionViewController::UpdateButtonState() {
 
   // Reset button state
   if (toolbar_actions_bar_) {
-    toolbar_actions_bar_->SetPopupOwner(nullptr);
     if (toolbar_actions_bar_->popped_out_action() == this &&
         !view_delegate_->IsMenuRunning()) {
       toolbar_actions_bar_->UndoPopOut();
