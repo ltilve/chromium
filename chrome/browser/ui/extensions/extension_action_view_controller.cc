@@ -430,9 +430,6 @@ void ExtensionActionViewController::UpdateButtonState() {
             extensions::FeatureSwitch::extension_action_redesign()
                 ->IsEnabled()) {
           platform_delegate_->CloseOverflowMenu();
-          toolbar_actions_bar_->PopOutAction(
-              this, base::Bind(&ExtensionActionViewController::OnPopupShown,
-                               weak_factory_.GetWeakPtr(), true));
         } else {
           // Without the popup corner arrow indicator, marking the browserAction
           // icon
@@ -444,13 +441,6 @@ void ExtensionActionViewController::UpdateButtonState() {
     }
   }
 
-  // Reset button state
-  if (toolbar_actions_bar_) {
-    if (toolbar_actions_bar_->popped_out_action() == this &&
-        !view_delegate_->IsMenuRunning()) {
-      toolbar_actions_bar_->UndoPopOut();
-    }
-  }
   view_delegate_->OnPopupClosed();
 }
 
