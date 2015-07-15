@@ -26,12 +26,10 @@ using extensions::SidebarManager;
 
 namespace extensions {
 
-const char kSimplePage[] = "/simple_page.html";
-
 class SidebarTest : public ExtensionBrowserTest {
  public:
   SidebarTest() {}
-  ~SidebarTest() {}
+  ~SidebarTest() override {}
 
  protected:
   // InProcessBrowserTest
