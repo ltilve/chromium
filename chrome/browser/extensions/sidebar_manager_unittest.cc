@@ -31,7 +31,7 @@ const char kSimplePage[] = "/simple_page.html";
 class SidebarManagerTest : public BrowserWithTestWindowTest {
  public:
   SidebarManagerTest() {}
-  ~SidebarManagerTest() {}
+  ~SidebarManagerTest() override {}
 
  protected:
   void SetUp() override {
