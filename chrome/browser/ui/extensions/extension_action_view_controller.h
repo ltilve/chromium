@@ -85,7 +85,7 @@ class ExtensionActionViewController
   ExtensionAction* extension_action() { return extension_action_; }
   const ExtensionAction* extension_action() const { return extension_action_; }
   ToolbarActionViewDelegate* view_delegate() { return view_delegate_; }
-  bool is_showing_popup() const { return is_showing_popup_; }
+  bool is_showing_popup() const { return popup_host_ != nullptr; }
 
   void set_icon_observer(ExtensionActionIconFactory::Observer* icon_observer) {
     icon_observer_ = icon_observer;
@@ -180,9 +180,6 @@ class ExtensionActionViewController
 
   // The extension popup's host if the popup is visible; null otherwise.
   extensions::ExtensionViewHost* popup_host_;
-
-  // If the sidebar is visible it is true; false otherwise.
-  bool is_showing_popup_;
 
   // The context menu model for the extension.
   scoped_refptr<ExtensionContextMenuModel> context_menu_model_;
