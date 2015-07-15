@@ -45,7 +45,6 @@ ExtensionActionViewController::ExtensionActionViewController(
       extension_action_(extension_action),
       toolbar_actions_bar_(toolbar_actions_bar),
       popup_host_(nullptr),
-      is_showing_popup_(false),
       view_delegate_(nullptr),
       platform_delegate_(ExtensionActionPlatformDelegate::Create(this)),
       icon_factory_(browser->profile(), extension, extension_action, this),
@@ -65,7 +64,7 @@ ExtensionActionViewController::ExtensionActionViewController(
 }
 
 ExtensionActionViewController::~ExtensionActionViewController() {
-  DCHECK(!popup_host_);
+  DCHECK(!is_showing_popup());
 
   extensions::SidebarManager* sidebar_manager =
       extensions::SidebarManager::GetFromContext(browser_->profile());
@@ -97,7 +96,7 @@ void ExtensionActionViewController::SetDelegate(
     view_delegate_ = delegate;
     platform_delegate_->OnDelegateSet();
   } else {
-    if (popup_host_)
+    if (is_showing_popup())
       HidePopup();
     platform_delegate_.reset();
     view_delegate_ = nullptr;
@@ -174,15 +173,15 @@ bool ExtensionActionViewController::HasPopup(
 }
 
 void ExtensionActionViewController::HidePopup() {
-  if (popup_host_) {
-    popup_host_->Close();
-    // We need to do these actions synchronously (instead of closing and then
-    // performing the rest of the cleanup in OnExtensionHostDestroyed()) because
-    // the extension host can close asynchronously, and we need to keep the view
-    // delegate up-to-date.
-    OnPopupClosed();
-  }
-  is_showing_popup_ = false;
+  if (!is_showing_popup())
+    return;
+
+  popup_host_->Close();
+  // We need to do these actions synchronously (instead of closing and then
+  // performing the rest of the cleanup in OnExtensionHostDestroyed()) because
+  // the extension host can close asynchronously, and we need to keep the view
+  // delegate up-to-date.
+  OnPopupClosed();
 }
 
 gfx::NativeView ExtensionActionViewController::GetPopupNativeView() {
@@ -339,11 +338,7 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   // same one as a desire to close it (like clicking a menu button that was
   // already open).
   if (is_showing_popup()) {
-    if (popup_host_)
-      HideActivePopup();
-    else
-      is_showing_popup_ = false;
-
+    HideActivePopup();
     return false;
   }
 
@@ -398,7 +393,6 @@ void ExtensionActionViewController::ShowPopup(
   platform_delegate_->ShowPopup(
       popup_host.Pass(), grant_tab_permissions, show_action);
   PressButton(grant_tab_permissions);
-  is_showing_popup_ = true;
 }
 
 void ExtensionActionViewController::OnPopupClosed() {
