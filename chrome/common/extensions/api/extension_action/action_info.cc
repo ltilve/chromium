@@ -45,7 +45,8 @@ static const ActionInfo* GetActionInfo(const Extension* extension,
 
 }  // namespace
 
-ActionInfo::ActionInfo() {
+ActionInfo::ActionInfo()
+  : open_in_sidebar(false) {
 }
 
 ActionInfo::~ActionInfo() {
