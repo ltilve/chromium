@@ -20,7 +20,6 @@ class SidebarManagerObserver {
   // Called when sidebar is hidden.
   virtual void OnSidebarHidden(content::WebContents* tab,
                                const std::string& content_id) {}
-
 };
 
 #endif  // CHROME_BROWSER_EXTENSIONS_SIDEBAR_MANAGER_OBSERVER_H_
