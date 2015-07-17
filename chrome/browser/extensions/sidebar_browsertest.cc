@@ -87,4 +87,4 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, CreateDisabledSidebar) {
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
-}  // namespace
+}  // namespace extensions
