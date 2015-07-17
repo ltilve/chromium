@@ -230,11 +230,11 @@ bool ExtensionActionViewController::ExecuteAction(PopupShowAction show_action,
         SessionTabHelper::IdForTab(view_delegate_->GetCurrentWebContents()));
 
     if (extension_action_->open_in_sidebar())
-      return GetPreferredPopupViewController()
-        ->TriggerSidebarWithUrl(popup_url);
+      return GetPreferredPopupViewController()->TriggerSidebarWithUrl(
+          popup_url);
     else
-      return GetPreferredPopupViewController()
-        ->TriggerPopupWithUrl(show_action, popup_url, grant_tab_permissions);
+      return GetPreferredPopupViewController()->TriggerPopupWithUrl(
+          show_action, popup_url, grant_tab_permissions);
   }
   return false;
 }
@@ -341,23 +341,19 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
   if (toolbar_actions_bar_)
     toolbar_actions_bar_->SetPopupOwner(this);
 
-  PressButtonWithSlideOutIfEnabled(
-      base::Bind(&ExtensionActionViewController::ShowPopup,
-                 weak_factory_.GetWeakPtr(),
-                 base::Passed(host.Pass()),
-                 grant_tab_permissions,
-                 show_action));
+  PressButtonWithSlideOutIfEnabled(base::Bind(
+      &ExtensionActionViewController::ShowPopup, weak_factory_.GetWeakPtr(),
+      base::Passed(host.Pass()), grant_tab_permissions, show_action));
 
   return true;
 }
 
-bool ExtensionActionViewController::TriggerSidebarWithUrl(const GURL& popup_url)
-{
+bool ExtensionActionViewController::TriggerSidebarWithUrl(
+    const GURL& popup_url) {
   extensions::SidebarManager* sidebar_manager =
       extensions::SidebarManager::GetFromContext(browser_->profile());
 
-  content::WebContents* web_contents =
-      view_delegate_->GetCurrentWebContents();
+  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
 
   extensions::SidebarContainer* sidebar =
       sidebar_manager->GetSidebarContainerFor(web_contents);
@@ -398,7 +394,6 @@ void ExtensionActionViewController::OnSidebarHidden(
   RaiseButton();
 }
 
-
 void ExtensionActionViewController::RaiseButton() {
   // Reset button state
   if (toolbar_actions_bar_) {
@@ -411,7 +406,7 @@ void ExtensionActionViewController::RaiseButton() {
 }
 
 void ExtensionActionViewController::PressButtonWithSlideOutIfEnabled(
-                                                const base::Closure& closure) {
+    const base::Closure& closure) {
   if (!toolbar_actions_bar_ || toolbar_actions_bar_->IsActionVisible(this) ||
       !extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
     closure.Run();
