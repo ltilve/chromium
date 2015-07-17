@@ -64,7 +64,7 @@ class SidebarTest : public ExtensionBrowserTest {
     SidebarManager* sidebar_manager =
         SidebarManager::GetFromContext(browser()->profile());
     return sidebar_manager->GetSidebarContainerFor(
-        browser()->tab_strip_model()->GetActiveWebContents()) != nullptr;
+               browser()->tab_strip_model()->GetActiveWebContents()) != nullptr;
   }
 
  private:
