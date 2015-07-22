@@ -296,8 +296,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     const GURL& popup_url,
     bool grant_tab_permissions) {
 
-  // Always hide the current popup, even if it's not owned by this extension.
-  // Only one popup should be visible at a time.
   // If we were showing a popup already, then we treat the action to open the
   // same one as a desire to close it (like clicking a menu button that was
   // already open).
@@ -305,6 +303,10 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
     HideActivePopup();
     return false;
   }
+
+  // Always hide the current popup, even if it's not owned by this extension.
+  // Only one popup should be visible at a time.
+  HideActivePopup();
 
   scoped_ptr<extensions::ExtensionViewHost> host(
       extensions::ExtensionViewHostFactory::CreatePopupHost(popup_url,
