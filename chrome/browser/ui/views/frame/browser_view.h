@@ -14,7 +14,6 @@
 #include "base/timer/timer.h"
 #include "build/build_config.h"
 #include "chrome/browser/devtools/devtools_window.h"
-#include "chrome/browser/extensions/sidebar_manager_observer.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
@@ -91,7 +90,6 @@ class BrowserView : public BrowserWindow,
                     public OmniboxPopupModelObserver,
                     public views::SingleSplitViewListener,
                     public ExclusiveAccessContext,
-                    public SidebarManagerObserver,
                     public ExclusiveAccessBubbleViewsContext {
  public:
   // The browser view's class name.
@@ -456,9 +454,10 @@ class BrowserView : public BrowserWindow,
 
   // Handle SidebarManager events
   void OnSidebarShown(content::WebContents* tab,
-                      const std::string& content_id) override;
+                      content::WebContents* sidebar_contents,
+                      const std::string& content_id);
   void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id) override;
+                       const std::string& content_id);
 
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate
@@ -553,7 +552,7 @@ class BrowserView : public BrowserWindow,
 
   // Initialize the hung plugin detector.
   void InitHangMonitor();
-  void UpdateSidebarForContents(content::WebContents* new_contents);
+  void UpdateSidebarForContents(content::WebContents* new_contents, content::WebContents* sidebar_contents);
 
   // Possibly records a user metrics action corresponding to the passed-in
   // accelerator.  Only implemented for Chrome OS, where we're interested in

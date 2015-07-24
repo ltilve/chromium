@@ -25,7 +25,6 @@
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/sidebar_container.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/infobars/infobar_service.h"
 #include "chrome/browser/native_window_notification_source.h"
@@ -683,15 +682,16 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
 }
 
 void BrowserView::OnSidebarShown(content::WebContents* tab,
+                                 content::WebContents* sidebar_contents,
                                  const std::string& content_id) {
   if (GetActiveWebContents() == tab)
-    UpdateSidebarForContents(tab);
+    UpdateSidebarForContents(tab, sidebar_contents);
 }
 
 void BrowserView::OnSidebarHidden(content::WebContents* tab,
                                   const std::string& content_id) {
   if (GetActiveWebContents() == tab)
-    UpdateSidebarForContents(tab);
+    UpdateSidebarForContents(tab, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -920,7 +920,6 @@ void BrowserView::OnActiveTabChanged(content::WebContents* old_contents,
   // to avoid toggling the size of any of them.
   UpdateDevToolsForContents(new_contents, !change_tab_contents);
 
-  UpdateSidebarForContents(new_contents);
   if (change_tab_contents) {
     web_contents_close_handler_->ActiveTabChanged();
     contents_web_view_->SetWebContents(new_contents);
@@ -1619,7 +1618,7 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     contents_web_view_->SetWebContents(nullptr);
     infobar_container_->ChangeInfoBarManager(nullptr);
     UpdateDevToolsForContents(nullptr, true);
-    UpdateSidebarForContents(nullptr);
+    UpdateSidebarForContents(nullptr, nullptr);
   }
 }
 
@@ -2163,34 +2162,17 @@ void BrowserView::InitViews() {
   GetLocationBar()->GetOmniboxView()->model()->popup_model()->AddObserver(this);
 }
 
-void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents) {
+void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents,
+                                    content::WebContents* sidebar_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-  if (!sidebar_manager)
-    return;  // Happens only in tests.s
-
-  WebContents* sidebar_contents = nullptr;
-  if (new_contents) {
-    extensions::SidebarContainer* client_host =
-        sidebar_manager->GetSidebarContainerFor(new_contents);
-    if (client_host)
-      sidebar_contents = client_host->sidebar_contents();
-  }
 
   bool visible = nullptr != sidebar_contents;
 
   bool should_show = visible && !sidebar_container_->visible();
   bool should_hide = !visible && sidebar_container_->visible();
 
-  // Update sidebar content.
-  WebContents* old_contents =
-      static_cast<WebContents*>(sidebar_web_view_->web_contents());
-
   sidebar_web_view_->SetWebContents(sidebar_contents);
-
-  sidebar_manager->NotifyStateChanges(old_contents, sidebar_contents);
 
   // Update sidebar UI width.
   if (should_show) {
