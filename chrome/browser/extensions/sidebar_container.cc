@@ -7,7 +7,6 @@
 #include "chrome/browser/chrome_notification_types.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "content/public/browser/notification_details.h"
@@ -42,9 +41,7 @@ SidebarContainer::~SidebarContainer() {
 void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
                                     content::WebContents* contents,
                                     int index) {
-  if (tab_ == contents)
-    extensions::SidebarManager::GetFromContext(host_->browser_context())
-        ->HideSidebarForTab(tab_);
+
 }
 
 void SidebarContainer::Observe(int type,
@@ -52,11 +49,6 @@ void SidebarContainer::Observe(int type,
                                const content::NotificationDetails& details) {
   DCHECK_EQ(type, extensions::NOTIFICATION_EXTENSION_HOST_VIEW_SHOULD_CLOSE)
       << "Received unexpected notification";
-
-  // If we aren't the host of the popup, then disregard the notification.
-  if (content::Details<extensions::ExtensionHost>(host_.get()) == details)
-    extensions::SidebarManager::GetFromContext(host_->browser_context())
-        ->HideSidebarForTab(tab_);
 }
 
 }  // namespace extensions
