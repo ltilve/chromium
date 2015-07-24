@@ -561,8 +561,9 @@ using content::WebContents;
     [self layoutSubviews];
 }
 
-- (void)updateSidebarForContents:(content::WebContents*)contents {
-  [sidebarController_ updateSidebarForTabContents:contents
+- (void)updateSidebarForContents:(content::WebContents*)tab_contents
+                sidebar_contents:(content::WebContents*)sidebar_contents {
+  [sidebarController_ updateSidebarForTabContents:tab_contents
                                       withContext:browser_->profile()];
   [sidebarController_ ensureContentsVisible];
 }

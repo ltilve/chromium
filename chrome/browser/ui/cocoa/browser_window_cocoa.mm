@@ -838,7 +838,8 @@ void BrowserWindowCocoa::ShowAvatarBubbleFromAvatarButton(
 }
 
 void BrowserWindowCocoa::UpdateSidebarForContents(
-    content::WebContents* tab_contents) {
+    content::WebContents* tab_contents,
+    content::WebContents* sidebar_contents) {
   if (tab_contents == browser_->tab_strip_model()->GetActiveWebContents()) {
     [controller_ updateSidebarForContents:tab_contents];
   }
@@ -881,11 +882,12 @@ void BrowserWindowCocoa::HideDownloadShelf() {
 }
 
 void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
+                                        content::WebContents* sidebar_contents,
                                         const std::string& content_id) {
-  UpdateSidebarForContents(tab);
+  UpdateSidebarForContents(tab, sidebar_contents);
 }
 
 void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
                                          const std::string& content_id) {
-  UpdateSidebarForContents(tab);
+  UpdateSidebarForContents(tab, nullptr);
 }
