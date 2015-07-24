@@ -10,7 +10,6 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/shared_module_service.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/chrome_switches.h"
 #include "content/public/browser/browser_thread.h"
@@ -72,7 +71,6 @@ ExtensionService* TestExtensionSystem::CreateExtensionService(
   scoped_ptr<TestingValueStore> value_store(new TestingValueStore());
   value_store_ = value_store.get();
   state_store_.reset(new StateStore(profile_, value_store.Pass()));
-  sidebar_manager_.reset(new SidebarManager());
   management_policy_.reset(new ManagementPolicy());
   management_policy_->RegisterProviders(
       ExtensionManagementFactory::GetForBrowserContext(profile_)
@@ -116,10 +114,6 @@ StateStore* TestExtensionSystem::state_store() {
 
 StateStore* TestExtensionSystem::rules_store() {
   return state_store_.get();
-}
-
-SidebarManager* TestExtensionSystem::sidebar_manager() {
-  return sidebar_manager_.get();
 }
 
 InfoMap* TestExtensionSystem::info_map() { return info_map_.get(); }

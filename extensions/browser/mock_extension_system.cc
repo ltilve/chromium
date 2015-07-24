@@ -42,10 +42,6 @@ StateStore* MockExtensionSystem::rules_store() {
   return nullptr;
 }
 
-SidebarManager* MockExtensionSystem::sidebar_manager() {
-  return nullptr;
-}
-
 InfoMap* MockExtensionSystem::info_map() {
   return nullptr;
 }
