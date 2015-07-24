@@ -459,7 +459,7 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetContentsWebViewForTest() { return contents_web_view_; }
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
-  // Handle SidebarManager events
+  // Handle Sidebar
   void OnSidebarShown(content::WebContents* tab,
                       content::WebContents* sidebar_contents,
                       const std::string& content_id);
