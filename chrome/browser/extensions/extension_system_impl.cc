@@ -25,7 +25,6 @@
 #include "chrome/browser/extensions/navigation_observer.h"
 #include "chrome/browser/extensions/shared_module_service.h"
 #include "chrome/browser/extensions/shared_user_script_master.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/state_store_notification_observer.h"
 #include "chrome/browser/extensions/unpacked_installer.h"
 #include "chrome/browser/profiles/profile.h"
@@ -234,8 +233,6 @@ void ExtensionSystemImpl::Shared::Init(bool extensions_enabled) {
       }
     }
   }
-
-  sidebar_manager_.reset(new SidebarManager());
 }
 
 void ExtensionSystemImpl::Shared::Shutdown() {
@@ -286,10 +283,6 @@ AppSorting* ExtensionSystemImpl::Shared::app_sorting() {
 
 ContentVerifier* ExtensionSystemImpl::Shared::content_verifier() {
   return content_verifier_.get();
-}
-
-SidebarManager* ExtensionSystemImpl::Shared::sidebar_manager() {
-  return sidebar_manager_.get();
 }
 
 //
@@ -407,10 +400,6 @@ void ExtensionSystemImpl::UnregisterExtensionWithRequestContexts(
       BrowserThread::IO,
       FROM_HERE,
       base::Bind(&InfoMap::RemoveExtension, info_map(), extension_id, reason));
-}
-
-SidebarManager* ExtensionSystemImpl::sidebar_manager() {
-  return shared_->sidebar_manager();
 }
 
 }  // namespace extensions
