@@ -46,7 +46,7 @@ void SidebarManager::CreateSidebar(content::WebContents* tab,
 
   const std::string id = container->extension_id();
   FOR_EACH_OBSERVER(SidebarManagerObserver, observer_list_,
-                    OnSidebarShown(tab, id));
+                    OnSidebarShown(tab, nullptr, id));
 }
 
 void SidebarManager::HideSidebarForTab(WebContents* tab) {

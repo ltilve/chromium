@@ -9,7 +9,7 @@
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_action_icon_factory.h"
 #include "chrome/browser/extensions/extension_context_menu_model.h"
-#include "chrome/browser/extensions/sidebar_manager_observer.h"
+#include "chrome/browser/extensions/sidebar_container.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_controller.h"
 #include "extensions/browser/extension_host_observer.h"
 #include "ui/gfx/image/image.h"
@@ -36,7 +36,6 @@ class ExtensionActionViewController
     : public ToolbarActionViewController,
       public ExtensionActionIconFactory::Observer,
       public ExtensionContextMenuModel::PopupDelegate,
-      public SidebarManagerObserver,
       public extensions::ExtensionHostObserver {
  public:
   // The different options for showing a popup.
@@ -61,6 +60,7 @@ class ExtensionActionViewController
   bool WantsToRun(content::WebContents* web_contents) const override;
   bool HasPopup(content::WebContents* web_contents) const override;
   void HidePopup() override;
+  void HideSidebar() override;
   gfx::NativeView GetPopupNativeView() override;
   ui::MenuModel* GetContextMenu() override;
   void OnContextMenuClosed() override;
@@ -78,6 +78,8 @@ class ExtensionActionViewController
   // Closes the active popup (whether it was this action's popup or not).
   void HideActivePopup();
 
+  // Closes the active sidebar.
+  void HideActiveSidebar();
 
   // Populates |command| with the command associated with |extension|, if one
   // exists. Returns true if |command| was populated.
@@ -151,9 +153,10 @@ class ExtensionActionViewController
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
 
-  // Handles sidebar events
-  void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id) override;
+  void OnSidebarSwitched(content::WebContents* old_tab,
+                         const std::string& old_content_id,
+                         content::WebContents* new_tab,
+                         const std::string& new_content_id);
 
   // The extension associated with the action we're displaying.
   scoped_refptr<const extensions::Extension> extension_;
@@ -174,6 +177,9 @@ class ExtensionActionViewController
 
   // The extension popup's host if the popup is visible; null otherwise.
   extensions::ExtensionViewHost* popup_host_;
+
+  // The sidebar container if the sidebar is visible.
+  scoped_ptr<extensions::SidebarContainer> sidebar_container_;
 
   // The context menu model for the extension.
   scoped_refptr<ExtensionContextMenuModel> context_menu_model_;

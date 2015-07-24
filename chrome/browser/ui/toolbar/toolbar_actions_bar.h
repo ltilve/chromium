@@ -149,6 +149,12 @@ class ToolbarActionsBar : public extensions::ExtensionToolbarModel::Observer {
   // Hides the actively showing popup, if any.
   void HideActivePopup();
 
+  // Sets the active sidebar owner to be |sidebar_owner|.
+  void SetSidebarOwner(ToolbarActionViewController* sidebar_owner);
+
+  // Hides the actively showing sidebar, if any.
+  void HideActiveSidebar();
+
   // Returns the main (i.e., not overflow) controller for the given action.
   ToolbarActionViewController* GetMainControllerForAction(
       ToolbarActionViewController* action);
@@ -249,6 +255,10 @@ class ToolbarActionsBar : public extensions::ExtensionToolbarModel::Observer {
   // The action that triggered the current popup (just a reference to an action
   // from toolbar_actions_).
   ToolbarActionViewController* popup_owner_;
+
+  // The action that triggered the current sidebar (just a reference to an action
+  // from toolbar_actions_).
+  ToolbarActionViewController* sidebar_owner_;
 
   ScopedObserver<extensions::ExtensionToolbarModel,
                  extensions::ExtensionToolbarModel::Observer> model_observer_;

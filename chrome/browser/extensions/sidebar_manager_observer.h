@@ -15,6 +15,7 @@ class SidebarManagerObserver {
 
   // Called when sidebar is shown.
   virtual void OnSidebarShown(content::WebContents* tab,
+                              content::WebContents* sidebar_contents,
                               const std::string& content_id) {}
 
   // Called when sidebar is hidden.
