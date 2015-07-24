@@ -89,6 +89,7 @@ class ExtensionActionViewController
   const ExtensionAction* extension_action() const { return extension_action_; }
   ToolbarActionViewDelegate* view_delegate() { return view_delegate_; }
   bool is_showing_popup() const { return popup_host_ != nullptr; }
+  bool is_showing_sidebar() const { return sidebar_container_ != nullptr; }
 
   void set_icon_observer(ExtensionActionIconFactory::Observer* icon_observer) {
     icon_observer_ = icon_observer;

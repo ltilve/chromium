@@ -12,7 +12,9 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
+#include "chrome/browser/ui/extensions/extension_action_view_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -58,9 +60,15 @@ class SidebarTest : public ExtensionBrowserTest {
     GetBrowserAction(*extension_)->set_open_in_sidebar(false);
   }
 
+  ExtensionActionViewController* getExtensionActionViewController() {
+    return static_cast<ExtensionActionViewController*>(
+        browser_action_test_util_.get()
+            ->GetToolbarActionsBar()
+            ->GetActions()[0]);
+  }
+
   bool HasSidebarForCurrentTab() {
-    // FIXME: Test if ExtensionActionManager sidebar_container_ is set
-    return false;
+    return getExtensionActionViewController()->is_showing_sidebar();
   }
 
  private:
@@ -70,6 +78,7 @@ class SidebarTest : public ExtensionBrowserTest {
 
 // Tests that cliking on the browser action show/hides the sidebar
 IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
+  EXPECT_FALSE(HasSidebarForCurrentTab());
   ClickExtensionBrowserAction();
   EXPECT_TRUE(HasSidebarForCurrentTab());
   ClickExtensionBrowserAction();
