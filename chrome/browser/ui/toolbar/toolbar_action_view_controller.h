@@ -65,6 +65,9 @@ class ToolbarActionViewController {
   // Hides the current popup, if one is visible.
   virtual void HidePopup() = 0;
 
+  // Hides the current sidebar, if one is visible.
+  virtual void HideSidebar() {};
+
   // Returns the native view for the popup, if one is active.
   virtual gfx::NativeView GetPopupNativeView() = 0;
 

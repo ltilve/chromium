@@ -124,6 +124,7 @@ ToolbarActionsBar::ToolbarActionsBar(ToolbarActionsBarDelegate* delegate,
       main_bar_(main_bar),
       platform_settings_(main_bar != nullptr),
       popup_owner_(nullptr),
+      sidebar_owner_(nullptr),
       model_observer_(this),
       suppress_layout_(false),
       suppress_animation_(true),
@@ -510,6 +511,21 @@ void ToolbarActionsBar::HideActivePopup() {
   if (popup_owner_)
     popup_owner_->HidePopup();
   DCHECK(!popup_owner_);
+}
+
+void ToolbarActionsBar::SetSidebarOwner(
+    ToolbarActionViewController* sidebar_owner) {
+  // We should never be setting a popup owner when one already exists, and
+  // never unsetting one when one wasn't set.
+  DCHECK((!sidebar_owner_ && sidebar_owner) ||
+         (sidebar_owner_ && !sidebar_owner));
+  sidebar_owner_ = sidebar_owner;
+}
+
+void ToolbarActionsBar::HideActiveSidebar() {
+  if (sidebar_owner_)
+    sidebar_owner_->HideSidebar();
+  DCHECK(!sidebar_owner_);
 }
 
 ToolbarActionViewController* ToolbarActionsBar::GetMainControllerForAction(

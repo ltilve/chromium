@@ -12,11 +12,10 @@
 #include "chrome/browser/extensions/extension_view.h"
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/extensions/extension_view_host_factory.h"
-#include "chrome/browser/extensions/sidebar_container.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -58,32 +57,10 @@ ExtensionActionViewController::ExtensionActionViewController(
   DCHECK(extension_action->action_type() == ActionInfo::TYPE_PAGE ||
          extension_action->action_type() == ActionInfo::TYPE_BROWSER);
   DCHECK(extension);
-
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-  sidebar_manager->AddObserver(this);
 }
 
 ExtensionActionViewController::~ExtensionActionViewController() {
   DCHECK(!is_showing_popup());
-
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-
-  sidebar_manager->RemoveObserver(this);
-  if (GetPreferredPopupViewController() == this) {
-    int count = browser_->tab_strip_model()->count();
-    for (int i = 0; i < count; ++i) {
-      content::WebContents* contents =
-          browser_->tab_strip_model()->GetWebContentsAt(i);
-      if (contents) {
-        extensions::SidebarContainer* sidebar =
-            sidebar_manager->GetSidebarContainerFor(contents);
-        if (sidebar && sidebar->extension_id() == GetId())
-          sidebar_manager->HideSidebarForTab(contents);
-      }
-    }
-  }
 }
 
 std::string ExtensionActionViewController::GetId() const {
@@ -350,19 +327,23 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
 bool ExtensionActionViewController::TriggerSidebarWithUrl(
     const GURL& popup_url) {
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
 
-  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
-
-  extensions::SidebarContainer* sidebar =
-      sidebar_manager->GetSidebarContainerFor(web_contents);
-  if (sidebar && sidebar->extension_id() == GetId()) {
-    sidebar_manager->HideSidebarForTab(web_contents);
+  if (sidebar_container_) {
+    HideActiveSidebar();
     return false;
   }
 
-  sidebar_manager->CreateSidebar(web_contents, popup_url, browser_);
+  HideActiveSidebar();
+
+  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
+  sidebar_container_.reset(new extensions::SidebarContainer(browser_, web_contents, popup_url));
+
+  if (toolbar_actions_bar_)
+    toolbar_actions_bar_->SetSidebarOwner(this);
+
+  PressButtonWithSlideOutIfEnabled(
+                        base::Bind(&ExtensionActionViewController::PressButton,
+                        weak_factory_.GetWeakPtr(), true));
   return true;
 }
 
@@ -388,10 +369,42 @@ void ExtensionActionViewController::OnPopupClosed() {
   RaiseButton();
 }
 
-void ExtensionActionViewController::OnSidebarHidden(
-    content::WebContents* tab,
-    const std::string& content_id) {
+void ExtensionActionViewController::HideActiveSidebar() {
+  if (toolbar_actions_bar_) {
+    toolbar_actions_bar_->HideActiveSidebar();
+  } else {
+    DCHECK_EQ(ActionInfo::TYPE_PAGE, extension_action_->action_type());
+    // In the traditional toolbar, page actions only know how to close their own
+    // sidebar.
+    HideSidebar();
+  }
+}
+
+void ExtensionActionViewController::HideSidebar() {
+  if (!sidebar_container_)
+    return;
+
+  sidebar_container_.reset();
+  if (toolbar_actions_bar_)
+    toolbar_actions_bar_->SetSidebarOwner(nullptr);
+
   RaiseButton();
+}
+
+void ExtensionActionViewController::OnSidebarSwitched(
+    content::WebContents* old_tab,
+    const std::string& old_content_id,
+    content::WebContents* new_tab,
+    const std::string& new_content_id) {
+
+  if (GetPreferredPopupViewController() != this)
+    return;
+
+  if (!new_tab || new_content_id != GetId()) {
+    RaiseButton();
+    return;
+  }
+
 }
 
 void ExtensionActionViewController::RaiseButton() {
