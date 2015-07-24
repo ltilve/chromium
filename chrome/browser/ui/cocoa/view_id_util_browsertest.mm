@@ -9,7 +9,6 @@
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/devtools/devtools_window_testing.h"
 #include "chrome/browser/download/download_shelf.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -50,16 +49,6 @@ class ViewIDTest : public InProcessBrowserTest {
   void DoTest() {
     // Make sure FindBar is created to test VIEW_ID_FIND_IN_PAGE_TEXT_FIELD.
     chrome::ShowFindBar(browser());
-
-    // Make sure sidebar is created to test VIEW_ID_SIDE_BAR_CONTAINER.
-    GURL test_page_url = test_server()->GetURL(kSimplePage);
-    extensions::SidebarManager* sidebar_manager =
-        extensions::SidebarManager::GetFromContext(browser()->profile());
-
-    sidebar_manager->CreateSidebar(
-        static_cast<content::WebContents*>(
-            browser()->tab_strip_model()->GetActiveWebContents()),
-            test_page_url, browser());
 
     // Make sure docked devtools is created to test VIEW_ID_DEV_TOOLS_DOCKED
     DevToolsWindow* devtools_window =

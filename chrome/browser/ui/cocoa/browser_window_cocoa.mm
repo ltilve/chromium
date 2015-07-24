@@ -17,7 +17,6 @@
 #include "chrome/browser/download/download_shelf.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/sidebar_container.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/fullscreen.h"
 #include "chrome/browser/profiles/profile.h"
@@ -143,10 +142,6 @@ BrowserWindowCocoa::BrowserWindowCocoa(Browser* browser,
                                            &initial_show_state_);
 
   browser_->search_model()->AddObserver(this);
-
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-  sidebar_manager->AddObserver(this);
 }
 
 BrowserWindowCocoa::~BrowserWindowCocoa() {
