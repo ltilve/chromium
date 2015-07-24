@@ -15,6 +15,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_tab_helper.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/extensions/accelerator_priority.h"
 #include "chrome/browser/ui/extensions/extension_action_platform_delegate.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -350,6 +351,11 @@ bool ExtensionActionViewController::TriggerSidebarWithUrl(
   DCHECK(toolbar_actions_bar_);
   toolbar_actions_bar_->SetSidebarOwner(this);
 
+  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
+  BrowserView::GetBrowserViewForBrowser(browser_)->OnSidebarShown(web_contents,
+                                        sidebar_host_->host_contents()-,
+                                        sidebar_host_->extension_id());
+
   PressButtonWithSlideOutIfEnabled(
       base::Bind(&ExtensionActionViewController::PressButton,
                  weak_factory_.GetWeakPtr(), true));
@@ -389,6 +395,10 @@ void ExtensionActionViewController::HideActiveSidebar() {
 void ExtensionActionViewController::HideSidebar() {
   if (!sidebar_host_)
     return;
+
+  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
+  BrowserView::GetBrowserViewForBrowser(browser_)->OnSidebarHidden(web_contents,
+                                        sidebar_host_->extension_id());
 
   sidebar_host_.reset();
   if (toolbar_actions_bar_)
