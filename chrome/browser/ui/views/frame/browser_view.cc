@@ -486,10 +486,6 @@ BrowserView::~BrowserView() {
 
   browser_->tab_strip_model()->RemoveObserver(this);
 
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-  sidebar_manager->RemoveObserver(this);
-
 #if defined(OS_WIN)
   // Stop hung plugin monitoring.
   ticker_.Stop();
@@ -534,10 +530,6 @@ void BrowserView::Init(Browser* browser) {
   browser_->tab_strip_model()->AddObserver(this);
   immersive_mode_controller_.reset(
       chrome::CreateImmersiveModeController(browser_->host_desktop_type()));
-
-  extensions::SidebarManager* sidebar_manager =
-      extensions::SidebarManager::GetFromContext(browser_->profile());
-  sidebar_manager->AddObserver(this);
 }
 
 // static
