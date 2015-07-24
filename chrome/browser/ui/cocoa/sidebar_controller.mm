@@ -8,7 +8,6 @@
 
 #include "base/prefs/pref_service.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/extensions/sidebar_manager.h"
 #import "chrome/browser/ui/cocoa/view_id_util.h"
 #include "chrome/common/pref_names.h"
 #include "content/public/browser/web_contents.h"
@@ -65,26 +64,13 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
   return splitView_.get();
 }
 
-- (void)updateSidebarForTabContents:(content::WebContents*)contents
+- (void)updateSidebarForTabContents:(content::WebContents*)tabContents
+                   sidebar_contents:(content::WebContents*)sidebarContents
                         withContext:(content::BrowserContext*)context {
-  // Get the active sidebar content.
-  extensions::SidebarManager* sidebarManager =
-      extensions::SidebarManager::GetFromContext(context);
-
-  if (sidebarManager == nullptr)  // Happens in tests.
-    return;
-
-  content::WebContents* sidebarContents = nullptr;
-  if (contents) {
-    extensions::SidebarContainer* activeSidebar =
-        sidebarManager->GetSidebarContainerFor(contents);
-    if (activeSidebar)
-      sidebarContents = activeSidebar->sidebar_contents();
-  }
 
   if (!contentsController_.get())
     contentsController_.reset(
-        [[TabContentsController alloc] initWithContents:contents]);
+        [[TabContentsController alloc] initWithContents:tabContents]);
 
   content::WebContents* oldSidebarContents =
       static_cast<content::WebContents*>([contentsController_ webContents]);
@@ -93,9 +79,6 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
   // Adjust sidebar view.
   [self showSidebarContents:sidebarContents];
-
-  // Notify extensions.
-  sidebarManager->NotifyStateChanges(oldSidebarContents, sidebarContents);
 }
 
 - (void)ensureContentsVisible {

@@ -344,9 +344,10 @@ class Command;
 // Shows or hides the docked web inspector depending on |contents|'s state.
 - (void)updateDevToolsForContents:(content::WebContents*)contents;
 
-// Displays the active sidebar linked to the |contents| or hides sidebar UI,
-// if there's no such sidebar.
-- (void)updateSidebarForContents:(content::WebContents*)contents;
+// Displays the active sidebar linked to the |tab_contents| with
+// |sidebar_contents| or hides sidebar UI if there's no sidebar contents.
+- (void)updateSidebarForContents:(content::WebContents*)tab_contents
+                sidebar_contents:(content::WebContents*)sidebar_contents;
 
 // Gets the current theme provider.
 - (ui::ThemeProvider*)themeProvider;
