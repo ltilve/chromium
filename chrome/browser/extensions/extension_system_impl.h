@@ -56,8 +56,6 @@ class ExtensionSystemImpl : public ExtensionSystem {
   scoped_ptr<ExtensionSet> GetDependentExtensions(
       const Extension* extension) override;
 
-  SidebarManager* sidebar_manager() override;  // shared
-
  private:
   friend class ExtensionSystemSharedFactory;
 
@@ -87,7 +85,6 @@ class ExtensionSystemImpl : public ExtensionSystem {
     QuotaService* quota_service();
     const OneShotEvent& ready() const { return ready_; }
     ContentVerifier* content_verifier();
-    SidebarManager* sidebar_manager();
 
    private:
     Profile* profile_;
@@ -112,8 +109,6 @@ class ExtensionSystemImpl : public ExtensionSystem {
 
     // For verifying the contents of extensions read from disk.
     scoped_refptr<ContentVerifier> content_verifier_;
-
-    scoped_ptr<SidebarManager> sidebar_manager_;
 
 #if defined(OS_CHROMEOS)
     scoped_ptr<chromeos::DeviceLocalAccountManagementPolicyProvider>
