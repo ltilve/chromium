@@ -456,13 +456,6 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetContentsWebViewForTest() { return contents_web_view_; }
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
-  // Handle Sidebar
-  void OnSidebarShown(content::WebContents* tab,
-                      content::WebContents* sidebar_contents,
-                      const std::string& content_id);
-  void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id);
-
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate
   // interface to keep these two classes decoupled and testable.
