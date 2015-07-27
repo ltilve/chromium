@@ -390,20 +390,6 @@ void ExtensionActionViewController::HideSidebar() {
   RaiseButton();
 }
 
-void ExtensionActionViewController::OnSidebarSwitched(
-    content::WebContents* old_tab,
-    const std::string& old_content_id,
-    content::WebContents* new_tab,
-    const std::string& new_content_id) {
-  if (GetPreferredPopupViewController() != this)
-    return;
-
-  if (!new_tab || new_content_id != GetId()) {
-    RaiseButton();
-    return;
-  }
-}
-
 void ExtensionActionViewController::RaiseButton() {
   // Reset button state
   if (toolbar_actions_bar_) {
