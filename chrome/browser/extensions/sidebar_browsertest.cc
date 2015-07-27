@@ -85,6 +85,20 @@ IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
   EXPECT_FALSE(HasSidebarForCurrentTab());
 }
 
+// Tests that sidebar visible at the other tabs
+IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
+  // Open sidebar and move to a new tab
+  ClickExtensionBrowserAction();
+  AddTabAtIndex(0, GURL(url::kAboutBlankURL), ui::PAGE_TRANSITION_TYPED);
+  EXPECT_TRUE(HasSidebarForCurrentTab());
+
+  // Close sidebar and switch back to the first tab
+  ClickExtensionBrowserAction();
+  TabStripModel* tab_strip_model = browser()->tab_strip_model();
+  tab_strip_model->ActivateTabAt(0, false);
+  EXPECT_FALSE(HasSidebarForCurrentTab());
+}
+
 // Tests that sidebars are not shown if open_in_sidebar: false
 IN_PROC_BROWSER_TEST_F(SidebarTest, CreateDisabledSidebar) {
   DisableOpenInSidebar();
