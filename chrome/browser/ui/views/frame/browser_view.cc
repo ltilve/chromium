@@ -2171,7 +2171,7 @@ void BrowserView::InitViews() {
 }
 
 void BrowserView::UpdateSidebarForContents(
-                                      content::WebContents* sidebar_contents) {
+    content::WebContents* sidebar_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
 
