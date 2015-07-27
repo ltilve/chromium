@@ -460,11 +460,8 @@ class BrowserView : public BrowserWindow,
   views::WebView* GetDevToolsWebViewForTest() { return devtools_web_view_; }
 
   // Handle Sidebar
-  void OnSidebarShown(content::WebContents* tab,
-                      content::WebContents* sidebar_contents,
-                      const std::string& content_id);
-  void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id);
+  void ShowSidebar(content::WebContents* sidebar_contents);
+  void HideSidebar();
 
  private:
   // Do not friend BrowserViewLayout. Use the BrowserViewLayoutDelegate
@@ -559,7 +556,7 @@ class BrowserView : public BrowserWindow,
 
   // Initialize the hung plugin detector.
   void InitHangMonitor();
-  void UpdateSidebarForContents(content::WebContents* new_contents, content::WebContents* sidebar_contents);
+  void UpdateSidebarForContents(content::WebContents* sidebar_contents);
 
   // Possibly records a user metrics action corresponding to the passed-in
   // accelerator.  Only implemented for Chrome OS, where we're interested in

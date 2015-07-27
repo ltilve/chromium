@@ -694,17 +694,12 @@ gfx::ImageSkia BrowserView::GetOTRAvatarIcon() const {
   return *GetThemeProvider()->GetImageSkiaNamed(IDR_OTR_ICON);
 }
 
-void BrowserView::OnSidebarShown(content::WebContents* tab,
-                                 content::WebContents* sidebar_contents,
-                                 const std::string& content_id) {
-  if (GetActiveWebContents() == tab)
-    UpdateSidebarForContents(tab, sidebar_contents);
+void BrowserView::ShowSidebar(content::WebContents* sidebar_contents) {
+  UpdateSidebarForContents(sidebar_contents);
 }
 
-void BrowserView::OnSidebarHidden(content::WebContents* tab,
-                                  const std::string& content_id) {
-  if (GetActiveWebContents() == tab)
-    UpdateSidebarForContents(tab, nullptr);
+void BrowserView::HideSidebar() {
+  UpdateSidebarForContents(nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1631,7 +1626,7 @@ void BrowserView::TabDetachedAt(WebContents* contents, int index) {
     contents_web_view_->SetWebContents(nullptr);
     infobar_container_->ChangeInfoBarManager(nullptr);
     UpdateDevToolsForContents(nullptr, true);
-    UpdateSidebarForContents(nullptr, nullptr);
+    UpdateSidebarForContents(nullptr);
   }
 }
 
@@ -2175,8 +2170,8 @@ void BrowserView::InitViews() {
   GetLocationBar()->GetOmniboxView()->model()->popup_model()->AddObserver(this);
 }
 
-void BrowserView::UpdateSidebarForContents(content::WebContents* new_contents,
-                                    content::WebContents* sidebar_contents) {
+void BrowserView::UpdateSidebarForContents(
+                                      content::WebContents* sidebar_contents) {
   if (!sidebar_container_)
     return;  // Happens when sidebar is not allowed.
 
