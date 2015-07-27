@@ -154,11 +154,6 @@ class ExtensionActionViewController
   // Handles cleanup after the popup closes.
   void OnPopupClosed();
 
-  void OnSidebarSwitched(content::WebContents* old_tab,
-                         const std::string& old_content_id,
-                         content::WebContents* new_tab,
-                         const std::string& new_content_id);
-
   // The extension associated with the action we're displaying.
   scoped_refptr<const extensions::Extension> extension_;
 
