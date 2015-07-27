@@ -94,13 +94,13 @@ void ExtensionActionPlatformDelegateViews::CloseOverflowMenu() {
     toolbar->CloseAppMenu();
 }
 
-void ExtensionActionPlatformDelegateViews::ShowSidebar(content::WebContents* sidebar_contents)
-{
-  BrowserView::GetBrowserViewForBrowser(controller_->browser())->ShowSidebar(sidebar_contents);
+void ExtensionActionPlatformDelegateViews::ShowSidebar(
+    content::WebContents* sidebar_contents) {
+  BrowserView::GetBrowserViewForBrowser(controller_->browser())
+      ->ShowSidebar(sidebar_contents);
 }
 
-void ExtensionActionPlatformDelegateViews::HideSidebar()
-{
+void ExtensionActionPlatformDelegateViews::HideSidebar() {
   BrowserView::GetBrowserViewForBrowser(controller_->browser())->HideSidebar();
 }
 
