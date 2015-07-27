@@ -39,6 +39,11 @@ class ExtensionActionPlatformDelegate {
 
   // Closes the overflow menu, if it was open.
   virtual void CloseOverflowMenu() = 0;
+
+  // Shows a sidebar with a given |sidebar_contents|.
+  virtual void ShowSidebar(content::WebContents* sidebar_contents) = 0;
+  // Hides a sidebar if there are active one.
+  virtual void HideSidebar() = 0;
 };
 
 #endif  // CHROME_BROWSER_UI_EXTENSIONS_EXTENSION_ACTION_PLATFORM_DELEGATE_H_
