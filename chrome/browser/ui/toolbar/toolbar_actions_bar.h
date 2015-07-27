@@ -270,8 +270,8 @@ class ToolbarActionsBar : public ToolbarActionsModel::Observer {
   // from toolbar_actions_).
   ToolbarActionViewController* popup_owner_;
 
-  // The action that triggered the current sidebar (just a reference to an action
-  // from toolbar_actions_).
+  // The action that triggered the current sidebar (just a reference to an
+  // action from toolbar_actions_).
   ToolbarActionViewController* sidebar_owner_;
 
   ScopedObserver<ToolbarActionsModel, ToolbarActionsModel::Observer>

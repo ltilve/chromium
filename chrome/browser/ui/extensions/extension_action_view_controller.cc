@@ -326,7 +326,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
 bool ExtensionActionViewController::TriggerSidebarWithUrl(
     const GURL& popup_url) {
-
   if (sidebar_container_) {
     HideActiveSidebar();
     return false;
@@ -335,14 +334,15 @@ bool ExtensionActionViewController::TriggerSidebarWithUrl(
   HideActiveSidebar();
 
   content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
-  sidebar_container_.reset(new extensions::SidebarContainer(browser_, web_contents, popup_url));
+  sidebar_container_.reset(
+      new extensions::SidebarContainer(browser_, web_contents, popup_url));
 
   if (toolbar_actions_bar_)
     toolbar_actions_bar_->SetSidebarOwner(this);
 
   PressButtonWithSlideOutIfEnabled(
-                        base::Bind(&ExtensionActionViewController::PressButton,
-                        weak_factory_.GetWeakPtr(), true));
+      base::Bind(&ExtensionActionViewController::PressButton,
+                 weak_factory_.GetWeakPtr(), true));
   return true;
 }
 
@@ -395,7 +395,6 @@ void ExtensionActionViewController::OnSidebarSwitched(
     const std::string& old_content_id,
     content::WebContents* new_tab,
     const std::string& new_content_id) {
-
   if (GetPreferredPopupViewController() != this)
     return;
 
@@ -403,7 +402,6 @@ void ExtensionActionViewController::OnSidebarSwitched(
     RaiseButton();
     return;
   }
-
 }
 
 void ExtensionActionViewController::RaiseButton() {

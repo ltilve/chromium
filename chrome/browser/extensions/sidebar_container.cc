@@ -41,7 +41,6 @@ SidebarContainer::~SidebarContainer() {
 void SidebarContainer::TabClosingAt(TabStripModel* tab_strip_model,
                                     content::WebContents* contents,
                                     int index) {
-
 }
 
 void SidebarContainer::Observe(int type,
