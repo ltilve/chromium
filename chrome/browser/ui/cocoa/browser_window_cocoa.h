@@ -180,19 +180,16 @@ class BrowserWindowCocoa
   BrowserWindowController* cocoa_controller() { return controller_; }
 
   // Handle Sidebar
-  void OnSidebarShown(content::WebContents* tab,
-                      content::WebContents* sidebar_contents,
-                      const std::string& content_id);
-  void OnSidebarHidden(content::WebContents* tab,
-                       const std::string& content_id);
+  void ShowSidebar(content::WebContents* sidebar_contents);
+  void HideSidebar();
 
  protected:
   void DestroyBrowser() override;
 
  private:
   NSWindow* window() const;  // Accessor for the (current) |NSWindow|.
-  void UpdateSidebarForContents(content::WebContents* tab_contents,
-                                content::WebContents* sidebar_contents);
+  void UpdateSidebarForContents(content::WebContents* sidebar_contents);
+
   Browser* browser_;  // weak, owned by controller
   BrowserWindowController* controller_;  // weak, owns us
   base::scoped_nsobject<NSString> pending_window_title_;

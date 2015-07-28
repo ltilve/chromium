@@ -12,6 +12,7 @@
 #include "chrome/browser/extensions/extension_view_host.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
+#import "chrome/browser/ui/cocoa/browser_window_cocoa.h"
 #import "chrome/browser/ui/cocoa/browser_window_controller.h"
 #import "chrome/browser/ui/cocoa/extensions/browser_actions_controller.h"
 #import "chrome/browser/ui/cocoa/extensions/extension_popup_controller.h"
@@ -90,6 +91,20 @@ void ExtensionActionPlatformDelegateCocoa::CloseOverflowMenu() {
           toolbarController] wrenchMenuController];
   if ([wrenchMenuController isMenuOpen])
     [wrenchMenuController cancel];
+}
+
+void ExtensionActionPlatformDelegateCocoa::ShowSidebar(content::WebContents* sidebar_contents)
+{
+  BrowserWindowCocoa* window =
+            static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
+  window->ShowSidebar(sidebar_contents);
+}
+
+void ExtensionActionPlatformDelegateCocoa::HideSidebar()
+{
+  BrowserWindowCocoa* window =
+            static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
+  window->HideSidebar();
 }
 
 NSPoint ExtensionActionPlatformDelegateCocoa::GetPopupPoint() const {

@@ -65,8 +65,7 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 }
 
 - (void)updateSidebarForTabContents:(content::WebContents*)tabContents
-                   sidebar_contents:(content::WebContents*)sidebarContents
-                        withContext:(content::BrowserContext*)context {
+                   sidebar_contents:(content::WebContents*)sidebarContents {
 
   if (!contentsController_.get())
     contentsController_.reset(
@@ -83,6 +82,13 @@ const CGFloat kMaximumSidebarWidthRatio = 1.0f / 2.0f;
 
 - (void)ensureContentsVisible {
   [contentsController_ ensureContentsVisible];
+}
+
+- (content::WebContents*)currentSidebarContents {
+  if (!contentsController_.get())
+    return nil;
+
+  return static_cast<content::WebContents*>([contentsController_ webContents]);
 }
 
 - (void)showSidebarContents:(content::WebContents*)sidebarContents {

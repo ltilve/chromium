@@ -317,7 +317,7 @@ void BrowserWindowCocoa::BookmarkBarStateChanged(
 void BrowserWindowCocoa::UpdateDevTools() {
   [controller_ updateDevToolsForContents:
       browser_->tab_strip_model()->GetActiveWebContents()];
-  UpdateSidebarForContents(browser_->tab_strip_model()->GetActiveWebContents());
+  UpdateSidebarForContents(nullptr);
 }
 
 void BrowserWindowCocoa::UpdateLoadingAnimations(bool should_animate) {
@@ -833,11 +833,11 @@ void BrowserWindowCocoa::ShowAvatarBubbleFromAvatarButton(
 }
 
 void BrowserWindowCocoa::UpdateSidebarForContents(
-    content::WebContents* tab_contents,
-    content::WebContents* sidebar_contents) {
-  if (tab_contents == browser_->tab_strip_model()->GetActiveWebContents()) {
-    [controller_ updateSidebarForContents:tab_contents];
-  }
+  content::WebContents* sidebar_contents) {
+  WebContents* web_contents =
+      browser_->tab_strip_model()->GetActiveWebContents();
+  [controller_ updateSidebarForContents:web_contents
+                       sidebar_contents:sidebar_contents];
 }
 
 int
@@ -876,13 +876,10 @@ void BrowserWindowCocoa::HideDownloadShelf() {
     statusBubble->Hide();
 }
 
-void BrowserWindowCocoa::OnSidebarShown(content::WebContents* tab,
-                                        content::WebContents* sidebar_contents,
-                                        const std::string& content_id) {
-  UpdateSidebarForContents(tab, sidebar_contents);
+void BrowserWindowCocoa::ShowSidebar(content::WebContents* sidebar_contents) {
+  UpdateSidebarForContents(sidebar_contents);
 }
 
-void BrowserWindowCocoa::OnSidebarHidden(content::WebContents* tab,
-                                         const std::string& content_id) {
-  UpdateSidebarForContents(tab, nullptr);
+void BrowserWindowCocoa::HideSidebar() {
+  UpdateSidebarForContents(nullptr);
 }
