@@ -37,13 +37,15 @@ class WebContents;
 // Depending on |contents|'s state, decides whether the sidebar
 // should be shown or hidden and adjusts its width (|delegate_| handles
 // the actual resize).
-- (void)updateSidebarForTabContents:(content::WebContents*)contents
-                        withContext:(content::BrowserContext*)context;
+- (void)updateSidebarForTabContents:(content::WebContents*)tabContents
+                   sidebar_contents:(content::WebContents*)sidebarContents;
 
 // Call when the sidebar view is properly sized and the render widget host view
 // should be put into the view hierarchy.
 - (void)ensureContentsVisible;
 
+// This controller's current sidebar contents. Return nil if it is inactivated.
+- (content::WebContents*)currentSidebarContents;
 @end
 
 #endif  // CHROME_BROWSER_UI_COCOA_SIDEBAR_CONTROLLER_H_

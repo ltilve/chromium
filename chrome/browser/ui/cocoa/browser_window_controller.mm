@@ -564,10 +564,11 @@ using content::WebContents;
     [self layoutSubviews];
 }
 
+
 - (void)updateSidebarForContents:(content::WebContents*)tab_contents
                 sidebar_contents:(content::WebContents*)sidebar_contents {
   [sidebarController_ updateSidebarForTabContents:tab_contents
-                                      withContext:browser_->profile()];
+                                 sidebar_contents:sidebar_contents];
   [sidebarController_ ensureContentsVisible];
 }
 
@@ -1503,7 +1504,7 @@ using content::WebContents;
 
   [sidebarController_
       updateSidebarForTabContents:static_cast<content::WebContents*>(contents)
-                      withContext:browser_->profile()];
+      sidebar_contents:[sidebarController_ currentSidebarContents]];
   // Update the bookmark bar.
   // TODO(viettrungluu): perhaps update to not terminate running animations (if
   // applicable)?

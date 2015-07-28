@@ -27,8 +27,6 @@ using bookmarks::BookmarkModel;
 using content::OpenURLParams;
 using content::Referrer;
 
-const char kSimplePage[] = "files/sidebar/simple_page.html";
-
 // Basic sanity check of ViewID use on the mac.
 class ViewIDTest : public InProcessBrowserTest {
  public:
