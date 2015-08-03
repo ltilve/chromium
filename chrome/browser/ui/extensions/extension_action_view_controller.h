@@ -9,7 +9,6 @@
 #include "base/scoped_observer.h"
 #include "chrome/browser/extensions/extension_action_icon_factory.h"
 #include "chrome/browser/extensions/extension_context_menu_model.h"
-#include "chrome/browser/extensions/sidebar_container.h"
 #include "chrome/browser/ui/toolbar/toolbar_action_view_controller.h"
 #include "extensions/browser/extension_host_observer.h"
 #include "ui/gfx/image/image.h"
@@ -89,7 +88,7 @@ class ExtensionActionViewController
   const ExtensionAction* extension_action() const { return extension_action_; }
   ToolbarActionViewDelegate* view_delegate() { return view_delegate_; }
   bool is_showing_popup() const { return popup_host_ != nullptr; }
-  bool is_showing_sidebar() const { return sidebar_container_ != nullptr; }
+  bool is_showing_sidebar() const { return sidebar_host_; }
 
   void set_icon_observer(ExtensionActionIconFactory::Observer* icon_observer) {
     icon_observer_ = icon_observer;
@@ -182,8 +181,8 @@ class ExtensionActionViewController
   // The extension popup's host if the popup is visible; null otherwise.
   extensions::ExtensionViewHost* popup_host_;
 
-  // The sidebar container if the sidebar is visible.
-  scoped_ptr<extensions::SidebarContainer> sidebar_container_;
+  // The extension sidebar's host if the sidebar is visible; null otherwise.
+  scoped_ptr<extensions::ExtensionViewHost> sidebar_host_;
 
   // The context menu model for the extension.
   scoped_refptr<ExtensionContextMenuModel> context_menu_model_;

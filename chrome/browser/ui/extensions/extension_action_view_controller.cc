@@ -325,17 +325,20 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 }
 
 bool ExtensionActionViewController::TriggerSidebarWithUrl(
-    const GURL& popup_url) {
-  if (sidebar_container_) {
+    const GURL& sidebar_url) {
+  if (sidebar_host_) {
     HideActiveSidebar();
     return false;
   }
 
   HideActiveSidebar();
 
-  content::WebContents* web_contents = view_delegate_->GetCurrentWebContents();
-  sidebar_container_.reset(
-      new extensions::SidebarContainer(browser_, web_contents, popup_url));
+  sidebar_host_.reset(
+      extensions::ExtensionViewHostFactory::CreateSidebarHost(sidebar_url,
+                                                              browser_));
+
+  sidebar_host_->CreateRenderViewSoon();
+  sidebar_host_->host_contents()->SetInitialFocus();
 
   DCHECK(toolbar_actions_bar_);
   toolbar_actions_bar_->SetSidebarOwner(this);
@@ -375,10 +378,10 @@ void ExtensionActionViewController::HideActiveSidebar() {
 }
 
 void ExtensionActionViewController::HideSidebar() {
-  if (!sidebar_container_)
+  if (!sidebar_host_)
     return;
 
-  sidebar_container_.reset();
+  sidebar_host_.reset();
   if (toolbar_actions_bar_)
     toolbar_actions_bar_->SetSidebarOwner(nullptr);
 
