@@ -813,8 +813,6 @@
       'browser/extensions/shared_module_service.h',
       'browser/extensions/shared_user_script_master.cc',
       'browser/extensions/shared_user_script_master.h',
-      'browser/extensions/sidebar_container.cc',
-      'browser/extensions/sidebar_container.h',
       'browser/extensions/signin/gaia_auth_extension_loader.cc',
       'browser/extensions/signin/gaia_auth_extension_loader.h',
       'browser/extensions/signin/scoped_gaia_auth_extension.cc',
