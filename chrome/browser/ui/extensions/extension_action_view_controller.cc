@@ -337,8 +337,8 @@ bool ExtensionActionViewController::TriggerSidebarWithUrl(
   sidebar_container_.reset(
       new extensions::SidebarContainer(browser_, web_contents, popup_url));
 
-  if (toolbar_actions_bar_)
-    toolbar_actions_bar_->SetSidebarOwner(this);
+  DCHECK(toolbar_actions_bar_);
+  toolbar_actions_bar_->SetSidebarOwner(this);
 
   PressButtonWithSlideOutIfEnabled(
       base::Bind(&ExtensionActionViewController::PressButton,
@@ -369,14 +369,9 @@ void ExtensionActionViewController::OnPopupClosed() {
 }
 
 void ExtensionActionViewController::HideActiveSidebar() {
-  if (toolbar_actions_bar_) {
-    toolbar_actions_bar_->HideActiveSidebar();
-  } else {
-    DCHECK_EQ(ActionInfo::TYPE_PAGE, extension_action_->action_type());
-    // In the traditional toolbar, page actions only know how to close their own
-    // sidebar.
-    HideSidebar();
-  }
+  DCHECK(toolbar_actions_bar_);
+  DCHECK_EQ(ActionInfo::TYPE_BROWSER, extension_action_->action_type());
+  toolbar_actions_bar_->HideActiveSidebar();
 }
 
 void ExtensionActionViewController::HideSidebar() {
