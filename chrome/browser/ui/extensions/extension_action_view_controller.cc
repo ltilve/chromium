@@ -405,8 +405,10 @@ void ExtensionActionViewController::PressButtonWithSlideOutIfEnabled(
   }
 
   // We disabled PopOutAction for sidebar
-  if (extension_action_->open_in_sidebar())
+  if (extension_action_->open_in_sidebar()) {
+    closure.Run();
     return;
+  }
 
   platform_delegate_->CloseOverflowMenu();
   toolbar_actions_bar_->PopOutAction(this, closure);
