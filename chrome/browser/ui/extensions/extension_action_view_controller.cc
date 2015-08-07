@@ -369,7 +369,9 @@ void ExtensionActionViewController::OnPopupClosed() {
     popup_host_observer_.Remove(popup_host_);
     popup_host_ = nullptr;
   }
-  toolbar_actions_bar_->SetPopupOwner(nullptr);
+  if (toolbar_actions_bar_)
+    toolbar_actions_bar_->SetPopupOwner(nullptr);
+
   RaiseButton();
 }
 
