@@ -93,17 +93,16 @@ void ExtensionActionPlatformDelegateCocoa::CloseOverflowMenu() {
     [wrenchMenuController cancel];
 }
 
-void ExtensionActionPlatformDelegateCocoa::ShowSidebar(content::WebContents* sidebar_contents)
-{
+void ExtensionActionPlatformDelegateCocoa::ShowSidebar(
+    content::WebContents* sidebar_contents) {
   BrowserWindowCocoa* window =
-            static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
+      static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
   window->ShowSidebar(sidebar_contents);
 }
 
-void ExtensionActionPlatformDelegateCocoa::HideSidebar()
-{
+void ExtensionActionPlatformDelegateCocoa::HideSidebar() {
   BrowserWindowCocoa* window =
-            static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
+      static_cast<BrowserWindowCocoa*>(controller_->browser()->window());
   window->HideSidebar();
 }
 
