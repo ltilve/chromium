@@ -328,6 +328,13 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
 bool ExtensionActionViewController::TriggerSidebarWithUrl(
     const GURL& sidebar_url) {
+
+  // Sidebar is only allowed via browser action
+  if (ActionInfo::TYPE_BROWSER != extension_action_->action_type())
+    return false;
+
+  DCHECK(toolbar_actions_bar_);
+
   if (sidebar_host_) {
     HideActiveSidebar();
     return false;
