@@ -16,17 +16,13 @@
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_builder.h"
-
-using content::NavigationController;
-using content::WebContents;
 
 namespace extensions {
 
-class SidebarTest : public ExtensionBrowserTest {
+class SidebarBrowserTest : public ExtensionBrowserTest {
  public:
-  SidebarTest() {}
-  ~SidebarTest() override {}
+  SidebarBrowserTest() {}
+  ~SidebarBrowserTest() override {}
 
  protected:
   // InProcessBrowserTest
@@ -43,15 +39,14 @@ class SidebarTest : public ExtensionBrowserTest {
     secondExtension_ = LoadExtension(extension_path.AppendASCII("sidebar2"));
     ASSERT_TRUE(secondExtension_);
 
-    ASSERT_NE(firstExtension_->id(),secondExtension_->id());
+    ASSERT_NE(firstExtension_->id(), secondExtension_->id());
 
     browser_action_test_util_.reset(new BrowserActionTestUtil(browser()));
   }
 
-  ExtensionAction* GetBrowserAction(const Extension& extension) {
-    return ExtensionActionManager::Get(browser()->profile())
-        ->GetBrowserAction(extension);
-  }
+  const ExtensionId first_extension_id() { return firstExtension_->id(); }
+
+  const ExtensionId second_extension_id() { return secondExtension_->id(); }
 
   void ClickExtensionBrowserAction() {
     browser_action_test_util_.get()->Press(0);
@@ -61,55 +56,39 @@ class SidebarTest : public ExtensionBrowserTest {
     return browser_action_test_util_->GetToolbarActionsBar();
   }
 
+  ExtensionAction* GetBrowserAction(const Extension& extension) {
+    return ExtensionActionManager::Get(browser()->profile())
+        ->GetBrowserAction(extension);
+  }
+
   void DisableOpenInSidebar() {
     GetBrowserAction(*firstExtension_)->set_open_in_sidebar(false);
     GetBrowserAction(*secondExtension_)->set_open_in_sidebar(false);
   }
 
-  ExtensionActionViewController* getExtensionActionViewController() {
-    return static_cast<ExtensionActionViewController*>(
-        browser_action_test_util_.get()
-            ->GetToolbarActionsBar()
-            ->GetActions()[0]);
-  }
-
-  bool HasSidebarForCurrentTab() {
-    return getExtensionActionViewController()->is_showing_sidebar();
-  }
-
-  bool isShowingSidebarForExtension(const ExtensionId id) {
+  bool IsShowingSidebar(const ExtensionId id) {
     ExtensionActionViewController* controller;
-    for (unsigned int i = 0; i < toolbar_actions_bar()->GetActions().size(); i++) {
-      controller = static_cast<ExtensionActionViewController*>(toolbar_actions_bar()->GetActions()[i]);
-      if ( controller->extension()->id() == id) {
+    for (unsigned int i = 0; i < toolbar_actions_bar()->GetActions().size();
+         i++) {
+      controller = static_cast<ExtensionActionViewController*>(
+          toolbar_actions_bar()->GetActions()[i]);
+      if (controller->extension()->id() == id) {
         return controller->is_showing_sidebar();
       }
     }
     return false;
   }
 
-  void clickBrowserActionForExtension(const ExtensionId id) {
-  ExtensionActionViewController* controller;
-    for (unsigned int i = 0; i < toolbar_actions_bar()->GetActions().size(); i++) {
-      controller = static_cast<ExtensionActionViewController*>(toolbar_actions_bar()->GetActions()[i]);
-      if ( controller->extension()->id() == id) {
+  void ClickBrowserAction(const ExtensionId id) {
+    ExtensionActionViewController* controller;
+    for (unsigned int i = 0; i < toolbar_actions_bar()->GetActions().size();
+         i++) {
+      controller = static_cast<ExtensionActionViewController*>(
+          toolbar_actions_bar()->GetActions()[i]);
+      if (controller->extension()->id() == id) {
         browser_action_test_util_.get()->Press(i);
       }
     }
-  }
-
-  bool isShowingFirstExtension() {
-    return isShowingSidebarForExtension(firstExtension_->id());
-  }
-  void clickFirstExtension() {
-    clickBrowserActionForExtension(firstExtension_->id());
-  }
-
-  bool isShowingSecondExtension() {
-    return isShowingSidebarForExtension(secondExtension_->id());
-  }
-  void clickSecondExtension() {
-    clickBrowserActionForExtension(secondExtension_->id());
   }
 
  private:
@@ -119,50 +98,50 @@ class SidebarTest : public ExtensionBrowserTest {
 };
 
 // 1 - Tests that cliking on the browser action show/hides the sidebar
-IN_PROC_BROWSER_TEST_F(SidebarTest, CreateSidebar) {
-  EXPECT_FALSE(HasSidebarForCurrentTab());
-  ClickExtensionBrowserAction();
-  EXPECT_TRUE(HasSidebarForCurrentTab());
-  ClickExtensionBrowserAction();
-  EXPECT_FALSE(HasSidebarForCurrentTab());
+IN_PROC_BROWSER_TEST_F(SidebarBrowserTest, CreateSidebar) {
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
+  ClickBrowserAction(first_extension_id());
+  EXPECT_TRUE(IsShowingSidebar(first_extension_id()));
+  ClickBrowserAction(first_extension_id());
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
 }
 
-// 2 - Tests that sidebar visible at the other tabs
-IN_PROC_BROWSER_TEST_F(SidebarTest, SwitchingTabs) {
+// Tests that sidebar visible at the other tabs
+IN_PROC_BROWSER_TEST_F(SidebarBrowserTest, SwitchingTabs) {
   // Open sidebar and move to a new tab
-  ClickExtensionBrowserAction();
+  ClickBrowserAction(first_extension_id());
   AddTabAtIndex(0, GURL(url::kAboutBlankURL), ui::PAGE_TRANSITION_TYPED);
-  EXPECT_TRUE(HasSidebarForCurrentTab());
+  EXPECT_TRUE(IsShowingSidebar(first_extension_id()));
 
   // Close sidebar and switch back to the first tab
-  ClickExtensionBrowserAction();
+  ClickBrowserAction(first_extension_id());
   TabStripModel* tab_strip_model = browser()->tab_strip_model();
   tab_strip_model->ActivateTabAt(0, false);
-  EXPECT_FALSE(HasSidebarForCurrentTab());
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
 }
 
-// 3 - Tests that sidebars are not shown if open_in_sidebar: false
-IN_PROC_BROWSER_TEST_F(SidebarTest, CreateDisabledSidebar) {
+// Tests that sidebars are not shown if open_in_sidebar: false
+IN_PROC_BROWSER_TEST_F(SidebarBrowserTest, CreateDisabledSidebar) {
   DisableOpenInSidebar();
-  ClickExtensionBrowserAction();
-  EXPECT_FALSE(HasSidebarForCurrentTab());
+  ClickBrowserAction(first_extension_id());
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
 }
 
+// Tests that cliking on the browser action show/hides the sidebar
+IN_PROC_BROWSER_TEST_F(SidebarBrowserTest, MultipleExtensions) {
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
+  EXPECT_FALSE(IsShowingSidebar(second_extension_id()));
+  ClickBrowserAction(first_extension_id());
+  EXPECT_TRUE(IsShowingSidebar(first_extension_id()));
+  EXPECT_FALSE(IsShowingSidebar(second_extension_id()));
 
-// 4 - Tests that cliking on the browser action show/hides the sidebar
-IN_PROC_BROWSER_TEST_F(SidebarTest, MultipleExtensions) {
-  EXPECT_FALSE(isShowingFirstExtension());
-  EXPECT_FALSE(isShowingSecondExtension());
-  clickFirstExtension();
-  EXPECT_TRUE(isShowingFirstExtension());
-  EXPECT_FALSE(isShowingSecondExtension());
-  clickSecondExtension();
-  EXPECT_FALSE(isShowingFirstExtension());
-  EXPECT_TRUE(isShowingSecondExtension());
-  clickSecondExtension();
-  EXPECT_FALSE(isShowingFirstExtension());
-  EXPECT_FALSE(isShowingSecondExtension());
+  ClickBrowserAction(second_extension_id());
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
+  EXPECT_TRUE(IsShowingSidebar(second_extension_id()));
+
+  ClickBrowserAction(second_extension_id());
+  EXPECT_FALSE(IsShowingSidebar(first_extension_id()));
+  EXPECT_FALSE(IsShowingSidebar(second_extension_id()));
 }
-
 
 }  // namespace extensions
