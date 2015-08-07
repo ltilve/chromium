@@ -33,10 +33,12 @@ class SidebarBrowserTest : public ExtensionBrowserTest {
     base::FilePath extension_path;
     ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
 
-    firstExtension_ = LoadExtension(extension_path.AppendASCII("sidebar"));
+    firstExtension_ =
+        LoadExtension(extension_path.AppendASCII("extensions/sidebar"));
     ASSERT_TRUE(firstExtension_);
 
-    secondExtension_ = LoadExtension(extension_path.AppendASCII("sidebar2"));
+    secondExtension_ =
+        LoadExtension(extension_path.AppendASCII("extensions/sidebar2"));
     ASSERT_TRUE(secondExtension_);
 
     ASSERT_NE(firstExtension_->id(), secondExtension_->id());
