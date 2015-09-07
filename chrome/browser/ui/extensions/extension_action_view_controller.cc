@@ -416,7 +416,7 @@ void ExtensionActionViewController::RaiseButton() {
 
 void ExtensionActionViewController::PressButtonWithSlideOutIfEnabled(
     const base::Closure& closure) {
-  if (!toolbar_actions_bar_ || toolbar_actions_bar_->IsActionVisible(this) ||
+  if (!toolbar_actions_bar_ || toolbar_actions_bar_->IsActionVisibleOnMainBar(this) ||
       !extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
     closure.Run();
     return;
