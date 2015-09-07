@@ -66,6 +66,7 @@ ExtensionViewHost::ExtensionViewHost(
       associated_web_contents_(NULL) {
   // Not used for panels, see PanelHost.
   DCHECK(host_type == VIEW_TYPE_EXTENSION_DIALOG ||
+         host_type == VIEW_TYPE_EXTENSION_SIDEBAR ||
          host_type == VIEW_TYPE_EXTENSION_POPUP);
 
   // Attach WebContents helpers. Extension tabs automatically get them attached
