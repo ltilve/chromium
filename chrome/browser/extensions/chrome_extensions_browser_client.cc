@@ -346,6 +346,7 @@ void ChromeExtensionsBrowserClient::AttachExtensionTaskManagerTag(
     case VIEW_TYPE_EXTENSION_BACKGROUND_PAGE:
     case VIEW_TYPE_EXTENSION_DIALOG:
     case VIEW_TYPE_EXTENSION_POPUP:
+    case VIEW_TYPE_EXTENSION_SIDEBAR:
     case VIEW_TYPE_LAUNCHER_PAGE:
     case VIEW_TYPE_VIRTUAL_KEYBOARD:
       // These are the only types that are tracked by the ExtensionTag.
