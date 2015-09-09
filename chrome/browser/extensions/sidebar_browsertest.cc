@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/files/file_path.h"
-#include "base/path_service.h"
 #include "chrome/browser/extensions/browser_action_test_util.h"
 #include "chrome/browser/extensions/extension_action_manager.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
@@ -13,7 +11,6 @@
 #include "chrome/browser/ui/extensions/extension_action_view_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_bar.h"
-#include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "extensions/common/extension.h"
 
@@ -29,16 +26,13 @@ class SidebarBrowserTest : public ExtensionBrowserTest {
   void SetUpOnMainThread() override {
     ExtensionBrowserTest::SetUpOnMainThread();
 
-    // Load test sidebar extension.
-    base::FilePath extension_path;
-    ASSERT_TRUE(PathService::Get(chrome::DIR_TEST_DATA, &extension_path));
-
+    // Load test sidebar extensions
     firstExtension_ =
-        LoadExtension(extension_path.AppendASCII("extensions/sidebar"));
+        LoadExtension(test_data_dir_.AppendASCII("sidebar"));
     ASSERT_TRUE(firstExtension_);
 
     secondExtension_ =
-        LoadExtension(extension_path.AppendASCII("extensions/sidebar2"));
+        LoadExtension(test_data_dir_.AppendASCII("sidebar2"));
     ASSERT_TRUE(secondExtension_);
 
     ASSERT_NE(firstExtension_->id(), secondExtension_->id());
