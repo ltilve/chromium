@@ -27,12 +27,10 @@ class SidebarBrowserTest : public ExtensionBrowserTest {
     ExtensionBrowserTest::SetUpOnMainThread();
 
     // Load test sidebar extensions
-    firstExtension_ =
-        LoadExtension(test_data_dir_.AppendASCII("sidebar"));
+    firstExtension_ = LoadExtension(test_data_dir_.AppendASCII("sidebar"));
     ASSERT_TRUE(firstExtension_);
 
-    secondExtension_ =
-        LoadExtension(test_data_dir_.AppendASCII("sidebar2"));
+    secondExtension_ = LoadExtension(test_data_dir_.AppendASCII("sidebar2"));
     ASSERT_TRUE(secondExtension_);
 
     ASSERT_NE(firstExtension_->id(), secondExtension_->id());

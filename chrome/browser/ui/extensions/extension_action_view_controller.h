@@ -160,7 +160,6 @@ class ExtensionActionViewController
       content::WebContents* web_contents,
       const gfx::Size& size);
 
-
   // The extension associated with the action we're displaying.
   scoped_refptr<const extensions::Extension> extension_;
 

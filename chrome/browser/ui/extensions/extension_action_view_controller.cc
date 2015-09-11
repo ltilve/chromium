@@ -328,7 +328,6 @@ bool ExtensionActionViewController::TriggerPopupWithUrl(
 
 bool ExtensionActionViewController::TriggerSidebarWithUrl(
     const GURL& sidebar_url) {
-
   // Sidebar is only allowed via browser action
   if (ActionInfo::TYPE_BROWSER != extension_action_->action_type())
     return false;
@@ -342,9 +341,8 @@ bool ExtensionActionViewController::TriggerSidebarWithUrl(
 
   HideActiveSidebar();
 
-  sidebar_host_.reset(
-      extensions::ExtensionViewHostFactory::CreateSidebarHost(sidebar_url,
-                                                              browser_));
+  sidebar_host_.reset(extensions::ExtensionViewHostFactory::CreateSidebarHost(
+      sidebar_url, browser_));
 
   sidebar_host_->CreateRenderViewSoon();
   sidebar_host_->host_contents()->SetInitialFocus();
@@ -412,7 +410,8 @@ void ExtensionActionViewController::RaiseButton() {
 
 void ExtensionActionViewController::PressButtonWithSlideOutIfEnabled(
     const base::Closure& closure) {
-  if (!toolbar_actions_bar_ || toolbar_actions_bar_->IsActionVisibleOnMainBar(this) ||
+  if (!toolbar_actions_bar_ ||
+      toolbar_actions_bar_->IsActionVisibleOnMainBar(this) ||
       !extensions::FeatureSwitch::extension_action_redesign()->IsEnabled()) {
     closure.Run();
     return;
@@ -467,4 +466,3 @@ ExtensionActionViewController::GetIconImageSource(
 
   return image_source.Pass();
 }
-
